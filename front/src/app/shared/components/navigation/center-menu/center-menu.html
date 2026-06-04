@@ -1,0 +1,354 @@
+<a
+  class="overlay-sidebar-header"
+  [class.overlay-sidebar-header-open]="openSide"
+  (click)="closeOverlay()"
+></a>
+<div class="responsive-btn float-right">
+  <a (click)="toggleSidebar()"><i class="fa fa-bars" aria-hidden="true"></i></a>
+</div>
+<div
+  class="navbar ml-md-auto ml-lg-0 res-width"
+  id="togglebtn"
+  [class.openSidebar]="openSide"
+>
+  <div class="responsive-btn">
+    <a (click)="toggleSidebar()">
+      <h5>back</h5>
+    </a>
+  </div>
+  <ul class="navbar-nav mr-auto">
+    <!-- 1st Level Menu -->
+    @for(menuItem of menuItems| slice : 0 : 3; track menuItem){
+    <li [class]="menuItem.megaMenu ? 'mega-menu' : ''">
+      <!-- Sub -->
+      @if(menuItem.type === 'sub'){
+      <a
+        href="javascript:void(0)"
+        class="dropdown"
+        (click)="setActive(menuItem.title)"
+      >
+        {{menuItem.title}}
+      </a>
+      }
+      <!-- Link -->
+      @if(menuItem.type === 'link'){
+      <a
+        [routerLink]="!menuItem.type ? null : [menuItem.path]"
+        routerLinkActive="active"
+        class="dropdown"
+      >
+        {{menuItem.title}}
+      </a>
+      }
+      <!-- External Link -->
+      @if(menuItem.type === 'extLink'){
+      <a href="{{ !menuItem.type ? null : menuItem.path }}" class="dropdown">
+        {{menuItem.title}}
+      </a>
+      }
+
+      <!-- External Tab Link -->
+      @if(menuItem.type === 'extTabLink'){
+      <a href="{{ !menuItem.type ? null : menuItem.path }}">
+        {{menuItem.title}}
+      </a>
+      }
+
+      <!-- Mega menu -->
+      @if(menuItem.megaMenu && menuItem.megaMenuType === 'small' ||
+      menuItem.megaMenuType === 'medium' || menuItem.megaMenuType === 'large'){
+      <div
+        class="mega-menu-container"
+        [class.opensubmenu]="isActive(menuItem.title)"
+      >
+        <div class="container">
+          <div class="row">
+            @for(childrenItem of menuItem.children; track childrenItem){
+            <div
+              [class]="menuItem.megaMenuType === 'small' ? 'col-lg-4' : menuItem.megaMenuType === 'medium' ? 'col-lg-3' : menuItem.megaMenuType ==='large'? 'col' :'' "
+            >
+              <div class="menu-container">
+                <a
+                  class="menu-head"
+                  (click)="setChildActive(childrenItem.title)"
+                  >{{childrenItem.title}}</a
+                >
+                <ul
+                  [class.menu-icon]="menuItem.title === 'Elements'"
+                  [class.openSubChildMenu]="ischildActive(childrenItem.title)"
+                >
+                  @for(subChildrenItem of childrenItem.children; track
+                  subChildrenItem){
+                  <li>
+                    @if(subChildrenItem.type === 'link'){
+                    <a
+                      [routerLink]="!subChildrenItem.type ? null : [subChildrenItem.path]"
+                      routerLinkActive="active"
+                    >
+                      <i class="icon-{{subChildrenItem.icon}}"></i
+                      >{{subChildrenItem.title}}</a
+                    >
+                    }
+                  </li>
+                  }
+                </ul>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+      } @if(menuItem.children && !menuItem.megaMenu){
+      <!-- 2nd Level Menu -->
+      <ul [class.opensubmenu]="isActive(menuItem.title)">
+        <!-- Simple Menu Start-->
+        @for(childrenItem of menuItem.children; track childrenItem){
+        <li [class.sub-menu]="childrenItem.children">
+          <!-- Sub -->
+          @if(childrenItem.type === 'sub'){
+          <a
+            href="javascript:void(0)"
+            (click)="setChildActive(childrenItem.title)"
+          >
+            {{childrenItem.title}}
+          </a>
+          }
+          <!-- Link -->
+          @if(childrenItem.type === 'link' && !menuItem.megaMenu){
+          <a
+            [routerLink]="!childrenItem.type ? null : [childrenItem.path]"
+            routerLinkActive="active"
+          >
+            {{childrenItem.title}}
+          </a>
+          }
+          <!-- External Link -->
+          @if(childrenItem.type === 'extLink' && !menuItem.megaMenu){
+          <a href="{{ !childrenItem.type ? null : childrenItem.path }}">
+            {{childrenItem.title}}
+          </a>
+          } @if(childrenItem.type === 'extTabLink' && !menuItem.megaMenu){
+          <!-- External Tab Link -->
+          <a
+            href="{{ !childrenItem.type ? null : childrenItem.path }}"
+            target="_blank"
+          >
+            {{childrenItem.title}}
+          </a>
+          } @if(childrenItem.children){
+          <ul [class.openSubChildMenu]="ischildActive(childrenItem.title)">
+            @for(subChildrenItem of childrenItem.children; track subChildrenItem
+            ){
+            <li>
+              <!-- Sub -->
+              @if(subChildrenItem.type === 'sub'){
+              <a href="javascript:void(0)"> {{subChildrenItem.title}} </a>
+              }
+              <!-- Link -->
+              @if(subChildrenItem.type === 'link' && !menuItem.megaMenu){
+              <a
+                [routerLink]="!subChildrenItem.type ? null : [subChildrenItem.path]"
+                routerLinkActive="active"
+              >
+                {{subChildrenItem.title}}
+              </a>
+              }
+              <!-- External Link -->
+              @if(subChildrenItem.type === 'extLink' && !menuItem.megaMenu){
+              <a
+                href="{{ !subChildrenItem.type ? null : subChildrenItem.path }}"
+              >
+                {{subChildrenItem.title}}
+              </a>
+              }
+              <!-- External Tab Link -->
+              @if(subChildrenItem.type === 'extTabLink' && !menuItem.megaMenu){
+              <a
+                href="{{ !subChildrenItem.type ? null : subChildrenItem.path }}"
+                target="_blank"
+              >
+                {{subChildrenItem.title}}
+              </a>
+
+              }
+            </li>
+            }
+          </ul>
+          }
+        </li>
+        }
+      </ul>
+      }
+    </li>
+    }
+  </ul>
+  <ul class="navbar-nav ml-auto">
+    <!-- 1st Level Menu -->
+    @for(menuItem of menuItems | slice : 3:7 ; track menuItem){
+    <li [class]="menuItem.megaMenu ? 'mega-menu' : ''">
+      <!-- Sub -->
+      @if(menuItem.type === 'sub'){
+      <a
+        href="javascript:void(0)"
+        class="dropdown"
+        (click)="setActive(menuItem?.title)"
+      >
+        {{menuItem.title}}
+      </a>
+      }
+      <!-- Link -->
+      @if(menuItem.type === 'link'){
+      <a
+        [routerLink]="!menuItem.type ? null : [menuItem.path]"
+        routerLinkActive="active"
+        class="dropdown"
+      >
+        {{menuItem.title}}
+      </a>
+      }
+      <!-- External Link -->
+      @if(menuItem.type === 'extLink'){
+      <a href="{{ !menuItem.type ? null : menuItem.path }}" class="dropdown">
+        {{menuItem.title}}
+      </a>
+      }
+      <!-- External Tab Link -->
+      @if(menuItem.type === 'extTabLink'){
+      <a href="{{ !menuItem.type ? null : menuItem.path }}">
+        {{menuItem.title}}
+      </a>
+      }
+
+      <!-- Mega menu -->
+      @if(menuItem.megaMenu && menuItem.megaMenuType === 'small' ||
+      menuItem.megaMenuType === 'medium' || menuItem.megaMenuType === 'large'){
+      <div
+        class="mega-menu-container"
+        [class.opensubmenu]="isActive(menuItem.title)"
+      >
+        <div class="container">
+          <div class="row">
+            @for(childrenItem of menuItem.children; track childrenItem){
+            <div
+              [class]="menuItem.megaMenuType === 'small' ? 'col-lg-4' : menuItem.megaMenuType === 'medium' ? 'col-lg-3' : menuItem.megaMenuType ==='large'? 'col' :'' "
+            >
+              <div class="menu-container">
+                <a
+                  class="menu-head"
+                  (click)="setChildActive(childrenItem.title)"
+                  >{{childrenItem.title}}</a
+                >
+                <ul
+                  [class.menu-icon]="menuItem.title === 'Elements'"
+                  [class.openSubChildMenu]="ischildActive(childrenItem.title)"
+                >
+                  @for(subChildrenItem of childrenItem.children; track
+                  subChildrenItem){
+                  <li>
+                    @if(subChildrenItem.type === 'link'){
+                    <a
+                      [routerLink]="!subChildrenItem.type ? null : [subChildrenItem.path]"
+                      routerLinkActive="active"
+                    >
+                      <i class="icon-{{subChildrenItem.icon}}"></i
+                      >{{subChildrenItem.title}}</a
+                    >
+                    }
+                  </li>
+                  }
+                </ul>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- 2nd Level Menu -->
+      @if(menuItem.children && !menuItem.megaMenu){
+      <ul [class.opensubmenu]="isActive(menuItem.title)">
+        <!-- Simple Menu Start-->
+        @for(childrenItem of menuItem.children; track childrenItem){
+        <li [class.sub-menu]="childrenItem.children">
+          <!-- Sub -->
+          @if(childrenItem.type === 'sub'){
+          <a
+            href="javascript:void(0)"
+            (click)="setChildActive(childrenItem.title)"
+          >
+            {{childrenItem.title}}
+          </a>
+          }
+          <!-- Link -->
+          @if(childrenItem.type === 'link' && !menuItem.megaMenu){
+          <a
+            [routerLink]="!childrenItem.type ? null : [childrenItem.path]"
+            routerLinkActive="active"
+          >
+            {{childrenItem.title}}
+          </a>
+
+          }
+          <!-- External Link -->
+          @if(childrenItem.type === 'extLink' && !menuItem.megaMenu){
+          <a href="{{ !childrenItem.type ? null : childrenItem.path }}">
+            {{childrenItem.title}}
+          </a>
+          }
+          <!-- External Tab Link -->
+          @if(childrenItem.type === 'extTabLink' && !menuItem.megaMenu){
+          <a
+            href="{{ !childrenItem.type ? null : childrenItem.path }}"
+            target="_blank"
+          >
+            {{childrenItem.title}}
+          </a>
+          } @if(childrenItem.children){
+          <ul [class.openSubChildMenu]="ischildActive(childrenItem.title)">
+            @for(subChildrenItem of childrenItem.children; track
+            subChildrenItem){
+            <li>
+              <!-- Sub -->
+              @if(subChildrenItem.type === 'sub'){
+              <a href="javascript:void(0)"> {{subChildrenItem.title}} </a>
+              }
+              <!-- Link -->
+              @if(subChildrenItem.type === 'link' && !menuItem.megaMenu){
+              <a
+                [routerLink]="!subChildrenItem.type ? null : [subChildrenItem.path]"
+                routerLinkActive="active"
+              >
+                {{subChildrenItem.title}}
+              </a>
+              }
+              <!-- External Link -->
+              @if(subChildrenItem.type === 'extLink' && !menuItem.megaMenu){
+              <a
+                href="{{ !subChildrenItem.type ? null : subChildrenItem.path }}"
+              >
+                {{subChildrenItem.title}}
+              </a>
+              }
+              <!-- External Tab Link -->
+              @if(subChildrenItem.type === 'extTabLink' && !menuItem.megaMenu){
+              <a
+                href="{{ !subChildrenItem.type ? null : subChildrenItem.path }}"
+                target="_blank"
+              >
+                {{subChildrenItem.title}}
+              </a>
+              }
+            </li>
+            }
+          </ul>
+          }
+        </li>
+
+        }
+      </ul>
+      }
+    </li>
+    }
+  </ul>
+</div>

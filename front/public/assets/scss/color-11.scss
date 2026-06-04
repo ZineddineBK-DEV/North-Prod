@@ -1,0 +1,10 @@
+@import "theme/variable";
+$primary: #c0882f;
+$secondary: #595959;
+$dark: #bf862d;
+$light: #ecc878;
+@import "theme/style";
+@import "theme/responsive";
+@import "theme/customize";
+@import "theme/theme-dark";
+@import "theme/theme-rtl";
