@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files
+.env
+*.env.local
+*.env.production
+
+# Uploads (local files, not tracked)
+northprod-api/uploads/avatars/*
+northprod-api/uploads/covers/*
+northprod-api/uploads/projects/*
+northprod-api/uploads/messages/*
+northprod-api/uploads/portfolio/*
+northprod-api/uploads/hero/*
+northprod-api/uploads/temp/*
+!northprod-api/uploads/**/.gitkeep
+
+# Build outputs
+dist/
+.angular/
+*.js.map
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
