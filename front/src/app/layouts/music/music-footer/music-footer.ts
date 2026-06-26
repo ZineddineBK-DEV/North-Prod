@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TapToTop } from '../../../shared/components/tap-to-top/tap-to-top';
 
 @Component({
   selector: 'app-music-footer',
   templateUrl: './music-footer.html',
   styleUrls: ['./music-footer.scss'],
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, TapToTop],
 })
 export class MusicFooter {
   private fb = inject(FormBuilder);

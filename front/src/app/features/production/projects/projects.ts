@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-production-projects',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   template: `
     <div class="production-page">
       <h2>Projets</h2>
