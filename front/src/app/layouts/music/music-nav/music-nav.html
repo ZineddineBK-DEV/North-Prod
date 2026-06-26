@@ -1,16 +1,102 @@
-<!-- Nav Start-->
-<header class="music loding-header header-fixed">
+<!-- NORTH PROD Navbar -->
+<header class="northprod-nav" [class.scrolled]="isScrolled">
   <div class="container">
-    <div class="row">
-      <div class="col">
-        <nav>
-          <a href="#" class="d-inline-block m-r-auto">
-            <img src="assets/images/logo/1.png" alt="" class="img-fluid" />
-          </a>
-          <app-menu />
-        </nav>
+    <nav class="nav-inner">
+
+      <!-- Logo -->
+      <a routerLink="/" class="nav-logo">
+        <span class="logo-text">NORTH <span class="logo-accent">PROD</span></span>
+        <span class="logo-sub">STUDIO</span>
+      </a>
+
+      <!-- Desktop menu -->
+      <ul class="nav-links desktop-only">
+        @for(item of menuItems; track item.title) {
+          <li>
+            <a [routerLink]="item.path" routerLinkActive="active"
+               [routerLinkActiveOptions]="{exact: item.path === '/'}">
+              {{ item.title }}
+            </a>
+          </li>
+        }
+      </ul>
+
+      <!-- Auth buttons / User avatar -->
+      <div class="nav-actions desktop-only">
+        @if(!authService.isLoggedIn()) {
+          <a routerLink="/auth/login" class="btn-nav-outline">Connexion</a>
+          <a routerLink="/auth/register" class="btn-nav-primary">Réserver</a>
+        } @else {
+          <!-- Notification bell -->
+          <button class="nav-bell" (click)="toggleNotifications()">
+            <i class="fa fa-bell"></i>
+            @if(notifService.unreadCount() > 0) {
+              <span class="badge">{{ notifService.unreadCount() }}</span>
+            }
+          </button>
+          <!-- User dropdown -->
+          <div class="nav-user" (click)="toggleUserMenu()" clickOutside (clickOutside)="closeUserMenu()">
+            <div class="user-avatar">
+              @if(authService.currentUser()?.avatarUrl) {
+                <img [src]="authService.currentUser()!.avatarUrl!" [alt]="authService.currentUser()!.aka" />
+              } @else {
+                <span>{{ authService.currentUser()!.aka[0].toUpperCase() }}</span>
+              }
+            </div>
+            <span class="user-aka">{{ authService.currentUser()?.aka }}</span>
+            <i class="fa fa-chevron-down"></i>
+
+            @if(userMenuOpen) {
+              <div class="user-dropdown">
+                @if(authService.isArtist()) {
+                  <a routerLink="/artist/dashboard"><i class="fa fa-tachometer"></i> Mon Espace</a>
+                  <a routerLink="/artist/bookings"><i class="fa fa-calendar"></i> Réservations</a>
+                  <a routerLink="/artist/projects"><i class="fa fa-music"></i> Projets</a>
+                  <a routerLink="/artist/messages"><i class="fa fa-comments"></i> Messages</a>
+                  <a routerLink="/artist/profile"><i class="fa fa-user"></i> Profil</a>
+                }
+                @if(authService.isProduction()) {
+                  <a routerLink="/production/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
+                  <a routerLink="/production/bookings"><i class="fa fa-calendar"></i> Réservations</a>
+                  <a routerLink="/production/projects"><i class="fa fa-music"></i> Projets</a>
+                }
+                @if(authService.isAdmin()) {
+                  <a routerLink="/admin/dashboard"><i class="fa fa-cog"></i> Admin</a>
+                }
+                <hr />
+                <button (click)="logout()"><i class="fa fa-sign-out"></i> Déconnexion</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Hamburger (mobile) -->
+      <button class="hamburger mobile-only" (click)="toggleMobile()" [class.open]="mobileOpen">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Mobile sidebar -->
+  <div class="mobile-sidebar" [class.open]="mobileOpen">
+    <div class="mobile-sidebar-inner">
+      <div class="mobile-logo">NORTH <span>PROD</span></div>
+      <ul>
+        @for(item of menuItems; track item.title) {
+          <li><a [routerLink]="item.path" (click)="closeMobile()">{{ item.title }}</a></li>
+        }
+      </ul>
+      <div class="mobile-auth">
+        @if(!authService.isLoggedIn()) {
+          <a routerLink="/auth/login" class="btn-nav-outline" (click)="closeMobile()">Connexion</a>
+          <a routerLink="/auth/register" class="btn-nav-primary" (click)="closeMobile()">Réserver</a>
+        } @else {
+          <a [routerLink]="authService.isArtist() ? '/artist/dashboard' : authService.isAdmin() ? '/admin/dashboard' : '/production/dashboard'" (click)="closeMobile()">Mon Espace</a>
+          <button class="btn-logout" (click)="logout()">Déconnexion</button>
+        }
       </div>
     </div>
   </div>
+  <div class="mobile-overlay" [class.open]="mobileOpen" (click)="closeMobile()"></div>
 </header>
-<!-- Nav end-->

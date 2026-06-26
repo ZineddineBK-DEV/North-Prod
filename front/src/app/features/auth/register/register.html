@@ -1,0 +1,128 @@
+<div class="auth-page">
+  <div class="auth-bg"></div>
+  <div class="auth-card wide">
+    <div class="auth-header">
+      <a routerLink="/" class="auth-logo">NORTH <span>PROD</span></a>
+      <h1>Créer un compte artiste</h1>
+      <p>Rejoignez NORTH PROD et gérez votre espace studio</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step" [class.active]="step() >= 1" [class.done]="step() > 1">
+        <span>1</span> Compte
+      </div>
+      <div class="step-line" [class.active]="step() > 1"></div>
+      <div class="step" [class.active]="step() >= 2">
+        <span>2</span> Profil artiste
+      </div>
+    </div>
+
+    @if(success) {
+      <div class="auth-success">
+        <i class="fa fa-check-circle"></i>
+        <h3>Compte créé avec succès !</h3>
+        <p>Un email de vérification vous a été envoyé à <strong>{{ email.value }}</strong>. Vérifiez votre boîte mail pour activer votre compte.</p>
+        <a routerLink="/auth/login" class="btn-auth">Aller à la connexion</a>
+      </div>
+    } @else {
+      @if(error) {
+        <div class="auth-alert error">
+          <i class="fa fa-exclamation-circle"></i> {{ error }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <!-- Step 1: Account info -->
+        @if(step() === 1) {
+          <div class="form-row-2">
+            <div class="form-field" [class.has-error]="firstName.invalid && firstName.touched">
+              <label>Prénom</label>
+              <input type="text" formControlName="firstName" placeholder="Mohamed" />
+              @if(firstName.invalid && firstName.touched) { <span class="field-error">Requis</span> }
+            </div>
+            <div class="form-field" [class.has-error]="lastName.invalid && lastName.touched">
+              <label>Nom</label>
+              <input type="text" formControlName="lastName" placeholder="Ben Ali" />
+              @if(lastName.invalid && lastName.touched) { <span class="field-error">Requis</span> }
+            </div>
+          </div>
+
+          <div class="form-field" [class.has-error]="aka.invalid && aka.touched">
+            <label>Nom de scène (AKA) <span class="required">*</span></label>
+            <input type="text" formControlName="aka" placeholder="Ex: MC Tunis, Young Bro..." />
+            @if(aka.invalid && aka.touched) { <span class="field-error">Le nom de scène est obligatoire (max 60 car.)</span> }
+          </div>
+
+          <div class="form-field" [class.has-error]="email.invalid && email.touched">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="votre@email.com" />
+            @if(email.invalid && email.touched) { <span class="field-error">Email invalide</span> }
+          </div>
+
+          <div class="form-field" [class.has-error]="password.invalid && password.touched">
+            <label>Mot de passe</label>
+            <div class="input-group">
+              <input [type]="showPass ? 'text' : 'password'" formControlName="password" placeholder="Min 8 car. avec majuscule et chiffre" />
+              <button type="button" class="toggle-pass" (click)="showPass = !showPass">
+                <i [class]="showPass ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+              </button>
+            </div>
+            @if(password.value) {
+              <div class="password-strength">
+                <div class="strength-bar">
+                  <div class="strength-fill" [style.width.%]="passwordStrength * 25" [style.background]="strengthColor"></div>
+                </div>
+                <span [style.color]="strengthColor">{{ strengthLabel }}</span>
+              </div>
+            }
+            @if(password.invalid && password.touched) {
+              <span class="field-error">Min 8 caractères, 1 majuscule, 1 chiffre</span>
+            }
+          </div>
+
+          <button type="button" class="btn-auth" (click)="nextStep()">
+            Continuer <i class="fa fa-arrow-right"></i>
+          </button>
+        }
+
+        <!-- Step 2: Artist profile -->
+        @if(step() === 2) {
+          <div class="form-field">
+            <label>Téléphone</label>
+            <input type="tel" formControlName="phone" placeholder="+216 XX XXX XXX" />
+          </div>
+
+          <div class="form-field">
+            <label>Bio <span class="char-count">{{ form.get('bio')?.value?.length || 0 }}/500</span></label>
+            <textarea formControlName="bio" rows="3" placeholder="Décrivez votre style musical, vos influences..."></textarea>
+          </div>
+
+          <div class="form-field">
+            <label>Genres musicaux (max 5)</label>
+            <div class="genre-grid">
+              @for(genre of genres; track genre) {
+                <button type="button" class="genre-tag" [class.selected]="isSelected(genre)"
+                        (click)="toggleGenre(genre)">{{ genre }}</button>
+              }
+            </div>
+          </div>
+
+          <div class="form-row-actions">
+            <button type="button" class="btn-auth-outline" (click)="step.set(1)">
+              <i class="fa fa-arrow-left"></i> Retour
+            </button>
+            <button type="submit" class="btn-auth" [disabled]="loading">
+              @if(loading) { <i class="fa fa-spinner fa-spin"></i> Création... }
+              @else { Créer mon compte <i class="fa fa-check"></i> }
+            </button>
+          </div>
+        }
+      </form>
+
+      <div class="auth-footer">
+        Déjà un compte ? <a routerLink="/auth/login">Se connecter</a>
+      </div>
+    }
+  </div>
+</div>

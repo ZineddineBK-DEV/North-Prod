@@ -1,0 +1,427 @@
+// ── NORTH PROD Auth Pages — Shared Styles ─────────────────
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+:host { display: block; font-family: 'Montserrat', sans-serif; }
+
+// Variables
+$gold:        #c0a060;
+$gold-dark:   #a08040;
+$bg-dark:     #0d0d0d;
+$bg-card:     #161616;
+$bg-input:    #1e1e1e;
+$border:      rgba(192, 160, 96, 0.2);
+$border-dark: rgba(255, 255, 255, 0.08);
+$text:        #e0e0e0;
+$muted:       #888;
+$error:       #e74c3c;
+$success:     #2ecc71;
+
+// ── Page layout ───────────────────────────────────────────
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  position: relative;
+  overflow: hidden;
+  background: $bg-dark;
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(192,160,96,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(192,160,96,0.04) 0%, transparent 70%);
+  pointer-events: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 60px,
+      rgba(255,255,255,0.01) 60px, rgba(255,255,255,0.01) 61px
+    );
+  }
+}
+
+// ── Card ──────────────────────────────────────────────────
+.auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  animation: slideUp 0.4s ease;
+
+  &.wide { max-width: 560px; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Header ────────────────────────────────────────────────
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #fff;
+  text-decoration: none;
+  margin-bottom: 24px;
+  span { color: $gold; }
+}
+
+.auth-header h1 {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: 0.5px;
+}
+.auth-header p {
+  color: $muted;
+  font-size: 14px;
+  margin: 0;
+}
+
+// ── Step indicator ────────────────────────────────────────
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 28px;
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: $muted;
+    letter-spacing: 0.5px;
+    transition: color 0.3s;
+
+    span {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: $bg-input;
+      border: 1px solid $border-dark;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+
+    &.active {
+      color: $gold;
+      span { background: rgba($gold, 0.15); border-color: $gold; color: $gold; }
+    }
+    &.done {
+      color: $success;
+      span { background: rgba($success, 0.15); border-color: $success; color: $success; }
+    }
+  }
+  .step-line {
+    width: 48px; height: 1px;
+    background: $border-dark;
+    margin: 0 8px;
+    transition: background 0.3s;
+    &.active { background: $gold; }
+  }
+}
+
+// ── Alerts ────────────────────────────────────────────────
+.auth-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 20px;
+
+  &.error {
+    background: rgba($error, 0.1);
+    border: 1px solid rgba($error, 0.3);
+    color: #ff6b6b;
+  }
+  &.info {
+    background: rgba($gold, 0.1);
+    border: 1px solid $border;
+    color: $gold;
+  }
+}
+
+// ── Success state ─────────────────────────────────────────
+.auth-success {
+  text-align: center;
+  padding: 16px 0;
+
+  .fa {
+    font-size: 52px;
+    color: $success;
+    margin-bottom: 16px;
+    display: block;
+  }
+  h3 { color: #fff; font-size: 20px; margin: 0 0 12px; }
+  p  { color: $muted; font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+}
+
+// ── Loading ───────────────────────────────────────────────
+.auth-loading {
+  text-align: center;
+  padding: 32px;
+  color: $gold;
+  .fa { margin-bottom: 12px; }
+  p { color: $muted; font-size: 14px; }
+}
+
+// ── Form elements ─────────────────────────────────────────
+.form-field {
+  margin-bottom: 20px;
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: $muted;
+    margin-bottom: 8px;
+  }
+
+  input, textarea {
+    width: 100%;
+    background: $bg-input;
+    border: 1px solid $border-dark;
+    border-radius: 6px;
+    padding: 12px 14px;
+    color: $text;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+
+    &::placeholder { color: rgba($muted, 0.6); }
+    &:focus { outline: none; border-color: $gold; }
+    &:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 100px $bg-input inset;
+      -webkit-text-fill-color: $text;
+    }
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  &.has-error input, &.has-error textarea {
+    border-color: rgba($error, 0.5);
+  }
+}
+
+.required { color: $gold; }
+
+.char-count {
+  font-size: 11px;
+  color: $muted;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.input-group {
+  position: relative;
+  input { padding-right: 44px; }
+  .toggle-pass {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    color: $muted; cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    transition: color 0.2s;
+    &:hover { color: $gold; }
+  }
+}
+
+.field-error {
+  display: block;
+  font-size: 11px;
+  color: #ff6b6b;
+  margin-top: 4px;
+}
+
+// Password strength
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+
+  .strength-bar {
+    flex: 1;
+    height: 3px;
+    background: $border-dark;
+    border-radius: 2px;
+    overflow: hidden;
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+    }
+  }
+  span { font-size: 11px; font-weight: 600; white-space: nowrap; }
+}
+
+// Form layout helpers
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.form-row-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px !important;
+  color: $muted !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+
+  input[type="checkbox"] {
+    width: 15px; height: 15px;
+    accent-color: $gold;
+  }
+  span { color: $muted; }
+}
+
+.forgot-link {
+  font-size: 12px;
+  color: $muted;
+  text-decoration: none;
+  transition: color 0.2s;
+  &:hover { color: $gold; }
+}
+
+// Genre grid
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre-tag {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid $border-dark;
+  background: $bg-input;
+  color: $muted;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { border-color: $gold; color: $gold; }
+  &.selected {
+    background: rgba($gold, 0.15);
+    border-color: $gold;
+    color: $gold;
+    font-weight: 600;
+  }
+}
+
+// ── Buttons ───────────────────────────────────────────────
+.btn-auth {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, $gold, $gold-dark);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.1s;
+
+  &:hover { opacity: 0.88; }
+  &:active { transform: scale(0.99); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-auth-outline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: transparent;
+  color: $muted;
+  border: 1px solid $border-dark;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover { border-color: $gold; color: $gold; }
+}
+
+// ── Footer ────────────────────────────────────────────────
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: $muted;
+
+  a {
+    color: $gold;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+    transition: opacity 0.2s;
+    &:hover { opacity: 0.8; }
+  }
+}

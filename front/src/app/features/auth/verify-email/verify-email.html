@@ -1,0 +1,26 @@
+<div class="auth-page">
+  <div class="auth-bg"></div>
+  <div class="auth-card">
+    <div class="auth-header">
+      <a routerLink="/" class="auth-logo">NORTH <span>PROD</span></a>
+    </div>
+    @if(loading) {
+      <div class="auth-loading">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+        <p>Vérification en cours...</p>
+      </div>
+    }
+    @if(success) {
+      <div class="auth-success">
+        <i class="fa fa-check-circle"></i>
+        <h3>Email vérifié !</h3>
+        <p>Votre compte est maintenant actif. Bienvenue dans votre espace NORTH PROD.</p>
+        <a routerLink="/artist/dashboard" class="btn-auth">Accéder à mon espace</a>
+      </div>
+    }
+    @if(error) {
+      <div class="auth-alert error"><i class="fa fa-exclamation-circle"></i> {{ error }}</div>
+      <div class="auth-footer"><a routerLink="/auth/login">Retour à la connexion</a></div>
+    }
+  </div>
+</div>
