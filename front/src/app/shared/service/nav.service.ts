@@ -8,6 +8,8 @@ export interface IMenu {
   icon?: string;
   active?: boolean;
   children?: IMenu[];
+  megaMenu?: boolean;
+  megaMenuType?: 'small' | 'medium' | 'large';
 }
 
 @Injectable({ providedIn: 'root' })

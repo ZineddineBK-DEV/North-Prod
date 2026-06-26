@@ -44,6 +44,5 @@ export class Music implements OnInit {
 
   ngOnInit() {
     this.title.setTitle(this.route.snapshot.data["title"]);
-    console.log(this.route)
   }
 }
