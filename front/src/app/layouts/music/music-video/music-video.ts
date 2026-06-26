@@ -1,18 +1,24 @@
-import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
-
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component, inject } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
-  selector: "app-music-video",
-  imports: [CommonModule],
-  templateUrl: "./music-video.html",
-  styleUrls: ["./music-video.scss"],
+  selector: 'app-music-video',
+  templateUrl: './music-video.html',
+  styleUrls: ['./music-video.scss'],
 })
 export class MusicVideo {
-  constructor(private modalService: NgbModal) {}
+  private sanitizer = inject(DomSanitizer);
+  modalOpen = false;
+  safeUrl!: SafeResourceUrl;
+  readonly videoUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1';
 
-  openVerticallyCentered(content: unknown) {
-    this.modalService.open(content, { centered: true, size: "lg" });
+  openVideo() {
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.videoUrl);
+    this.modalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+  closeVideo() {
+    this.modalOpen = false;
+    document.body.style.overflow = '';
   }
 }

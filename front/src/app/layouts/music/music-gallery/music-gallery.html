@@ -1,39 +1,13 @@
-<!-- gallery section Start-->
-<section
-  class="music gallery bg-gallery bg-shadow-top-bottom"
-  [ngStyle]="{'background-image': 'url(assets/images/music/gallery/bg.jpg)'}"
->
-  <div class="container">
-    <div class="row">
-      <div class="col-md-10 offset-md-1">
-        <div class="title title4">
-          <div class="main-title">
-            <h2>gallery</h2>
-          </div>
-          <div class="sub-title">
-            <p>Latest Photo Our Music Event</p>
-          </div>
-        </div>
+<section class="np-gallery">
+  <div class="gallery-header container">
+    <span class="section-tag">Galerie</span>
+    <h2 class="section-title">Le Studio en <span class="gold">Images</span></h2>
+  </div>
+  <div class="gallery-strip">
+    @for(img of images; track img.alt) {
+      <div class="gallery-cell" [style.background-image]="'url(' + img.src + ')'">
+        <div class="cell-overlay"><i class="fa fa-expand"></i></div>
       </div>
-      <div class="col-12">
-        <owl-carousel-o
-          class="gallery-slider"
-          [options]="galleryCarouselOptions"
-        >
-          @for(image of gallery; track image){
-          <ng-template carouselSlide class="item">
-            <img [src]="image.img" alt="" />
-            <div class="abs-center w-100 text-container">
-              <h5 class="text-white overlay-text text-center">
-                Special Music Event<span>2025</span>
-              </h5>
-            </div>
-            <div class="overlay"></div>
-          </ng-template>
-          }
-        </owl-carousel-o>
-      </div>
-    </div>
+    }
   </div>
 </section>
-<!-- gallery section end-->

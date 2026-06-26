@@ -1,0 +1,14 @@
+$gold: #c0a060; $bg: #111; $card: #161616; $border: rgba(192,160,96,0.12);
+.np-testimonials { padding: 100px 0; background: $bg; }
+.section-header { text-align: center; margin-bottom: 56px; }
+.section-tag { display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: $gold; margin-bottom: 12px; &::before,&::after { content: '—'; margin: 0 8px; opacity: 0.5; } }
+.section-title { font-size: clamp(26px,3.5vw,38px); font-weight: 800; color: #fff; margin: 0; .gold { color: $gold; } }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; @media (max-width: 900px) { grid-template-columns: 1fr; } }
+.testimonial-card { background: $card; border: 1px solid $border; border-radius: 12px; padding: 32px; transition: border-color 0.3s; &:hover { border-color: rgba($gold, 0.3); } }
+.quote-icon { color: $gold; font-size: 24px; margin-bottom: 16px; opacity: 0.6; }
+.quote-text { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.8; margin: 0 0 24px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, $gold, #a08040); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #000; font-size: 15px; flex-shrink: 0; }
+.author-name { font-size: 14px; font-weight: 700; color: #fff; }
+.author-genre { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; }
+.stars { margin-left: auto; color: $gold; font-size: 11px; display: flex; gap: 2px; }

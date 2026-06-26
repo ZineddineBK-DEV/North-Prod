@@ -1,0 +1,5 @@
+$gold: #c0a060; $border: rgba(192,160,96,0.1);
+.np-copyright { background: #080808; border-top: 1px solid $border; padding: 20px 0; }
+.copyright-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+p { font-size: 12px; color: rgba(255,255,255,0.3); margin: 0; strong { color: $gold; } }
+.copyright-links { display: flex; gap: 20px; a { font-size: 12px; color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.2s; &:hover { color: $gold; } } }

@@ -1,12 +1,12 @@
-import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: "app-music-copyright",
-  imports: [CommonModule],
-  templateUrl: "./music-copyright.html",
-  styleUrls: ["./music-copyright.scss"],
+  selector: 'app-music-copyright',
+  templateUrl: './music-copyright.html',
+  styleUrls: ['./music-copyright.scss'],
+  imports: [RouterLink],
 })
 export class MusicCopyright {
-  public year = new Date().getFullYear();
+  year = new Date().getFullYear();
 }

@@ -1,0 +1,8 @@
+$gold: #c0a060;
+.np-gallery { padding: 80px 0 0; background: #111; }
+.gallery-header { margin-bottom: 40px; }
+.section-tag { display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: $gold; margin-bottom: 12px; &::before,&::after { content: '—'; margin: 0 8px; opacity: 0.5; } }
+.section-title { font-size: clamp(26px,3.5vw,38px); font-weight: 800; color: #fff; margin: 0; .gold { color: $gold; } }
+.gallery-strip { display: grid; grid-template-columns: repeat(5, 1fr); height: 280px; @media (max-width: 900px) { grid-template-columns: repeat(3,1fr); height: 200px; } @media (max-width: 500px) { grid-template-columns: repeat(2,1fr); height: 180px; } }
+.gallery-cell { background-size: cover; background-position: center; position: relative; overflow: hidden; cursor: pointer; background-color: #1a1a1a; &:hover .cell-overlay { opacity: 1; } }
+.cell-overlay { position: absolute; inset: 0; background: rgba($gold, 0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; i { font-size: 24px; color: #fff; } }

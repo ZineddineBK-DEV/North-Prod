@@ -1,108 +1,41 @@
-<!-- album section Start-->
-<section class="music album">
+<!-- Services & Pricing section -->
+<section class="np-services" id="services">
   <div class="container">
-    <div class="row">
-      <div class="col-md-10 offset-md-1">
-        <div class="title title4">
-          <div class="main-title">
-            <h2 class="text-light">album list</h2>
-          </div>
-          <div class="sub-title">
-            <p>Our Latest Album and details Song 2024</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase list-head text-light">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase list-head text-light">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-4 col-sm-6 d-none d-md-block d-lg-none">
-        <div class="album-list overlay-box text-center">
-          <h5 class="text-uppercase text-light list-head">decorner</h5>
-          <div>
-            <h6 class="item-sublist text-light">20 December</h6>
-            <h6 class="item-sublist text-light">Sunday</h6>
-            <h6 class="item-sublist text-light">23:00-0:00</h6>
-          </div>
-        </div>
-      </div>
+
+    <div class="section-header">
+      <span class="section-tag">Nos Services</span>
+      <h2 class="section-title">Tarifs & <span class="gold">Prestations</span></h2>
+      <p class="section-sub">Des formules adaptées à chaque étape de votre création musicale</p>
     </div>
+
+    <div class="services-grid">
+      @if(loading) {
+        @for(i of [1,2,3,4]; track i) {
+          <div class="service-card skeleton"></div>
+        }
+      } @else {
+        @for(svc of services; track svc._id) {
+          <div class="service-card" [class.popular]="svc.isPopular">
+            @if(svc.isPopular) { <div class="popular-badge">Plus populaire</div> }
+            <div class="service-icon"><i [class]="svc.icon || 'fa fa-music'"></i></div>
+            <h3 class="service-name">{{ svc.name }}</h3>
+            <p class="service-desc">{{ svc.description }}</p>
+            <div class="service-price">
+              <span class="price-amount">{{ svc.price }}</span>
+              <span class="price-unit">DT / {{ svc.unit }}</span>
+            </div>
+            <ul class="service-features">
+              @for(f of svc.features; track f) {
+                <li><i class="fa fa-check"></i> {{ f }}</li>
+              }
+            </ul>
+            <a routerLink="/auth/register" class="btn-service">
+              Réserver <i class="fa fa-arrow-right"></i>
+            </a>
+          </div>
+        }
+      }
+    </div>
+
   </div>
 </section>
-<!-- album section end-->

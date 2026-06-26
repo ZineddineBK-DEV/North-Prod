@@ -1,88 +1,52 @@
-<!-- artist section Start-->
-<section
-  class="music artist bg-artist bg-shadow-top-bottom"
-  id="artist"
-  [ngStyle]="{'background-image': 'url(assets/images/music/artist/bg.jpg)'}"
->
+<!-- Portfolio preview section -->
+<section class="np-portfolio" id="portfolio">
   <div class="container">
-    <div class="row">
-      <div class="col-md-10 offset-md-1">
-        <div class="title title4">
-          <div class="main-title">
-            <h2>artists</h2>
-          </div>
-          <div class="sub-title">
-            <p>Our artists 2024</p>
-          </div>
+    <div class="section-header">
+      <span class="section-tag">Productions</span>
+      <h2 class="section-title">Notre <span class="gold">Portfolio</span></h2>
+      <p class="section-sub">Découvrez les productions sorties de nos studios</p>
+    </div>
+
+    <!-- Category filters -->
+    <div class="portfolio-filters">
+      @for(cat of categories; track cat) {
+        <button class="filter-btn" [class.active]="activeCategory === cat" (click)="filter(cat)">
+          {{ cat }}
+        </button>
+      }
+    </div>
+
+    <!-- Grid -->
+    <div class="portfolio-grid">
+      @if(loading) {
+        @for(i of [1,2,3,4,5,6]; track i) {
+          <div class="portfolio-item skeleton"></div>
+        }
+      } @else if(items.length === 0) {
+        <div class="portfolio-empty">
+          <i class="fa fa-music"></i>
+          <p>Aucune production dans cette catégorie.</p>
         </div>
-      </div>
-      <div class="col-12">
-        <owl-carousel-o
-          [options]="artistscarouselOptions"
-          class="artist-slider"
-        >
-          @for(artist of artists; track artist){
-          <ng-template carouselSlide class="item">
-            <div class="album-artist text-center">
-              <img
-                [src]="artist.img"
-                alt=""
-                class="img-fluid set-relative overlay-img"
-              />
-              <div>
-                <div class="overlay-box2"></div>
-              </div>
-              <div class="set-abs bottom-0 w-100 text-left set-z-index">
-                <div class="singers">
-                  <div class="m-b-10">
-                    <h5 class="name">{{artist.name}}</h5>
-                    <h6 class="musician">{{artist.musician}}</h6>
-                  </div>
-                  <div class="rate">
-                    <div>
-                      <div class="progress">
-                        <div
-                          class="progress-bar"
-                          role="progressbar"
-                          aria-valuenow="70"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: 70%"
-                        >
-                          <span class="sr-only">70% Complete</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="set-abs cds">
-                <img
-                  src="assets/images/music/artist/cd1.png"
-                  alt=""
-                  class="cd-animation"
-                />
-                <img
-                  src="assets/images/music/artist/Ellipse.png"
-                  alt=""
-                  class="elipse"
-                />
-              </div>
+      } @else {
+        @for(item of items; track item._id) {
+          <div class="portfolio-item" [style.background-image]="'url(' + getThumb(item) + ')'">
+            <div class="portfolio-overlay">
+              <span class="portfolio-cat">{{ item.category }}</span>
+              <h4 class="portfolio-title">{{ item.title }}</h4>
+              @if(item.artist) { <p class="portfolio-artist">{{ item.artist }}</p> }
+              @if(item.embedUrl) {
+                <a [href]="item.embedUrl" target="_blank" class="portfolio-play">
+                  <i class="fa fa-play"></i>
+                </a>
+              }
             </div>
-          </ng-template>
-          }
-        </owl-carousel-o>
-        <div class="artist-text text-center">
-          <p class="text-white text-para">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book.
-          </p>
-          <h4 class="text-uppercase dummy-text">“ dummy text of the ”</h4>
-        </div>
-      </div>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="section-cta">
+      <a routerLink="/portfolio" class="btn-section">Voir tout le portfolio <i class="fa fa-arrow-right"></i></a>
     </div>
   </div>
 </section>
-<!-- artist section end-->

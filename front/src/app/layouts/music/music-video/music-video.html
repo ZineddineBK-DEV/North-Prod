@@ -1,82 +1,35 @@
-<!-- video section Start-->
-<section
-  class="music bg-video format"
-  [ngStyle]="{'background-image': 'url(assets/images/music/video-bg.jpg)'}"
->
+<section class="np-video" id="studio">
   <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <img src="assets/images/music/singer.png" alt="" class="img-fluid" />
+    <div class="video-inner">
+      <div class="video-content">
+        <span class="section-tag">Le Studio</span>
+        <h2 class="section-title">Un espace <span class="gold">professionnel</span><br/>pensé pour les artistes</h2>
+        <p>Équipé des meilleures technologies audio et d'une acoustique soignée, NORTH PROD vous offre les conditions idéales pour créer, enregistrer et finaliser vos projets musicaux.</p>
+        <ul class="studio-specs">
+          <li><i class="fa fa-check-circle"></i> Console SSL 4000 Series</li>
+          <li><i class="fa fa-check-circle"></i> Monitoring Genelec 8050</li>
+          <li><i class="fa fa-check-circle"></i> Pro Tools & Logic Pro X</li>
+          <li><i class="fa fa-check-circle"></i> Plugins premium (Waves, FabFilter, Slate)</li>
+          <li><i class="fa fa-check-circle"></i> Cabine d'enregistrement acoustique</li>
+          <li><i class="fa fa-check-circle"></i> Lounge artiste & espace détente</li>
+        </ul>
       </div>
-      <div class="col-md-6">
-        <div class="center-text">
-          <div>
-            <div class="format-small-text">
-              <h6 class="gradient-text hash-video">#video</h6>
-            </div>
-            <div class="format-head-text">
-              <h3 class="about-font-header">Anet Licker</h3>
-            </div>
-            <div class="format-sub-text">
-              <div class="sub-heading">
-                <h6 class="sub-small-text">Performs in Slide Spring Tour</h6>
-              </div>
-              <p class="text-white sub-para">
-                The page builder elements that we’ve created for you, make the
-                website building process easy and fun.
-              </p>
-            </div>
-            <div class="m-b-40">
-              <div class="link-horizontal">
-                <ul>
-                  <li>
-                    <a
-                      class="button icon-btn d-flex"
-                      (click)="openVerticallyCentered(content)"
-                    >
-                      <i
-                        class="fa fa-play video-icon center-content m-0"
-                        aria-hidden="true"
-                      ></i>
-                      <ng-template #content let-modal>
-                        <div class="modal-body video-modal">
-                          <button
-                            type="button"
-                            class="close"
-                            aria-label="Close"
-                            (click)="modal.dismiss('Cross click')"
-                          >
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                          <iframe
-                            class="mfp-iframe"
-                            frameborder="0"
-                            allowfullscreen=""
-                            src="//www.youtube.com/embed/dNIfsv1rKJo?autoplay=1"
-                          ></iframe>
-                        </div>
-                      </ng-template>
-                      <div class="watch-now center-content">
-                        <h6 class="watch">Watch Now</h6>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="d-flex">
-              <a href="#"
-                ><h6 class="watch">
-                  see all video<i
-                    class="fa fa-arrow-right m-l-15"
-                    aria-hidden="true"
-                  ></i></h6
-              ></a>
-            </div>
-          </div>
+      <div class="video-thumb" (click)="openVideo()">
+        <div class="video-overlay">
+          <div class="play-btn"><i class="fa fa-play"></i></div>
+          <span>Visite virtuelle du studio</span>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Video Modal -->
+  @if(modalOpen) {
+    <div class="video-modal" (click)="closeVideo()">
+      <div class="modal-inner" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeVideo()"><i class="fa fa-times"></i></button>
+        <iframe [src]="safeUrl" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
+  }
 </section>
-<!-- video section end-->

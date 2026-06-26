@@ -1,0 +1,15 @@
+$gold: #c0a060; $bg: #0d0d0d; $border: rgba(192,160,96,0.15);
+.np-video { padding: 100px 0; background: $bg; }
+.section-tag { display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: $gold; margin-bottom: 12px; &::before,&::after { content: '—'; margin: 0 8px; opacity: 0.5; } }
+.video-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; @media (max-width: 900px) { grid-template-columns: 1fr; } }
+.section-title { font-size: clamp(24px,3vw,36px); font-weight: 800; color: #fff; margin: 0 0 16px; line-height: 1.2; .gold { color: $gold; } }
+.video-content p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 28px; }
+.studio-specs { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; li { font-size: 13px; color: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 8px; } .fa-check-circle { color: $gold; font-size: 12px; } }
+.video-thumb { aspect-ratio: 16/9; border-radius: 12px; background: #1a1a1a; position: relative; overflow: hidden; cursor: pointer; border: 1px solid $border; transition: border-color 0.3s; &:hover { border-color: rgba($gold, 0.4); .play-btn { transform: translate(-50%, -50%) scale(1.08); } } }
+.video-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.play-btn { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, $gold, #a08040); display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: transform 0.2s; i { color: #000; font-size: 22px; margin-left: 4px; } }
+.video-overlay span { position: absolute; bottom: 20px; font-size: 13px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; }
+.video-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-inner { position: relative; width: 90vw; max-width: 900px; aspect-ratio: 16/9; iframe { width: 100%; height: 100%; border-radius: 8px; } }
+.modal-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; transition: color 0.2s; &:hover { color: #fff; } }

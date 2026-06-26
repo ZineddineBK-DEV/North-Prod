@@ -1,42 +1,26 @@
-<!-- testimonial section start-->
-<section
-  class="music testimonial sponsor"
-  [ngStyle]="{'background-image': 'url(assets/images/music/sponser/bg.jpg)'}"
->
+<section class="np-testimonials">
   <div class="container">
-    <div class="row">
-      <div class="col-md-10 offset-md-1">
-        <div class="title title4">
-          <div class="main-title">
-            <h2>testimonial</h2>
-          </div>
-          <div class="sub-title">
-            <p>Our happy client</p>
+    <div class="section-header">
+      <span class="section-tag">Témoignages</span>
+      <h2 class="section-title">Ce que disent nos <span class="gold">Artistes</span></h2>
+    </div>
+    <div class="testimonials-grid">
+      @for(t of testimonials; track t.name) {
+        <div class="testimonial-card">
+          <div class="quote-icon"><i class="fa fa-quote-left"></i></div>
+          <p class="quote-text">{{ t.text }}</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">{{ t.name[0] }}</div>
+            <div>
+              <div class="author-name">{{ t.name }}</div>
+              <div class="author-genre">{{ t.genre }}</div>
+            </div>
+            <div class="stars">
+              @for(s of [1,2,3,4,5]; track s) { <i class="fa fa-star"></i> }
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-8 offset-md-2">
-        <owl-carousel-o
-          [options]="testimoialCarouselOptions"
-          class="music-testimonial-slider"
-        >
-          @for(testimoial of testimoials; track testimoial){
-          <ng-template carouselSlide class="item">
-            <div class="">
-              <img [src]="testimoial.img" alt="" class="img-fluid" />
-              <div class="text-center testimonial-info">
-                <p class="testimonial-para">{{testimoial.review}}</p>
-                <h6 class="gradient-text text-uppercase m-b-5 font-large">
-                  {{testimoial.name}}
-                </h6>
-                <h6 class="font-small">{{testimoial.designation}}</h6>
-              </div>
-            </div>
-          </ng-template>
-          }
-        </owl-carousel-o>
-      </div>
+      }
     </div>
   </div>
 </section>
-<!-- testimonial section end-->
