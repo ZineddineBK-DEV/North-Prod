@@ -21,7 +21,7 @@ export class CenterMenu implements OnInit {
   constructor(public navServices: NavService) {}
 
   ngOnInit() {
-    this.navServices.items.subscribe((menuItems) => {
+    this.navServices.items$.subscribe((menuItems) => {
       this.menuItems = menuItems;
     });
   }
