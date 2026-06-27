@@ -1,0 +1,86 @@
+$gold: #c0a060; $gold-dark: #a08040;
+$sidebar-w: 240px;
+$bg: #0d0d0d; $sidebar-bg: #111; $card: #161616;
+$border: rgba(192,160,96,0.12); $border-light: rgba(255,255,255,0.06);
+$text: #e0e0e0; $muted: rgba(255,255,255,0.4);
+
+.ds-layout { display: flex; min-height: 100vh; background: $bg; position: relative; }
+
+// ── Sidebar ───────────────────────────────────────────────
+.ds-sidebar {
+  width: $sidebar-w; flex-shrink: 0;
+  background: $sidebar-bg;
+  border-right: 1px solid $border;
+  position: fixed; top: 0; left: 0; height: 100vh;
+  z-index: 200; transition: transform 0.3s;
+  @media (max-width: 900px) { transform: translateX(-100%); &.sidebar-open { transform: translateX(0); } }
+}
+.ds-sidebar-inner { display: flex; flex-direction: column; height: 100%; padding: 0; }
+
+.ds-logo {
+  display: flex; flex-direction: column; padding: 24px 20px;
+  text-decoration: none; border-bottom: 1px solid $border-light;
+  font-size: 16px; font-weight: 800; letter-spacing: 3px; color: #fff;
+  span { color: $gold; }
+  small { font-size: 9px; letter-spacing: 2px; color: $muted; margin-top: 2px; font-weight: 400; text-transform: uppercase; }
+}
+
+.ds-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+
+.ds-nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 8px;
+  color: $muted; text-decoration: none; font-size: 13px;
+  transition: all 0.2s;
+  i { font-size: 15px; width: 18px; text-align: center; }
+  &:hover { background: rgba(255,255,255,0.04); color: $text; }
+  &.active { background: rgba($gold, 0.1); color: $gold; border-left: 2px solid $gold; }
+}
+
+.ds-sidebar-footer {
+  border-top: 1px solid $border-light; padding: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.ds-user { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.ds-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, $gold, $gold-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #000; font-size: 13px; flex-shrink: 0; overflow: hidden; img { width: 100%; height: 100%; object-fit: cover; } }
+.ds-user-info { min-width: 0; }
+.ds-user-name { display: block; font-size: 13px; font-weight: 600; color: $text; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-user-role { display: block; font-size: 10px; color: $muted; text-transform: capitalize; }
+.ds-logout { background: none; border: none; color: $muted; cursor: pointer; font-size: 15px; padding: 6px; border-radius: 6px; transition: all 0.2s; flex-shrink: 0; &:hover { color: #e74c3c; background: rgba(231,76,60,0.1); } }
+
+// ── Main area ─────────────────────────────────────────────
+.ds-main { flex: 1; margin-left: $sidebar-w; display: flex; flex-direction: column; min-height: 100vh; @media (max-width: 900px) { margin-left: 0; } }
+
+.ds-topbar { height: 60px; background: $sidebar-bg; border-bottom: 1px solid $border-light; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+.ds-hamburger { display: none; background: none; border: none; color: $text; font-size: 18px; cursor: pointer; @media (max-width: 900px) { display: block; } }
+.ds-topbar-right { display: flex; align-items: center; gap: 4px; }
+
+.topbar-icon { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: none; border: none; border-radius: 8px; color: $muted; font-size: 15px; cursor: pointer; text-decoration: none; transition: all 0.2s; &:hover { background: rgba(255,255,255,0.05); color: $text; } }
+.notif-badge { position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; background: $gold; color: #000; font-size: 8px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.topbar-notif-wrap { position: relative; }
+
+.ds-content { flex: 1; padding: 32px; @media (max-width: 600px) { padding: 20px 16px; } }
+.ds-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 199; &.open { display: block; } }
+
+// ── Shared page elements used in child pages ──────────────
+:host ::ng-deep {
+  .page-header { margin-bottom: 28px; }
+  .page-title { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 4px; }
+  .page-sub   { font-size: 13px; color: $muted; margin: 0; }
+  .stat-card  { background: $card; border: 1px solid $border; border-radius: 10px; padding: 20px 24px; }
+  .stats-row  { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .stat-num   { font-size: 28px; font-weight: 800; color: $gold; line-height: 1; }
+  .stat-label { font-size: 11px; color: $muted; letter-spacing: 0.5px; margin-top: 4px; }
+  .card       { background: $card; border: 1px solid $border; border-radius: 10px; }
+  .card-header { padding: 18px 20px; border-bottom: 1px solid $border-light; display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-size: 14px; font-weight: 700; color: #fff; margin: 0; }
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+    &.pending     { background: rgba(243,156,18,0.12); color: #f39c18; }
+    &.confirmed   { background: rgba(46,204,113,0.12); color: #2ecc71; }
+    &.rejected    { background: rgba(231,76,60,0.12);  color: #e74c3c; }
+    &.cancelled   { background: rgba(149,165,166,0.12); color: #95a5a6; }
+    &.delivered   { background: rgba(192,160,96,0.15); color: $gold; }
+  }
+  .btn-gold { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: linear-gradient(135deg, $gold, $gold-dark); color: #000; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; font-family: inherit; cursor: pointer; text-decoration: none; transition: opacity 0.2s; &:hover { opacity: 0.88; } }
+  .btn-outline { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: transparent; color: $muted; border: 1px solid $border-light; border-radius: 6px; font-size: 12px; font-family: inherit; cursor: pointer; text-decoration: none; transition: all 0.2s; &:hover { border-color: $gold; color: $gold; } }
+}

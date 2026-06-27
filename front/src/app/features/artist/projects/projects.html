@@ -1,0 +1,69 @@
+<app-dashboard-shell [navItems]="navItems" title="Espace Artiste">
+  <div class="page-header">
+    <h1 class="page-title">Mes Projets</h1>
+    <p class="page-sub">Suivez l'avancement de vos productions</p>
+  </div>
+
+  <!-- Stage filter -->
+  <div class="filter-tabs" style="margin-bottom:24px">
+    <button class="filter-tab" [class.active]="filterStage===''" (click)="setFilter('')">Tous</button>
+    @for(s of stages; track s.key) {
+      <button class="filter-tab" [class.active]="filterStage===s.key" (click)="setFilter(s.key)"
+              [style.border-color]="filterStage===s.key ? s.color : ''"
+              [style.color]="filterStage===s.key ? s.color : ''">
+        {{ s.label }}
+      </button>
+    }
+  </div>
+
+  @if(loading) {
+    <div class="list-loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(projects.length === 0) {
+    <div class="list-empty">
+      <i class="fa fa-music fa-3x"></i>
+      <p>Aucun projet trouvé.</p>
+      <small>Les projets sont créés automatiquement lorsqu'une réservation est confirmée.</small>
+    </div>
+  } @else {
+    <div class="projects-grid">
+      @for(p of projects; track p._id) {
+        <a [routerLink]="['/artist/projects', p._id]" class="project-card">
+          <div class="pc-header">
+            <h3 class="pc-title">{{ p.title }}</h3>
+            <span class="pc-stage" [style.color]="getStage(p.stage)?.color">
+              {{ getStage(p.stage)?.label }}
+            </span>
+          </div>
+          @if(p.genre || p.bpm) {
+            <div class="pc-meta">
+              @if(p.genre) { <span><i class="fa fa-music"></i> {{ p.genre }}</span> }
+              @if(p.bpm)   { <span><i class="fa fa-heartbeat"></i> {{ p.bpm }} BPM</span> }
+            </div>
+          }
+          <!-- Pipeline visual -->
+          <div class="pc-pipeline">
+            @for(s of stages; track s.key) {
+              <div class="pipeline-dot"
+                   [class.done]="isPipelineDone(p.stage, s.key)"
+                   [class.current]="p.stage === s.key"
+                   [style.background]="p.stage === s.key ? s.color : ''"
+                   [title]="s.label">
+              </div>
+            }
+          </div>
+          <!-- Progress bar -->
+          <div class="pc-progress">
+            <div class="pc-progress-bar">
+              <div class="pc-progress-fill" [style.width.%]="p.progress" [style.background]="getStage(p.stage)?.color"></div>
+            </div>
+            <span class="pc-pct">{{ p.progress }}%</span>
+          </div>
+          <div class="pc-footer">
+            <span class="pc-date"><i class="fa fa-calendar-o"></i> {{ formatDate(p.updatedAt) }}</span>
+            <span class="pc-files"><i class="fa fa-file-audio-o"></i> {{ p.files?.length || 0 }} fichier(s)</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</app-dashboard-shell>

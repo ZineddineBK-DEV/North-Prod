@@ -1,0 +1,74 @@
+<div class="ds-layout" [class.sidebar-open]="sidebarOpen">
+
+  <!-- Sidebar -->
+  <aside class="ds-sidebar">
+    <div class="ds-sidebar-inner">
+      <a routerLink="/" class="ds-logo">
+        NORTH <span>PROD</span>
+        <small>{{ title }}</small>
+      </a>
+
+      <nav class="ds-nav">
+        @for(item of navItems; track item.route) {
+          <a [routerLink]="item.route" routerLinkActive="active" class="ds-nav-item">
+            <i [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+
+      <div class="ds-sidebar-footer">
+        <div class="ds-user">
+          <div class="ds-avatar">
+            @if(authService.currentUser()?.avatarUrl) {
+              <img [src]="authService.currentUser()!.avatarUrl!" [alt]="authService.currentUser()!.aka" />
+            } @else {
+              {{ authService.currentUser()!.aka[0].toUpperCase() }}
+            }
+          </div>
+          <div class="ds-user-info">
+            <span class="ds-user-name">{{ authService.currentUser()?.aka }}</span>
+            <span class="ds-user-role">{{ authService.currentUser()?.role }}</span>
+          </div>
+        </div>
+        <button class="ds-logout" (click)="logout()" title="Déconnexion">
+          <i class="fa fa-sign-out"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="ds-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Main content -->
+  <main class="ds-main">
+    <!-- Top bar -->
+    <div class="ds-topbar">
+      <button class="ds-hamburger" (click)="toggleSidebar()">
+        <i class="fa fa-bars"></i>
+      </button>
+      <div class="ds-topbar-right">
+        <a routerLink="/artist/messages" class="topbar-icon" title="Messages">
+          <i class="fa fa-comments"></i>
+        </a>
+        <div class="topbar-notif-wrap">
+          <button class="topbar-icon" title="Notifications">
+            <i class="fa fa-bell"></i>
+            @if(notifService.unreadCount() > 0) {
+              <span class="notif-badge">{{ notifService.unreadCount() }}</span>
+            }
+          </button>
+        </div>
+        <a routerLink="/" class="topbar-icon" title="Retour au site">
+          <i class="fa fa-globe"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="ds-content">
+      <ng-content></ng-content>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,94 @@
+<app-dashboard-shell [navItems]="navItems" title="Espace Artiste">
+  <div class="page-header">
+    <h1 class="page-title">Mon Profil</h1>
+    <p class="page-sub">Gérez vos informations personnelles et préférences</p>
+  </div>
+
+  <div class="profile-grid">
+    <!-- Avatar card -->
+    <div class="card profile-avatar-card">
+      <div class="avatar-wrap">
+        @if(authService.currentUser()?.avatarUrl) {
+          <img [src]="authService.currentUser()!.avatarUrl!" class="avatar-img" />
+        } @else {
+          <div class="avatar-placeholder">{{ authService.currentUser()?.aka?.[0]?.toUpperCase() }}</div>
+        }
+        <label class="avatar-upload-btn" title="Changer l'avatar">
+          <i class="fa fa-camera"></i>
+          <input type="file" accept="image/*" (change)="uploadAvatar($event)" hidden />
+        </label>
+      </div>
+      <div class="profile-name">{{ authService.currentUser()?.aka }}</div>
+      <div class="profile-email">{{ authService.currentUser()?.email }}</div>
+      <div class="profile-role-badge">{{ authService.currentUser()?.role }}</div>
+    </div>
+
+    <!-- Main form -->
+    <div class="profile-main">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3 class="card-title">Informations personnelles</h3>
+        </div>
+        <div style="padding:20px">
+          @if(error) { <div class="alert-error">{{ error }}</div> }
+          @if(saved)  { <div class="alert-success"><i class="fa fa-check-circle"></i> Profil enregistré avec succès.</div> }
+          <form [formGroup]="form" (ngSubmit)="save()">
+            <div class="form-2col">
+              <div class="field-group"><label class="field-label">Prénom</label><input type="text" formControlName="firstName" class="field-input" /></div>
+              <div class="field-group"><label class="field-label">Nom</label><input type="text" formControlName="lastName" class="field-input" /></div>
+            </div>
+            <div class="field-group"><label class="field-label">Nom de scène (AKA)</label><input type="text" formControlName="aka" class="field-input" /></div>
+            <div class="field-group"><label class="field-label">Téléphone</label><input type="tel" formControlName="phone" class="field-input" placeholder="+216 XX XXX XXX" /></div>
+            <div class="field-group">
+              <label class="field-label">Bio <span style="font-size:11px;color:#888;text-transform:none">{{ form.get('bio')?.value?.length || 0 }}/500</span></label>
+              <textarea formControlName="bio" rows="3" class="field-input" placeholder="Décrivez votre style..."></textarea>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Genres musicaux (max 5)</label>
+              <div class="genre-chips">
+                @for(g of genres; track g) {
+                  <button type="button" class="genre-chip" [class.active]="isSelected(g)" (click)="toggleGenre(g)">{{ g }}</button>
+                }
+              </div>
+            </div>
+            <!-- Social links -->
+            <div formGroupName="socialLinks">
+              <label class="field-label" style="margin-bottom:12px">Réseaux sociaux</label>
+              <div class="social-fields">
+                @for(net of ['instagram','youtube','spotify','soundcloud','tiktok','facebook']; track net) {
+                  <div class="field-group social-field">
+                    <label class="field-label"><i class="fa fa-{{net}}"></i> {{ net | titlecase }}</label>
+                    <input type="url" [formControlName]="net" class="field-input" [placeholder]="'https://' + net + '.com/..'" />
+                  </div>
+                }
+              </div>
+            </div>
+            <button type="submit" class="btn-gold" [disabled]="saving" style="margin-top:8px">
+              @if(saving) { <i class="fa fa-spinner fa-spin"></i> Enregistrement... }
+              @else { <i class="fa fa-save"></i> Enregistrer }
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Change password -->
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="fa fa-lock"></i> Changer le mot de passe</h3></div>
+        <div style="padding:20px">
+          @if(pwError)   { <div class="alert-error">{{ pwError }}</div> }
+          @if(pwSuccess) { <div class="alert-success"><i class="fa fa-check-circle"></i> {{ pwSuccess }}</div> }
+          <form [formGroup]="pwForm" (ngSubmit)="changePassword()">
+            <div class="field-group"><label class="field-label">Mot de passe actuel</label><input type="password" formControlName="currentPassword" class="field-input" /></div>
+            <div class="form-2col">
+              <div class="field-group"><label class="field-label">Nouveau mot de passe</label><input type="password" formControlName="newPassword" class="field-input" /></div>
+              <div class="field-group"><label class="field-label">Confirmer</label><input type="password" formControlName="confirmPassword" class="field-input" /></div>
+            </div>
+            <button type="submit" class="btn-gold" [disabled]="pwSaving">
+              @if(pwSaving) { <i class="fa fa-spinner fa-spin"></i> } @else { Modifier }
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-dashboard-shell>

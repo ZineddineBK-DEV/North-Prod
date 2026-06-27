@@ -1,0 +1,16 @@
+$gold:#c0a060; $card:#161616; $border:rgba(192,160,96,0.12); $muted:rgba(255,255,255,0.4);
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;} .filter-tab{padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:20px;color:$muted;font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.2s;&.active,:hover{border-color:$gold;color:$gold;background:rgba($gold,0.06);}}
+.list-loading,.list-empty{padding:60px;text-align:center;color:$gold;p{color:$muted;margin:8px 0 0;} small{color:rgba(255,255,255,0.25);font-size:12px;}}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.project-card{background:$card;border:1px solid $border;border-radius:10px;padding:20px;text-decoration:none;display:block;transition:all 0.2s;&:hover{border-color:rgba($gold,0.3);transform:translateY(-2px);}}
+.pc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.pc-title{font-size:14px;font-weight:700;color:#fff;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-stage{font-size:11px;font-weight:600;white-space:nowrap;}
+.pc-meta{display:flex;gap:12px;margin-bottom:14px; span{font-size:11px;color:$muted;display:flex;align-items:center;gap:5px;} i{color:$gold;font-size:10px;}}
+.pc-pipeline{display:flex;align-items:center;gap:4px;margin-bottom:12px;}
+.pipeline-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;&.done{background:rgba(46,204,113,0.4);border-color:#2ecc71;}&.current{border:2px solid;transform:scale(1.2);}}
+.pc-progress{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.pc-progress-bar{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.pc-progress-fill{height:100%;border-radius:2px;transition:width 0.5s;}
+.pc-pct{font-size:11px;color:$muted;width:28px;text-align:right;}
+.pc-footer{display:flex;justify-content:space-between; span{font-size:11px;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:5px;} i{font-size:10px;}}

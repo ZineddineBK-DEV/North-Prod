@@ -1,0 +1,105 @@
+<app-dashboard-shell [navItems]="navItems" title="Espace Artiste">
+
+  <!-- Welcome -->
+  <div class="page-header dash-welcome">
+    <div>
+      <h1 class="page-title">Bonjour, {{ authService.currentUser()?.aka }} 👋</h1>
+      <p class="page-sub">Voici un aperçu de votre activité sur NORTH PROD</p>
+    </div>
+    <a routerLink="/artist/bookings" class="btn-gold">
+      <i class="fa fa-plus"></i> Nouvelle réservation
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(192,160,96,0.1)"><i class="fa fa-calendar" style="color:#c0a060"></i></div>
+      <div><div class="stat-num">{{ stats.totalBookings }}</div><div class="stat-label">Réservations totales</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(243,156,18,0.1)"><i class="fa fa-clock-o" style="color:#f39c12"></i></div>
+      <div><div class="stat-num">{{ stats.pendingBookings }}</div><div class="stat-label">En attente</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(46,204,113,0.1)"><i class="fa fa-music" style="color:#2ecc71"></i></div>
+      <div><div class="stat-num">{{ stats.activeProjects }}</div><div class="stat-label">Projets actifs</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(52,152,219,0.1)"><i class="fa fa-check-circle" style="color:#3498db"></i></div>
+      <div><div class="stat-num">{{ stats.deliveredProjects }}</div><div class="stat-label">Projets livrés</div></div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+
+    <!-- Recent bookings -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa fa-calendar-o"></i> Réservations récentes</h3>
+        <a routerLink="/artist/bookings" class="btn-outline" style="padding:6px 14px;font-size:11px">Voir tout</a>
+      </div>
+      @if(loading) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(bookings.length === 0) {
+        <div class="card-empty">
+          <i class="fa fa-calendar-o"></i>
+          <p>Aucune réservation pour l'instant.</p>
+          <a routerLink="/artist/bookings" class="btn-gold" style="font-size:11px;padding:8px 16px">Réserver une séance</a>
+        </div>
+      } @else {
+        <div class="booking-list">
+          @for(b of bookings; track b._id) {
+            <div class="booking-row">
+              <div class="booking-date">
+                <span class="bdate-day">{{ formatDate(b.date).split(' ')[0] }}</span>
+                <span class="bdate-month">{{ formatDate(b.date).split(' ')[1] }}</span>
+              </div>
+              <div class="booking-info">
+                <div class="booking-type">{{ b.type | titlecase }}</div>
+                <div class="booking-time">{{ b.startTime }}{{ b.endTime ? ' → ' + b.endTime : '' }}</div>
+              </div>
+              <div class="booking-price">{{ b.totalPrice }} DT</div>
+              <span class="status-badge {{ getStatusClass(b.status) }}">{{ getStatusLabel(b.status) }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Active projects -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa fa-music"></i> Projets en cours</h3>
+        <a routerLink="/artist/projects" class="btn-outline" style="padding:6px 14px;font-size:11px">Voir tout</a>
+      </div>
+      @if(loading) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(projects.length === 0) {
+        <div class="card-empty">
+          <i class="fa fa-music"></i>
+          <p>Aucun projet actif. Réservez une séance pour commencer.</p>
+        </div>
+      } @else {
+        <div class="project-list">
+          @for(p of projects; track p._id) {
+            <a [routerLink]="['/artist/projects', p._id]" class="project-row">
+              <div class="project-info">
+                <div class="project-title">{{ p.title }}</div>
+                <div class="project-stage">{{ getStageLabel(p.stage) }}</div>
+              </div>
+              <div class="project-progress-wrap">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="p.progress"></div>
+                </div>
+                <span class="progress-pct">{{ p.progress }}%</span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+
+</app-dashboard-shell>

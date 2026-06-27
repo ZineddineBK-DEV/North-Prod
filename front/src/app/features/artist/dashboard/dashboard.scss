@@ -1,0 +1,30 @@
+$gold: #c0a060; $border: rgba(192,160,96,0.12); $card: #161616; $muted: rgba(255,255,255,0.4);
+
+.dash-welcome { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.stat-card { display: flex; align-items: center; gap: 16px; }
+.stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; i { font-size: 18px; } }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; @media (max-width: 900px) { grid-template-columns: 1fr; } }
+
+.card-loading { padding: 40px; text-align: center; color: $gold; }
+.card-empty   { padding: 40px; text-align: center; color: $muted; display: flex; flex-direction: column; align-items: center; gap: 12px; i { font-size: 32px; } p { font-size: 13px; margin: 0; } }
+
+// Booking list
+.booking-list { display: flex; flex-direction: column; }
+.booking-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; &:last-child { border-bottom: none; } &:hover { background: rgba(255,255,255,0.02); } }
+.booking-date { width: 36px; text-align: center; flex-shrink: 0; .bdate-day { display: block; font-size: 18px; font-weight: 800; color: $gold; line-height: 1; } .bdate-month { display: block; font-size: 10px; color: $muted; text-transform: uppercase; } }
+.booking-info { flex: 1; min-width: 0; }
+.booking-type { font-size: 13px; color: #fff; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.booking-time { font-size: 11px; color: $muted; margin-top: 2px; }
+.booking-price { font-size: 13px; color: $gold; font-weight: 700; white-space: nowrap; margin-right: 8px; }
+
+// Project list
+.project-list { display: flex; flex-direction: column; }
+.project-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); text-decoration: none; transition: background 0.15s; &:last-child { border-bottom: none; } &:hover { background: rgba(255,255,255,0.02); } }
+.project-info { flex: 1; min-width: 0; }
+.project-title { font-size: 13px; color: #fff; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-stage { font-size: 11px; color: $muted; margin-top: 2px; }
+.project-progress-wrap { display: flex; align-items: center; gap: 8px; }
+.progress-bar { width: 80px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, $gold, #a08040); border-radius: 2px; transition: width 0.5s; }
+.progress-pct { font-size: 11px; color: $muted; width: 28px; text-align: right; }

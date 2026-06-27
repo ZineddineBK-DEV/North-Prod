@@ -1,0 +1,16 @@
+$gold:#c0a060; $card:#161616; $input:#1e1e1e; $border:rgba(192,160,96,0.12); $muted:rgba(255,255,255,0.4);
+.profile-grid{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start;@media(max-width:800px){grid-template-columns:1fr;}}
+.profile-avatar-card{padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.avatar-wrap{position:relative;} .avatar-img,.avatar-placeholder{width:90px;height:90px;border-radius:50%;object-fit:cover;} .avatar-placeholder{background:linear-gradient(135deg,$gold,#a08040);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#000;}
+.avatar-upload-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:$gold;display:flex;align-items:center;justify-content:center;cursor:pointer;i{font-size:12px;color:#000;}}
+.profile-name{font-size:16px;font-weight:700;color:#fff;} .profile-email{font-size:12px;color:$muted;} .profile-role-badge{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:$gold;background:rgba($gold,0.1);border:1px solid rgba($gold,0.2);border-radius:10px;padding:3px 12px;}
+.field-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:$muted;margin-bottom:8px;}
+.field-group{margin-bottom:16px;}
+.field-input{width:100%;background:$input;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:11px 14px;color:#e0e0e0;font-size:13px;font-family:inherit;box-sizing:border-box;transition:border-color 0.2s;&:focus{outline:none;border-color:rgba($gold,0.5);}textarea{resize:vertical;}}
+textarea.field-input{resize:vertical;min-height:80px;}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;@media(max-width:500px){grid-template-columns:1fr;}}
+.genre-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.genre-chip{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:$input;color:$muted;font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.2s;&.active{border-color:$gold;color:$gold;background:rgba($gold,0.1);}&:hover:not(.active){border-color:rgba($gold,0.3);color:rgba($gold,0.7);}}
+.social-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;@media(max-width:600px){grid-template-columns:1fr;}}
+.alert-error{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.25);color:#ff6b6b;padding:11px 14px;border-radius:6px;font-size:13px;margin-bottom:14px;}
+.alert-success{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.2);color:#2ecc71;padding:11px 14px;border-radius:6px;font-size:13px;margin-bottom:14px;}

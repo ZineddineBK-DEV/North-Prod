@@ -1,0 +1,135 @@
+<app-dashboard-shell [navItems]="navItems" title="Espace Artiste">
+
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">Réservations</h1>
+      <p class="page-sub">Gérez vos séances en studio</p>
+    </div>
+    <button class="btn-gold" (click)="showForm.set(!showForm())">
+      <i class="fa fa-plus"></i> Nouvelle réservation
+    </button>
+  </div>
+
+  <!-- New booking form -->
+  @if(showForm()) {
+    <div class="card booking-form-card" style="margin-bottom:24px">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa fa-calendar-plus-o"></i> Demande de réservation</h3>
+        <button class="btn-outline" style="padding:6px 12px;font-size:12px" (click)="showForm.set(false)">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="form-body">
+        @if(formError)   { <div class="alert-error"><i class="fa fa-exclamation-circle"></i> {{ formError }}</div> }
+        @if(formSuccess) { <div class="alert-success"><i class="fa fa-check-circle"></i> {{ formSuccess }}</div> }
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <!-- Type selection cards -->
+          <div class="field-group">
+            <label class="field-label">Type de séance</label>
+            <div class="type-grid">
+              @for(t of types; track t.value) {
+                <div class="type-card" [class.selected]="form.value.type === t.value"
+                     (click)="form.patchValue({type: t.value})">
+                  <div class="type-name">{{ t.label }}</div>
+                  <div class="type-price">{{ t.price }} DT / {{ t.unit }}</div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="field-group">
+              <label class="field-label">Date souhaitée</label>
+              <input type="date" formControlName="date" [min]="minDate" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Heure de début</label>
+              <input type="time" formControlName="startTime" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">
+                Durée ({{ selectedType?.unit }}s)
+                <span class="estimate">≈ {{ estimatedPrice }} DT</span>
+              </label>
+              <input type="number" formControlName="duration" min="0.5" step="0.5" class="field-input" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="field-group">
+              <label class="field-label">Genre musical</label>
+              <select formControlName="musicalGenre" class="field-input">
+                <option value="">Sélectionner...</option>
+                @for(g of genres; track g) { <option [value]="g">{{ g }}</option> }
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Nombre de participants</label>
+              <input type="number" formControlName="participants" min="1" max="10" class="field-input" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Notes / Demandes spéciales</label>
+            <textarea formControlName="notes" rows="3" class="field-input" placeholder="Informations supplémentaires pour l'équipe..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-outline" (click)="showForm.set(false)">Annuler</button>
+            <button type="submit" class="btn-gold" [disabled]="submitting">
+              @if(submitting) { <i class="fa fa-spinner fa-spin"></i> Envoi en cours... }
+              @else { <i class="fa fa-paper-plane"></i> Envoyer la demande }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    @for(s of [{v:'',l:'Toutes'},{v:'pending',l:'En attente'},{v:'confirmed',l:'Confirmées'},{v:'rejected',l:'Refusées'},{v:'cancelled',l:'Annulées'}]; track s.v) {
+      <button class="filter-tab" [class.active]="filterStatus === s.v" (click)="setFilter(s.v)">{{ s.l }}</button>
+    }
+  </div>
+
+  <!-- Bookings list -->
+  @if(loading) {
+    <div class="list-loading"><i class="fa fa-spinner fa-spin"></i></div>
+  } @else if(bookings.length === 0) {
+    <div class="list-empty">
+      <i class="fa fa-calendar-o"></i>
+      <p>Aucune réservation trouvée.</p>
+    </div>
+  } @else {
+    <div class="bookings-list">
+      @for(b of bookings; track b._id) {
+        <div class="booking-card">
+          <div class="bc-date">
+            <span class="bc-day">{{ new Date(b.date).getDate() }}</span>
+            <span class="bc-month">{{ new Date(b.date).toLocaleDateString('fr-FR',{month:'short'}) }}</span>
+            <span class="bc-year">{{ new Date(b.date).getFullYear() }}</span>
+          </div>
+          <div class="bc-info">
+            <div class="bc-type">{{ b.type | titlecase }}</div>
+            <div class="bc-meta">
+              <span><i class="fa fa-clock-o"></i> {{ b.startTime }}{{ b.endTime ? ' → ' + b.endTime : '' }}</span>
+              <span><i class="fa fa-users"></i> {{ b.participants }} participant(s)</span>
+              @if(b.musicalGenre) { <span><i class="fa fa-music"></i> {{ b.musicalGenre }}</span> }
+            </div>
+            @if(b.notes) { <p class="bc-notes">{{ b.notes }}</p> }
+          </div>
+          <div class="bc-right">
+            <div class="bc-price">{{ b.totalPrice }} DT</div>
+            <span class="status-badge {{ b.status }}">{{ statusLabel(b.status) }}</span>
+            @if(b.status === 'pending' || b.status === 'confirmed') {
+              <button class="btn-cancel" (click)="cancel(b._id)">Annuler</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</app-dashboard-shell>

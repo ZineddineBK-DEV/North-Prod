@@ -1,0 +1,88 @@
+<app-dashboard-shell [navItems]="navItems" title="Espace Artiste">
+  <div class="messages-layout">
+
+    <!-- Threads sidebar -->
+    <div class="threads-panel">
+      <div class="threads-header">
+        <h3>Messages</h3>
+      </div>
+      @if(loadingThreads) {
+        <div class="panel-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(threads.length === 0) {
+        <div class="panel-empty"><i class="fa fa-comments-o"></i><p>Aucune conversation.</p></div>
+      } @else {
+        @for(t of threads; track t._id) {
+          <div class="thread-item" [class.active]="activeThread?._id === t._id" (click)="openThread(t)">
+            <div class="thread-avatar">{{ otherUser(t)?.aka?.[0]?.toUpperCase() || '?' }}</div>
+            <div class="thread-info">
+              <div class="thread-name">{{ otherUser(t)?.aka || 'Inconnu' }}</div>
+              <div class="thread-role">{{ otherUser(t)?.role }}</div>
+              @if(t.lastMessage?.content) {
+                <div class="thread-preview">{{ t.lastMessage.content | slice:0:40 }}...</div>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Chat panel -->
+    <div class="chat-panel">
+      @if(!activeThread) {
+        <div class="chat-placeholder">
+          <i class="fa fa-comments-o"></i>
+          <p>Sélectionnez une conversation pour commencer</p>
+        </div>
+      } @else {
+        <!-- Chat header -->
+        <div class="chat-header">
+          <div class="chat-avatar">{{ otherUser(activeThread)?.aka?.[0]?.toUpperCase() }}</div>
+          <div>
+            <div class="chat-name">{{ otherUser(activeThread)?.aka }}</div>
+            <div class="chat-role">{{ otherUser(activeThread)?.role }}</div>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages">
+          @if(loadingMessages) {
+            <div class="panel-loading"><i class="fa fa-spinner fa-spin"></i></div>
+          } @else {
+            @for(m of messages; track m._id) {
+              <div class="msg-wrap" [class.mine]="isMine(m)">
+                <div class="msg-bubble">
+                  <p>{{ m.content }}</p>
+                  @if(m.attachment) {
+                    <a [href]="m.attachment.url" target="_blank" class="msg-attachment">
+                      <i class="fa fa-paperclip"></i> {{ m.attachment.name }}
+                    </a>
+                  }
+                  <span class="msg-time">{{ formatTime(m.createdAt) }}</span>
+                </div>
+              </div>
+            }
+            @if(isOtherTyping) {
+              <div class="msg-wrap">
+                <div class="msg-bubble typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            }
+            <div #messagesEnd></div>
+          }
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-wrap">
+          <form [formGroup]="form" (ngSubmit)="send()" class="chat-form">
+            <input formControlName="content" placeholder="Écrivez un message..." class="chat-input"
+                   (input)="onTyping()" (keydown.enter)="$event.preventDefault(); send()" />
+            <button type="submit" class="btn-send" [disabled]="!form.value.content?.trim()">
+              <i class="fa fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      }
+    </div>
+  </div>
+</app-dashboard-shell>
