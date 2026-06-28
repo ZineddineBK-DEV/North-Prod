@@ -1,0 +1,17 @@
+$gold:#c0a060; $card:#161616; $border:rgba(192,160,96,0.12); $borderL:rgba(255,255,255,0.06); $muted:rgba(255,255,255,0.4);
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-tab{padding:8px 18px;background:transparent;border:1px solid $borderL;border-radius:20px;color:$muted;font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.2s;&.active,:hover{border-color:$gold;color:$gold;background:rgba($gold,0.07);}}
+.list-loading,.list-empty{padding:60px;text-align:center;color:$gold; p{color:$muted;font-size:13px;margin-top:8px;}}
+.bookings-table{background:$card;border:1px solid $border;border-radius:10px;overflow:hidden;}
+.table-head{display:grid;grid-template-columns:2fr 1.5fr 1.8fr 0.8fr 0.8fr 1fr 0.6fr;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid $borderL; span{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:$muted;font-weight:600;}}
+.table-row{display:grid;grid-template-columns:2fr 1.5fr 1.8fr 0.8fr 0.8fr 1fr 0.6fr;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center;transition:background 0.15s;&:last-child{border-bottom:none;}&:hover{background:rgba(255,255,255,0.02);} span{font-size:13px;color:rgba(255,255,255,0.7);}}
+.artist-cell{display:flex;align-items:center;gap:10px;}
+.artist-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,$gold,#a08040);display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:12px;flex-shrink:0;}
+.artist-name{font-size:13px;font-weight:600;color:#fff;} .artist-email{font-size:10px;color:$muted;}
+.cell-type{font-size:12px;} .cell-date div{font-size:12px;color:rgba(255,255,255,0.7);} .cell-time{color:$muted !important;font-size:11px !important;}
+.cell-dur,.cell-price{font-size:13px;} .cell-price{color:$gold !important;font-weight:700;}
+.cell-actions{display:flex;gap:6px;}
+.btn-action{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:13px;transition:all 0.2s;
+  &.view{background:rgba($gold,0.1);color:$gold;&:hover{background:rgba($gold,0.2);}}
+}
+@media(max-width:900px){.table-head,.table-row{grid-template-columns:1fr 1fr;gap:8px;} .table-head span:not(:nth-child(-n+2)){display:none;} .table-row .cell-dur,.table-row .cell-type{display:none;}}

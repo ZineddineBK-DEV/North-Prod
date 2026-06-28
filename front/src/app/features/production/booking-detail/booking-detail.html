@@ -1,0 +1,107 @@
+<app-dashboard-shell [navItems]="navItems" title="Équipe Production">
+
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <a routerLink="/production/bookings" style="font-size:12px;color:#c0a060;text-decoration:none">
+        <i class="fa fa-arrow-left"></i> Réservations
+      </a>
+      <h1 class="page-title" style="margin-top:6px">Détail de la réservation</h1>
+    </div>
+    @if(booking?.status === 'pending') {
+      <div class="action-btns">
+        <button class="btn-confirm" (click)="confirm()" [disabled]="processing">
+          <i class="fa fa-check"></i> Confirmer
+        </button>
+        <button class="btn-reject-toggle" (click)="showReject = !showReject">
+          <i class="fa fa-times"></i> Refuser
+        </button>
+      </div>
+    }
+  </div>
+
+  @if(error)   { <div class="alert-error"><i class="fa fa-exclamation-circle"></i> {{ error }}</div> }
+  @if(success) { <div class="alert-success"><i class="fa fa-check-circle"></i> {{ success }}</div> }
+
+  <!-- Reject form -->
+  @if(showReject && booking?.status === 'pending') {
+    <div class="card reject-card">
+      <h4>Motif du refus</h4>
+      <form [formGroup]="rejectForm" (ngSubmit)="reject()">
+        <textarea formControlName="reason" rows="3" placeholder="Expliquez la raison du refus à l'artiste..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <button type="submit" class="btn-reject" [disabled]="processing || rejectForm.invalid">
+            @if(processing) { <i class="fa fa-spinner fa-spin"></i> } @else { Confirmer le refus }
+          </button>
+          <button type="button" class="btn-outline" (click)="showReject=false">Annuler</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if(loading) {
+    <div style="padding:60px;text-align:center;color:#c0a060"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(booking) {
+    <div class="detail-grid">
+
+      <!-- Booking info -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Informations de la séance</h3>
+          <span class="status-badge {{ booking.status }}">{{ statusLabel(booking.status) }}</span>
+        </div>
+        <div class="detail-rows">
+          <div class="detail-row"><span class="dl">Type</span><span class="dv">{{ typeLabel(booking.type) }}</span></div>
+          <div class="detail-row"><span class="dl">Date</span><span class="dv">{{ formatDate(booking.date) }}</span></div>
+          <div class="detail-row"><span class="dl">Heure</span><span class="dv">{{ booking.startTime }}{{ booking.endTime ? ' → ' + booking.endTime : '' }}</span></div>
+          <div class="detail-row"><span class="dl">Durée</span><span class="dv">{{ booking.duration }} {{ booking.unit }}(s)</span></div>
+          <div class="detail-row"><span class="dl">Participants</span><span class="dv">{{ booking.participants }}</span></div>
+          @if(booking.musicalGenre) {
+            <div class="detail-row"><span class="dl">Genre</span><span class="dv">{{ booking.musicalGenre }}</span></div>
+          }
+          <div class="detail-row"><span class="dl">Montant</span><span class="dv gold-text">{{ booking.totalPrice }} DT</span></div>
+          <div class="detail-row"><span class="dl">Soumis le</span><span class="dv">{{ formatDateTime(booking.createdAt) }}</span></div>
+          @if(booking.rejectionReason) {
+            <div class="detail-row"><span class="dl">Motif refus</span><span class="dv" style="color:#e74c3c">{{ booking.rejectionReason }}</span></div>
+          }
+        </div>
+        @if(booking.notes) {
+          <div class="notes-block">
+            <div class="notes-label">Notes de l'artiste</div>
+            <p>{{ booking.notes }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Artist card -->
+      <div>
+        <div class="card artist-card">
+          <div class="card-header"><h3 class="card-title">Artiste</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+            <div class="big-avatar">{{ booking.artist?.aka?.[0]?.toUpperCase() }}</div>
+            <div class="artist-aka">{{ booking.artist?.aka }}</div>
+            <div class="artist-email">{{ booking.artist?.email }}</div>
+            @if(booking.artist?.phone) {
+              <a [href]="'tel:' + booking.artist.phone" class="artist-phone">
+                <i class="fa fa-phone"></i> {{ booking.artist.phone }}
+              </a>
+            }
+          </div>
+        </div>
+
+        @if(booking.project) {
+          <div class="card" style="margin-top:16px">
+            <div class="card-header"><h3 class="card-title">Projet lié</h3></div>
+            <div style="padding:16px 20px">
+              <a [routerLink]="['/production/projects', booking.project._id]" class="project-link">
+                <i class="fa fa-music"></i> {{ booking.project.title || 'Voir le projet' }}
+                <i class="fa fa-arrow-right" style="margin-left:auto"></i>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</app-dashboard-shell>

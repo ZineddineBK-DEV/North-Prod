@@ -1,0 +1,21 @@
+$gold:#c0a060; $card:#161616; $border:rgba(192,160,96,0.12); $borderL:rgba(255,255,255,0.06); $muted:rgba(255,255,255,0.4);
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-tab{padding:7px 14px;background:transparent;border:1px solid $borderL;border-radius:20px;color:$muted;font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.2s;&.active,:hover{border-color:$gold;color:$gold;background:rgba($gold,0.06);}}
+.list-loading,.list-empty{padding:60px;text-align:center;color:$gold;p{color:$muted;font-size:13px;margin-top:8px;}}
+.projects-table{background:$card;border:1px solid $border;border-radius:10px;overflow:hidden;}
+.table-head{display:grid;grid-template-columns:1.5fr 2fr 1.5fr 1.5fr 1fr 0.4fr;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid $borderL; span{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:$muted;font-weight:600;}}
+.table-row{display:grid;grid-template-columns:1.5fr 2fr 1.5fr 1.5fr 1fr 0.4fr;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center;transition:background 0.15s;&:last-child{border-bottom:none;}&:hover{background:rgba(255,255,255,0.02);}}
+.artist-cell{display:flex;align-items:center;gap:8px;}
+.artist-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,$gold,#a08040);display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:11px;flex-shrink:0;}
+.artist-name{font-size:13px;font-weight:600;color:#fff;}
+.project-title{font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.project-genre{font-size:11px;color:$muted;}
+.cell-stage{display:flex;align-items:center;gap:6px;}
+.stage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cell-progress{display:flex;align-items:center;gap:8px;}
+.prog-bar{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;min-width:50px;}
+.prog-fill{height:100%;border-radius:2px;transition:width 0.5s;}
+.prog-pct{font-size:11px;color:$muted;width:28px;}
+.cell-date{font-size:12px;color:$muted;}
+.btn-action{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:13px;transition:all 0.2s;&.view{background:rgba($gold,0.1);color:$gold;&:hover{background:rgba($gold,0.2);}}}
+@media(max-width:900px){.table-head,.table-row{grid-template-columns:1fr 1fr 0.4fr;} .table-head span:nth-child(3),.table-head span:nth-child(4),.table-row .cell-stage,.table-row .cell-progress{display:none;}}

@@ -1,0 +1,56 @@
+<app-dashboard-shell [navItems]="navItems" title="Équipe Production">
+  <div class="page-header">
+    <h1 class="page-title">Projets</h1>
+    <p class="page-sub">Gérez les projets en cours de production</p>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="filter-tab" [class.active]="filterStage===''" (click)="setFilter('')">Tous</button>
+    @for(s of stages; track s) {
+      <button class="filter-tab" [class.active]="filterStage===s" (click)="setFilter(s)"
+              [style.color]="filterStage===s ? stageColor(s) : ''"
+              [style.border-color]="filterStage===s ? stageColor(s) : ''">
+        {{ stageLabel(s) }}
+      </button>
+    }
+  </div>
+
+  @if(loading) {
+    <div class="list-loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(projects.length === 0) {
+    <div class="list-empty"><i class="fa fa-music fa-3x"></i><p>Aucun projet trouvé.</p></div>
+  } @else {
+    <div class="projects-table">
+      <div class="table-head">
+        <span>Artiste</span><span>Projet</span><span>Étape</span>
+        <span>Progression</span><span>Dernière MàJ</span><span></span>
+      </div>
+      @for(p of projects; track p._id) {
+        <div class="table-row">
+          <div class="artist-cell">
+            <div class="artist-avatar">{{ p.artist?.aka?.[0]?.toUpperCase() || '?' }}</div>
+            <span class="artist-name">{{ p.artist?.aka }}</span>
+          </div>
+          <div class="cell-project">
+            <div class="project-title">{{ p.title }}</div>
+            @if(p.genre) { <div class="project-genre">{{ p.genre }}</div> }
+          </div>
+          <div class="cell-stage">
+            <span class="stage-dot" [style.background]="stageColor(p.stage)"></span>
+            <span [style.color]="stageColor(p.stage)">{{ stageLabel(p.stage) }}</span>
+          </div>
+          <div class="cell-progress">
+            <div class="prog-bar">
+              <div class="prog-fill" [style.width.%]="p.progress" [style.background]="stageColor(p.stage)"></div>
+            </div>
+            <span class="prog-pct">{{ p.progress }}%</span>
+          </div>
+          <span class="cell-date">{{ formatDate(p.updatedAt) }}</span>
+          <a [routerLink]="['/production/projects', p._id]" class="btn-action view">
+            <i class="fa fa-pencil"></i>
+          </a>
+        </div>
+      }
+    </div>
+  }
+</app-dashboard-shell>

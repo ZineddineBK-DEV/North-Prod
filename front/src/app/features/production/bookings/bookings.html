@@ -1,0 +1,51 @@
+<app-dashboard-shell [navItems]="navItems" title="Équipe Production">
+
+  <div class="page-header">
+    <h1 class="page-title">Réservations</h1>
+    <p class="page-sub">Gérez et validez les demandes des artistes</p>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    @for(f of [{v:'pending',l:'En attente'},{v:'confirmed',l:'Confirmées'},{v:'rejected',l:'Refusées'},{v:'',l:'Toutes'}]; track f.v) {
+      <button class="filter-tab" [class.active]="filterStatus===f.v" (click)="setFilter(f.v)">{{ f.l }}</button>
+    }
+  </div>
+
+  @if(loading) {
+    <div class="list-loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(bookings.length === 0) {
+    <div class="list-empty"><i class="fa fa-calendar-o fa-3x"></i><p>Aucune réservation trouvée.</p></div>
+  } @else {
+    <div class="bookings-table">
+      <div class="table-head">
+        <span>Artiste</span><span>Type</span><span>Date & Heure</span>
+        <span>Durée</span><span>Montant</span><span>Statut</span><span>Actions</span>
+      </div>
+      @for(b of bookings; track b._id) {
+        <div class="table-row">
+          <div class="artist-cell">
+            <div class="artist-avatar">{{ b.artist?.aka?.[0]?.toUpperCase() || '?' }}</div>
+            <div>
+              <div class="artist-name">{{ b.artist?.aka }}</div>
+              <div class="artist-email">{{ b.artist?.email }}</div>
+            </div>
+          </div>
+          <span class="cell-type">{{ typeLabel(b.type) }}</span>
+          <div class="cell-date">
+            <div>{{ formatDate(b.date) }}</div>
+            <div class="cell-time">{{ b.startTime }}{{ b.endTime ? ' → ' + b.endTime : '' }}</div>
+          </div>
+          <span class="cell-dur">{{ b.duration }} {{ b.unit }}(s)</span>
+          <span class="cell-price">{{ b.totalPrice }} DT</span>
+          <span class="status-badge {{ b.status }}">{{ statusLabel(b.status) }}</span>
+          <div class="cell-actions">
+            <a [routerLink]="['/production/bookings', b._id]" class="btn-action view">
+              <i class="fa fa-eye"></i>
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</app-dashboard-shell>

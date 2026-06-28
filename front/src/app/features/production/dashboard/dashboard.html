@@ -1,0 +1,109 @@
+<app-dashboard-shell [navItems]="navItems" title="Équipe Production">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tableau de bord</h1>
+      <p class="page-sub">Vue d'ensemble de l'activité du studio</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon orange"><i class="fa fa-clock-o"></i></div>
+      <div>
+        <div class="stat-num">{{ stats.pending }}</div>
+        <div class="stat-label">Demandes en attente</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="fa fa-calendar-check-o"></i></div>
+      <div>
+        <div class="stat-num">{{ stats.confirmed }}</div>
+        <div class="stat-label">Séances confirmées</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="fa fa-music"></i></div>
+      <div>
+        <div class="stat-num">{{ stats.activeProjects }}</div>
+        <div class="stat-label">Projets actifs</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon gold"><i class="fa fa-check-circle"></i></div>
+      <div>
+        <div class="stat-num">{{ stats.deliveredToday }}</div>
+        <div class="stat-label">Projets livrés</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prod-grid">
+
+    <!-- Pending bookings -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa fa-bell"></i> Demandes en attente</h3>
+        <a routerLink="/production/bookings" class="btn-outline" style="padding:6px 14px;font-size:11px">Tout voir</a>
+      </div>
+
+      @if(loading) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(pendingBookings.length === 0) {
+        <div class="card-empty">
+          <i class="fa fa-check-circle" style="color:#2ecc71"></i>
+          <p>Aucune demande en attente.</p>
+        </div>
+      } @else {
+        <div class="pending-list">
+          @for(b of pendingBookings; track b._id) {
+            <a [routerLink]="['/production/bookings', b._id]" class="pending-row">
+              <div class="pending-avatar">{{ b.artist?.aka?.[0]?.toUpperCase() || '?' }}</div>
+              <div class="pending-info">
+                <div class="pending-aka">{{ b.artist?.aka }}</div>
+                <div class="pending-meta">
+                  {{ formatDate(b.date) }} · {{ b.startTime }} · {{ b.totalPrice }} DT
+                </div>
+              </div>
+              <span class="status-badge pending">{{ statusLabel(b.status) }}</span>
+            </a>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Active projects -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa fa-music"></i> Projets actifs</h3>
+        <a routerLink="/production/projects" class="btn-outline" style="padding:6px 14px;font-size:11px">Tout voir</a>
+      </div>
+
+      @if(loading) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(activeProjects.length === 0) {
+        <div class="card-empty"><i class="fa fa-music"></i><p>Aucun projet actif.</p></div>
+      } @else {
+        <div class="project-list">
+          @for(p of activeProjects; track p._id) {
+            <a [routerLink]="['/production/projects', p._id]" class="project-row">
+              <div class="project-info">
+                <div class="project-title">{{ p.title }}</div>
+                <div class="project-artist">{{ p.artist?.aka }}</div>
+              </div>
+              <div class="project-stage-wrap">
+                <span class="project-stage-dot" [style.background]="stageColor(p.stage)"></span>
+                <span class="project-stage-label" [style.color]="stageColor(p.stage)">{{ stageLabel(p.stage) }}</span>
+              </div>
+              <div class="progress-mini">
+                <div class="progress-mini-fill" [style.width.%]="p.progress" [style.background]="stageColor(p.stage)"></div>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</app-dashboard-shell>
