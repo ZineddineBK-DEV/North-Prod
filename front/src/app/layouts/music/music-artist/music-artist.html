@@ -1,5 +1,5 @@
 <!-- Portfolio preview section -->
-<section class="np-portfolio" id="portfolio">
+<section class="np-portfolio" id="portfolio-section">
   <div class="container">
     <div class="section-header">
       <span class="section-tag">Productions</span>
@@ -10,7 +10,9 @@
     <!-- Category filters -->
     <div class="portfolio-filters">
       @for(cat of categories; track cat) {
-        <button class="filter-btn" [class.active]="activeCategory === cat" (click)="filter(cat)">
+        <button class="filter-btn"
+                [class.active]="activeCategory === cat"
+                (click)="filter(cat)">
           {{ cat }}
         </button>
       }
@@ -29,16 +31,12 @@
         </div>
       } @else {
         @for(item of items; track item._id) {
-          <div class="portfolio-item" [style.background-image]="'url(' + getThumb(item) + ')'">
+          <div class="portfolio-item"
+               [style.background-image]="'url(' + getThumb(item) + ')'">
             <div class="portfolio-overlay">
               <span class="portfolio-cat">{{ item.category }}</span>
               <h4 class="portfolio-title">{{ item.title }}</h4>
               @if(item.artist) { <p class="portfolio-artist">{{ item.artist }}</p> }
-              @if(item.embedUrl) {
-                <a [href]="item.embedUrl" target="_blank" class="portfolio-play">
-                  <i class="fa fa-play"></i>
-                </a>
-              }
             </div>
           </div>
         }
@@ -46,7 +44,9 @@
     </div>
 
     <div class="section-cta">
-      <a routerLink="/portfolio" class="btn-section">Voir tout le portfolio <i class="fa fa-arrow-right"></i></a>
+      <a routerLink="/portfolio" class="btn-section">
+        Voir tout le portfolio <i class="fa fa-arrow-right"></i>
+      </a>
     </div>
   </div>
 </section>

@@ -6,16 +6,16 @@
       <!-- Logo -->
       <a routerLink="/" class="nav-logo">
         <img src="assets/images/logo/north-prod-logo.png"
-             alt="NORTH PROD"
+             alt="NORTH PRODUCTION"
              class="logo-img"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
         <span class="logo-text-fallback">
           NORTH <span class="logo-accent">PROD</span>
-          <span class="logo-sub">STUDIO</span>
+          <small class="logo-sub">S T U D I O</small>
         </span>
       </a>
 
-      <!-- Desktop menu -->
+      <!-- Desktop nav links -->
       <ul class="nav-links desktop-only">
         @for(item of menuItems; track item.title) {
           <li>
@@ -28,10 +28,10 @@
         }
       </ul>
 
-      <!-- Auth actions -->
+      <!-- Right actions -->
       <div class="nav-actions desktop-only">
         @if(!authService.isLoggedIn()) {
-          <a routerLink="/auth/login" class="btn-nav-outline">Connexion</a>
+          <a routerLink="/auth/login"    class="btn-nav-outline">Connexion</a>
           <a routerLink="/auth/register" class="btn-nav-primary">Réserver</a>
         } @else {
 
@@ -54,7 +54,7 @@
                 </div>
                 <div class="notif-body">
                   @if(notifsLoading) {
-                    <div class="notif-loading"><i class="fa fa-spinner fa-spin"></i></div>
+                    <div class="notif-empty"><i class="fa fa-spinner fa-spin"></i><p>Chargement...</p></div>
                   } @else if(notifications.length === 0) {
                     <div class="notif-empty">
                       <i class="fa fa-bell-slash"></i>
@@ -83,7 +83,7 @@
               @if(authService.currentUser()?.avatarUrl) {
                 <img [src]="authService.currentUser()!.avatarUrl!" [alt]="authService.currentUser()!.aka" />
               } @else {
-                <span>{{ authService.currentUser()!.aka[0].toUpperCase() }}</span>
+                <span>{{ (authService.currentUser()!.aka || 'U')[0].toUpperCase() }}</span>
               }
             </div>
             <span class="user-aka">{{ authService.currentUser()?.aka }}</span>
@@ -92,14 +92,14 @@
             @if(userMenuOpen) {
               <div class="user-dropdown" (click)="$event.stopPropagation()">
                 @if(authService.isArtist()) {
-                  <a routerLink="/artist/dashboard"  (click)="userMenuOpen=false"><i class="fa fa-home"></i> Mon Espace</a>
+                  <a routerLink="/artist/dashboard"  (click)="userMenuOpen=false"><i class="fa fa-th-large"></i> Mon Espace</a>
                   <a routerLink="/artist/bookings"   (click)="userMenuOpen=false"><i class="fa fa-calendar"></i> Réservations</a>
                   <a routerLink="/artist/projects"   (click)="userMenuOpen=false"><i class="fa fa-music"></i> Projets</a>
                   <a routerLink="/artist/messages"   (click)="userMenuOpen=false"><i class="fa fa-comments"></i> Messages</a>
                   <a routerLink="/artist/profile"    (click)="userMenuOpen=false"><i class="fa fa-user"></i> Mon Profil</a>
                 }
                 @if(authService.isProduction()) {
-                  <a routerLink="/production/dashboard" (click)="userMenuOpen=false"><i class="fa fa-home"></i> Dashboard</a>
+                  <a routerLink="/production/dashboard" (click)="userMenuOpen=false"><i class="fa fa-th-large"></i> Dashboard</a>
                   <a routerLink="/production/bookings"  (click)="userMenuOpen=false"><i class="fa fa-calendar"></i> Réservations</a>
                   <a routerLink="/production/projects"  (click)="userMenuOpen=false"><i class="fa fa-music"></i> Projets</a>
                 }
@@ -118,7 +118,7 @@
       </div>
 
       <!-- Hamburger (mobile) -->
-      <button class="hamburger mobile-only" (click)="toggleMobile()" [class.open]="mobileOpen">
+      <button class="hamburger mobile-only" (click)="toggleMobile()" [class.open]="mobileOpen" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
     </nav>

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface IMenu {
@@ -12,48 +12,21 @@ export interface IMenu {
   megaMenuType?: 'small' | 'medium' | 'large';
 }
 
+// Public site nav items — each path is a real Angular route defined in layout.routes.ts
+export const MENUITEMS: IMenu[] = [
+  { path: '/',          title: 'Accueil',         type: 'link' },
+  { path: '/portfolio', title: 'Portfolio',        type: 'link' },
+  { path: '/services',  title: 'Services & Tarifs',type: 'link' },
+  { path: '/studio',    title: 'Le Studio',        type: 'link' },
+  { path: '/contact',   title: 'Contact',          type: 'link' },
+];
+
 @Injectable({ providedIn: 'root' })
 export class NavService {
-  // Mobile sidebar open state
-  openSidebar = signal(false);
+  // Public observable for components that subscribe reactively
+  private _items = new BehaviorSubject<IMenu[]>(MENUITEMS);
+  items$ = this._items.asObservable();
 
-  // Main navigation items for NORTH PROD
-  MENUITEMS: IMenu[] = [
-    {
-      title: 'Accueil',
-      type: 'link',
-      path: '/',
-    },
-    {
-      title: 'Portfolio',
-      type: 'link',
-      path: '/portfolio',
-    },
-      {
-      title: 'Studio',
-      type: 'link',
-      path: '/studio',
-    },
-    {
-      title: 'Services',
-      type: 'link',
-      path: '/services',
-    },
-    {
-      title: 'Contact',
-      type: 'link',
-      path: '/contact',
-    },
-  ];
-
-  private items = new BehaviorSubject<IMenu[]>(this.MENUITEMS);
-  items$ = this.items.asObservable();
-
-  toggleSidebar() {
-    this.openSidebar.update((v) => !v);
-  }
-
-  closeSidebar() {
-    this.openSidebar.set(false);
-  }
+  // Direct access for the nav component (no subscription needed)
+  readonly MENUITEMS = MENUITEMS;
 }
