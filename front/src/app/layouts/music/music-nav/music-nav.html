@@ -5,15 +5,22 @@
 
       <!-- Logo -->
       <a routerLink="/" class="nav-logo">
-        <span class="logo-text">NORTH <span class="logo-accent">PROD</span></span>
-        <span class="logo-sub">STUDIO</span>
+        <img src="assets/images/logo/north-prod-logo.png"
+             alt="NORTH PROD"
+             class="logo-img"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+        <span class="logo-text-fallback">
+          NORTH <span class="logo-accent">PROD</span>
+          <span class="logo-sub">STUDIO</span>
+        </span>
       </a>
 
       <!-- Desktop menu -->
       <ul class="nav-links desktop-only">
         @for(item of menuItems; track item.title) {
           <li>
-            <a [routerLink]="item.path" routerLinkActive="active"
+            <a [routerLink]="item.path"
+               routerLinkActive="active"
                [routerLinkActiveOptions]="{exact: item.path === '/'}">
               {{ item.title }}
             </a>
@@ -21,21 +28,57 @@
         }
       </ul>
 
-      <!-- Auth buttons / User avatar -->
+      <!-- Auth actions -->
       <div class="nav-actions desktop-only">
         @if(!authService.isLoggedIn()) {
           <a routerLink="/auth/login" class="btn-nav-outline">Connexion</a>
           <a routerLink="/auth/register" class="btn-nav-primary">Réserver</a>
         } @else {
+
           <!-- Notification bell -->
-          <button class="nav-bell" (click)="toggleNotifications()">
-            <i class="fa fa-bell"></i>
-            @if(notifService.unreadCount() > 0) {
-              <span class="badge">{{ notifService.unreadCount() }}</span>
+          <div class="notif-wrap">
+            <button class="nav-bell" (click)="toggleNotifications($event)" [class.active]="notifOpen">
+              <i class="fa fa-bell"></i>
+              @if(notifService.unreadCount() > 0) {
+                <span class="badge">{{ notifService.unreadCount() }}</span>
+              }
+            </button>
+
+            @if(notifOpen) {
+              <div class="notif-panel" (click)="$event.stopPropagation()">
+                <div class="notif-header">
+                  <span>Notifications</span>
+                  @if(notifService.unreadCount() > 0) {
+                    <button class="mark-all" (click)="markAllRead($event)">Tout lire</button>
+                  }
+                </div>
+                <div class="notif-body">
+                  @if(notifsLoading) {
+                    <div class="notif-loading"><i class="fa fa-spinner fa-spin"></i></div>
+                  } @else if(notifications.length === 0) {
+                    <div class="notif-empty">
+                      <i class="fa fa-bell-slash"></i>
+                      <p>Aucune notification</p>
+                    </div>
+                  } @else {
+                    @for(n of notifications; track n._id) {
+                      <div class="notif-item" [class.unread]="!n.isRead">
+                        <div class="notif-dot"></div>
+                        <div class="notif-content">
+                          <p class="notif-title">{{ n.title }}</p>
+                          <p class="notif-msg">{{ n.message }}</p>
+                          <span class="notif-time">{{ n.createdAt | date:'dd/MM HH:mm' }}</span>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
             }
-          </button>
+          </div>
+
           <!-- User dropdown -->
-          <div class="nav-user" (click)="toggleUserMenu()" clickOutside (clickOutside)="closeUserMenu()">
+          <div class="nav-user" (click)="toggleUserMenu($event)" [class.open]="userMenuOpen">
             <div class="user-avatar">
               @if(authService.currentUser()?.avatarUrl) {
                 <img [src]="authService.currentUser()!.avatarUrl!" [alt]="authService.currentUser()!.aka" />
@@ -44,24 +87,27 @@
               }
             </div>
             <span class="user-aka">{{ authService.currentUser()?.aka }}</span>
-            <i class="fa fa-chevron-down"></i>
+            <i class="fa fa-chevron-down" [class.rotated]="userMenuOpen"></i>
 
             @if(userMenuOpen) {
-              <div class="user-dropdown">
+              <div class="user-dropdown" (click)="$event.stopPropagation()">
                 @if(authService.isArtist()) {
-                  <a routerLink="/artist/dashboard"><i class="fa fa-tachometer"></i> Mon Espace</a>
-                  <a routerLink="/artist/bookings"><i class="fa fa-calendar"></i> Réservations</a>
-                  <a routerLink="/artist/projects"><i class="fa fa-music"></i> Projets</a>
-                  <a routerLink="/artist/messages"><i class="fa fa-comments"></i> Messages</a>
-                  <a routerLink="/artist/profile"><i class="fa fa-user"></i> Profil</a>
+                  <a routerLink="/artist/dashboard"  (click)="userMenuOpen=false"><i class="fa fa-home"></i> Mon Espace</a>
+                  <a routerLink="/artist/bookings"   (click)="userMenuOpen=false"><i class="fa fa-calendar"></i> Réservations</a>
+                  <a routerLink="/artist/projects"   (click)="userMenuOpen=false"><i class="fa fa-music"></i> Projets</a>
+                  <a routerLink="/artist/messages"   (click)="userMenuOpen=false"><i class="fa fa-comments"></i> Messages</a>
+                  <a routerLink="/artist/profile"    (click)="userMenuOpen=false"><i class="fa fa-user"></i> Mon Profil</a>
                 }
                 @if(authService.isProduction()) {
-                  <a routerLink="/production/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
-                  <a routerLink="/production/bookings"><i class="fa fa-calendar"></i> Réservations</a>
-                  <a routerLink="/production/projects"><i class="fa fa-music"></i> Projets</a>
+                  <a routerLink="/production/dashboard" (click)="userMenuOpen=false"><i class="fa fa-home"></i> Dashboard</a>
+                  <a routerLink="/production/bookings"  (click)="userMenuOpen=false"><i class="fa fa-calendar"></i> Réservations</a>
+                  <a routerLink="/production/projects"  (click)="userMenuOpen=false"><i class="fa fa-music"></i> Projets</a>
                 }
                 @if(authService.isAdmin()) {
-                  <a routerLink="/admin/dashboard"><i class="fa fa-cog"></i> Admin</a>
+                  <a routerLink="/admin/dashboard"  (click)="userMenuOpen=false"><i class="fa fa-cog"></i> Administration</a>
+                  <a routerLink="/admin/users"      (click)="userMenuOpen=false"><i class="fa fa-users"></i> Utilisateurs</a>
+                  <a routerLink="/admin/portfolio"  (click)="userMenuOpen=false"><i class="fa fa-image"></i> Portfolio</a>
+                  <a routerLink="/admin/services"   (click)="userMenuOpen=false"><i class="fa fa-list"></i> Services</a>
                 }
                 <hr />
                 <button (click)="logout()"><i class="fa fa-sign-out"></i> Déconnexion</button>
@@ -89,10 +135,11 @@
       </ul>
       <div class="mobile-auth">
         @if(!authService.isLoggedIn()) {
-          <a routerLink="/auth/login" class="btn-nav-outline" (click)="closeMobile()">Connexion</a>
+          <a routerLink="/auth/login"    class="btn-nav-outline" (click)="closeMobile()">Connexion</a>
           <a routerLink="/auth/register" class="btn-nav-primary" (click)="closeMobile()">Réserver</a>
         } @else {
-          <a [routerLink]="authService.isArtist() ? '/artist/dashboard' : authService.isAdmin() ? '/admin/dashboard' : '/production/dashboard'" (click)="closeMobile()">Mon Espace</a>
+          <a [routerLink]="authService.isAdmin() ? '/admin/dashboard' : authService.isProduction() ? '/production/dashboard' : '/artist/dashboard'"
+             (click)="closeMobile()">Mon Espace</a>
           <button class="btn-logout" (click)="logout()">Déconnexion</button>
         }
       </div>
