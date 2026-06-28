@@ -1,0 +1,28 @@
+$gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e0e0;$muted:#888;
+:host{display:block;background:$bg;min-height:100vh;padding:24px;}
+.dash-page{max-width:960px;margin:0 auto;}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;
+  h1{margin:0;font-size:22px;color:#fff;display:flex;align-items:center;gap:10px;i{color:$gold;}}}
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.filter-btn{padding:7px 16px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:$muted;
+  border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.2s;
+  &.active,&:hover{border-color:$gold;color:$gold;background:rgba($gold,0.08);}}
+.loading-state{text-align:center;padding:60px;color:$gold;}
+.empty-state{text-align:center;padding:60px;color:$muted;
+  i{font-size:40px;display:block;margin-bottom:16px;}p{margin:0;font-size:14px;}}
+.project-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  @media(max-width:768px){grid-template-columns:repeat(2,1fr);}
+  @media(max-width:480px){grid-template-columns:1fr;}}
+.project-card{background:$card;border:1px solid $border;border-radius:10px;
+  padding:20px;text-decoration:none;display:block;transition:all 0.2s;
+  &:hover{border-color:rgba($gold,0.4);transform:translateY(-2px);}
+  .pc-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .pc-stage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .pc-stage{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .pc-title{margin:0 0 6px;font-size:16px;font-weight:700;color:#fff;}
+  .pc-genre{margin:0 0 14px;font-size:12px;color:$muted;i{margin-right:4px;}}
+  .pc-date{margin:10px 0 0;font-size:11px;color:rgba($muted,0.6);i{margin-right:4px;}}}
+.pc-progress{display:flex;align-items:center;gap:10px;
+  span{font-size:12px;color:$muted;width:34px;text-align:right;}}
+.progress-bar{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;
+  .progress-fill{height:100%;border-radius:2px;transition:width 0.4s;}}

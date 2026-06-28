@@ -1,0 +1,92 @@
+<div class="dash-page">
+  <div class="page-head">
+    <a routerLink="../.." class="btn-back"><i class="fa fa-arrow-left"></i> Retour aux projets</a>
+  </div>
+
+  @if(loading) {
+    <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(err) {
+    <div class="error-state"><i class="fa fa-exclamation-circle"></i><p>{{ err }}</p></div>
+  } @else if(project) {
+    <!-- Header -->
+    <div class="project-hero">
+      <div class="project-hero-info">
+        <div class="stage-badge" [style.color]="stageColor(project.stage)"
+             [style.border-color]="stageColor(project.stage)">
+          {{ stageLabel(project.stage) }}
+        </div>
+        <h1>{{ project.title }}</h1>
+        @if(project.genre) { <p class="project-genre"><i class="fa fa-music"></i> {{ project.genre }}</p> }
+        @if(project.description) { <p class="project-desc">{{ project.description }}</p> }
+      </div>
+      <div class="progress-circle">
+        <svg viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+          <circle cx="40" cy="40" r="34" fill="none"
+                  [attr.stroke]="stageColor(project.stage)"
+                  stroke-width="8" stroke-linecap="round"
+                  stroke-dasharray="213.6"
+                  [attr.stroke-dashoffset]="213.6 * (1 - project.progress/100)"
+                  transform="rotate(-90 40 40)"/>
+        </svg>
+        <div class="circle-label">
+          <span class="circle-num">{{ project.progress }}</span>
+          <span class="circle-pct">%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage timeline -->
+    <div class="dash-card" style="margin-bottom:20px;">
+      <div class="card-head"><h2><i class="fa fa-road"></i> Progression</h2></div>
+      <div class="stage-timeline">
+        @for(s of stages; track s; let i = $index) {
+          <div class="stage-step"
+               [class.done]="stageIndex(project.stage) > i"
+               [class.active]="project.stage === s">
+            <div class="step-dot" [style.background]="project.stage===s ? stageColor(s) :
+                 stageIndex(project.stage)>i ? '#2ecc71' : 'rgba(255,255,255,0.1)'">
+              @if(stageIndex(project.stage) > i) { <i class="fa fa-check"></i> }
+              @else { <span>{{ i+1 }}</span> }
+            </div>
+            <p class="step-label">{{ stageLabel(s) }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="dash-card">
+      <div class="card-head"><h2><i class="fa fa-history"></i> Historique</h2></div>
+      <div class="history-list">
+        @if(project.history.length === 0) {
+          <div class="card-empty"><i class="fa fa-history"></i><p>Aucun historique.</p></div>
+        } @else {
+          @for(h of project.history; track h._id) {
+            <div class="history-item">
+              <div class="history-dot" [style.background]="stageColor(h.stage)"></div>
+              <div class="history-content">
+                <div class="history-head">
+                  <span class="history-stage" [style.color]="stageColor(h.stage)">{{ stageLabel(h.stage) }}</span>
+                  <span class="history-date">{{ h.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                @if(h.comment) { <p class="history-comment">{{ h.comment }}</p> }
+                <p class="history-by">par {{ h.updatedBy?.aka || h.updatedBy?.firstName || 'Équipe' }}</p>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Comment form -->
+        <div class="comment-form-wrap">
+          <form [formGroup]="commentForm" (ngSubmit)="sendComment()" class="comment-form">
+            <input formControlName="comment" type="text" placeholder="Ajouter une note ou question..." />
+            <button type="submit" class="btn-gold" [disabled]="commentForm.invalid || sendingComment">
+              @if(sendingComment){<i class="fa fa-spinner fa-spin"></i>} @else {Envoyer}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

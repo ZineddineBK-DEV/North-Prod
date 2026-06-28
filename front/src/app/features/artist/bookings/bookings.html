@@ -1,0 +1,118 @@
+<div class="dash-page">
+  <div class="page-head">
+    <h1><i class="fa fa-calendar"></i> Mes Réservations</h1>
+    <button class="btn-gold" (click)="showForm = !showForm">
+      <i class="fa fa-plus"></i> Nouvelle réservation
+    </button>
+  </div>
+
+  @if(submitMsg) {
+    <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ submitMsg }}</div>
+  }
+
+  <!-- Booking form -->
+  @if(showForm) {
+    <div class="dash-card form-card">
+      <div class="card-head">
+        <h2><i class="fa fa-calendar-plus-o"></i> Nouvelle réservation</h2>
+        <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="booking-form">
+        @if(submitErr) {
+          <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ submitErr }}</div>
+        }
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Type de séance *</label>
+            <select formControlName="type">
+              @for(t of types; track t.value) {
+                <option [value]="t.value">{{ t.label }} — {{ t.price }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Date *</label>
+            <input type="date" formControlName="date" [min]="minDate" />
+          </div>
+          <div class="form-field">
+            <label>Heure de début *</label>
+            <input type="time" formControlName="startTime" />
+          </div>
+          <div class="form-field">
+            <label>Durée (heures) *</label>
+            <input type="number" formControlName="duration" min="1" max="12" />
+          </div>
+          <div class="form-field">
+            <label>Nombre de participants</label>
+            <input type="number" formControlName="participants" min="1" max="10" />
+          </div>
+          <div class="form-field">
+            <label>Genre musical</label>
+            <select formControlName="musicalGenre">
+              <option value="">Sélectionner...</option>
+              @for(g of genres; track g) { <option [value]="g">{{ g }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Notes / Instructions spéciales</label>
+          <textarea formControlName="notes" rows="3" placeholder="Informations supplémentaires..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-outline" (click)="showForm=false">Annuler</button>
+          <button type="submit" class="btn-gold" [disabled]="submitting">
+            @if(submitting) { <i class="fa fa-spinner fa-spin"></i> Envoi... }
+            @else { <i class="fa fa-send"></i> Envoyer la demande }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Filter -->
+  <div class="filter-bar">
+    @for(opt of statusOptions; track opt.value) {
+      <button class="filter-btn" [class.active]="filterStatus===opt.value"
+              (click)="filterStatus=opt.value">
+        {{ opt.label }}
+        <span class="count">{{ opt.value==='all' ? bookings.length : bookings.length && (filtered.length) }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- List -->
+  @if(loading) {
+    <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(filtered.length === 0) {
+    <div class="empty-state">
+      <i class="fa fa-calendar-o"></i>
+      <p>Aucune réservation{{ filterStatus !== 'all' ? ' dans cette catégorie' : '' }}.</p>
+      <button class="btn-gold" (click)="showForm=true">Réserver maintenant</button>
+    </div>
+  } @else {
+    <div class="booking-cards">
+      @for(b of filtered; track b._id) {
+        <div class="booking-card">
+          <div class="bc-date">
+            <span class="bc-day">{{ b.date | date:'dd' }}</span>
+            <span class="bc-month">{{ b.date | date:'MMMM' }}</span>
+            <span class="bc-year">{{ b.date | date:'yyyy' }}</span>
+          </div>
+          <div class="bc-info">
+            <p class="bc-type">{{ b.type }}</p>
+            <p class="bc-time"><i class="fa fa-clock-o"></i> {{ b.startTime }}{{ b.endTime ? ' → '+b.endTime : '' }}</p>
+            @if(b.musicalGenre) { <p class="bc-genre"><i class="fa fa-music"></i> {{ b.musicalGenre }}</p> }
+            @if(b.notes) { <p class="bc-notes">{{ b.notes }}</p> }
+          </div>
+          <div class="bc-right">
+            <span class="badge" [class]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+            <p class="bc-price">{{ b.totalPrice | number }} DT</p>
+            @if(b.status === 'pending') {
+              <button class="btn-cancel" (click)="cancel(b._id)">Annuler</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,140 @@
+<div class="dash-page">
+  <!-- Welcome banner -->
+  <div class="dash-welcome">
+    <div class="welcome-avatar">
+      @if(user.avatarUrl) {
+        <img [src]="user.avatarUrl" [alt]="user.aka" />
+      } @else {
+        <span>{{ user.aka[0].toUpperCase() }}</span>
+      }
+    </div>
+    <div class="welcome-text">
+      <h1>Bienvenue, <span class="gold">{{ user.aka }}</span> 👋</h1>
+      <p>Espace artiste — NORTH PRODUCTION</p>
+    </div>
+    <a routerLink="../bookings" class="btn-dash-primary">
+      <i class="fa fa-calendar-plus-o"></i> Nouvelle réservation
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="dash-stats">
+    <div class="stat-card">
+      <i class="fa fa-calendar stat-icon"></i>
+      <div>
+        <p class="stat-num">{{ stats.totalBookings }}</p>
+        <p class="stat-label">Réservations</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="fa fa-check-circle stat-icon ok"></i>
+      <div>
+        <p class="stat-num">{{ stats.confirmedBookings }}</p>
+        <p class="stat-label">Confirmées</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="fa fa-music stat-icon"></i>
+      <div>
+        <p class="stat-num">{{ stats.activeProjects }}</p>
+        <p class="stat-label">Projets actifs</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="fa fa-check-square stat-icon ok"></i>
+      <div>
+        <p class="stat-num">{{ stats.deliveredProjects }}</p>
+        <p class="stat-label">Projets livrés</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <!-- Upcoming bookings -->
+    <div class="dash-card">
+      <div class="card-head">
+        <h2><i class="fa fa-calendar"></i> Prochaines séances</h2>
+        <a routerLink="../bookings">Tout voir</a>
+      </div>
+      @if(loadingBookings) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(upcomingBookings.length === 0) {
+        <div class="card-empty">
+          <i class="fa fa-calendar-o"></i>
+          <p>Aucune réservation à venir.</p>
+          <a routerLink="../bookings" class="btn-dash-sm">Réserver maintenant</a>
+        </div>
+      } @else {
+        <div class="booking-list">
+          @for(b of upcomingBookings; track b._id) {
+            <div class="booking-row">
+              <div class="booking-date">
+                <span class="bday">{{ b.date | date:'dd' }}</span>
+                <span class="bmon">{{ b.date | date:'MMM':'':'fr' }}</span>
+              </div>
+              <div class="booking-info">
+                <p class="booking-type">{{ b.type | titlecase }}</p>
+                <p class="booking-time"><i class="fa fa-clock-o"></i> {{ b.startTime }}</p>
+              </div>
+              <span class="badge" [class]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Active projects -->
+    <div class="dash-card">
+      <div class="card-head">
+        <h2><i class="fa fa-music"></i> Mes Projets</h2>
+        <a routerLink="../projects">Tout voir</a>
+      </div>
+      @if(loadingProjects) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(activeProjects.length === 0) {
+        <div class="card-empty">
+          <i class="fa fa-music"></i>
+          <p>Aucun projet en cours.</p>
+        </div>
+      } @else {
+        <div class="project-list">
+          @for(p of activeProjects; track p._id) {
+            <a [routerLink]="['../project-detail', p._id]" class="project-row">
+              <div class="project-info">
+                <p class="project-title">{{ p.title }}</p>
+                <p class="project-stage">{{ stageLabel(p.stage) }}</p>
+              </div>
+              <div class="project-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width]="p.progress + '%'"></div>
+                </div>
+                <span>{{ p.progress }}%</span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Quick links -->
+  <div class="quick-links">
+    <a routerLink="../messages" class="quick-link">
+      <i class="fa fa-comments"></i>
+      <span>Messages</span>
+      @if(notifSvc.unreadCount() > 0) { <span class="quick-badge">{{ notifSvc.unreadCount() }}</span> }
+    </a>
+    <a routerLink="../profile" class="quick-link">
+      <i class="fa fa-user"></i>
+      <span>Mon Profil</span>
+    </a>
+    <a routerLink="/auth/register" class="quick-link">
+      <i class="fa fa-calendar-plus-o"></i>
+      <span>Réserver</span>
+    </a>
+    <a routerLink="/" class="quick-link">
+      <i class="fa fa-home"></i>
+      <span>Site public</span>
+    </a>
+  </div>
+</div>

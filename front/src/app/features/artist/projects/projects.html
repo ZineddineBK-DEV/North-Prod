@@ -1,0 +1,42 @@
+<div class="dash-page">
+  <div class="page-head">
+    <h1><i class="fa fa-music"></i> Mes Projets</h1>
+  </div>
+
+  <div class="filter-bar">
+    @for(s of stages; track s.value) {
+      <button class="filter-btn" [class.active]="filterStage===s.value" (click)="filterStage=s.value">
+        {{ s.label }}
+      </button>
+    }
+  </div>
+
+  @if(loading) {
+    <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(filtered.length === 0) {
+    <div class="empty-state">
+      <i class="fa fa-music"></i>
+      <p>Aucun projet{{ filterStage !== 'all' ? ' dans cette étape' : '' }}.</p>
+    </div>
+  } @else {
+    <div class="project-grid">
+      @for(p of filtered; track p._id) {
+        <a [routerLink]="['../project-detail', p._id]" class="project-card">
+          <div class="pc-top">
+            <div class="pc-stage-dot" [style.background]="stageColor(p.stage)"></div>
+            <span class="pc-stage" [style.color]="stageColor(p.stage)">{{ stageLabel(p.stage) }}</span>
+          </div>
+          <h3 class="pc-title">{{ p.title }}</h3>
+          @if(p.genre) { <p class="pc-genre"><i class="fa fa-music"></i> {{ p.genre }}</p> }
+          <div class="pc-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width]="p.progress+'%'" [style.background]="stageColor(p.stage)"></div>
+            </div>
+            <span>{{ p.progress }}%</span>
+          </div>
+          <p class="pc-date"><i class="fa fa-clock-o"></i> {{ p.updatedAt | date:'dd/MM/yyyy' }}</p>
+        </a>
+      }
+    </div>
+  }
+</div>
