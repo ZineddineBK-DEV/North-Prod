@@ -1,0 +1,59 @@
+<div class="dash-page">
+  <div class="page-head">
+    <a routerLink="../.." class="btn-back"><i class="fa fa-arrow-left"></i> Retour</a>
+  </div>
+
+  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
+  @else if(booking) {
+    @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
+    @if(err) { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
+
+    <div class="detail-header">
+      <div>
+        <h1>Réservation</h1>
+        <p class="detail-artist">{{ booking.artist?.aka || booking.artist?.firstName || 'Artiste' }}</p>
+      </div>
+      <span class="badge big" [class]="statusClass(booking.status)">{{ statusLabel(booking.status) }}</span>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-card">
+        <h3>Informations</h3>
+        <div class="detail-rows">
+          <div class="dr"><span>Type</span><strong>{{ typeLabel(booking.type) }}</strong></div>
+          <div class="dr"><span>Date</span><strong>{{ booking.date | date:'EEEE dd MMMM yyyy' }}</strong></div>
+          <div class="dr"><span>Heure</span><strong>{{ booking.startTime }}{{ booking.endTime ? ' → '+booking.endTime : '' }}</strong></div>
+          <div class="dr"><span>Durée</span><strong>{{ booking.duration }}h</strong></div>
+          <div class="dr"><span>Participants</span><strong>{{ booking.participants }}</strong></div>
+          @if(booking.musicalGenre) {
+            <div class="dr"><span>Genre</span><strong>{{ booking.musicalGenre }}</strong></div>
+          }
+          <div class="dr"><span>Montant</span><strong class="gold-text">{{ booking.totalPrice | number }} DT</strong></div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3>Notes</h3>
+        <p class="detail-notes">{{ booking.notes || 'Aucune note.' }}</p>
+
+        @if(booking.status === 'pending') {
+          <div class="action-box">
+            <h3>Actions</h3>
+            <div class="reject-field">
+              <label>Motif de refus (optionnel)</label>
+              <textarea [formControl]="rejectForm.controls.reason" rows="2" placeholder="Précisez si nécessaire..."></textarea>
+            </div>
+            <div class="action-btns">
+              <button class="btn-confirm" (click)="confirm()" [disabled]="saving">
+                <i class="fa fa-check"></i> Confirmer
+              </button>
+              <button class="btn-reject" (click)="reject()" [disabled]="saving">
+                <i class="fa fa-times"></i> Refuser
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

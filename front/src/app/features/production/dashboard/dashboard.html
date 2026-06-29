@@ -1,0 +1,84 @@
+<div class="dash-page">
+  <div class="dash-welcome">
+    <div class="welcome-avatar"><span>{{ user.aka[0].toUpperCase() }}</span></div>
+    <div class="welcome-text">
+      <h1>Tableau de bord — <span class="gold">Production</span></h1>
+      <p>{{ user.aka }} · Équipe NORTH PRODUCTION</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="dash-stats">
+    <div class="stat-card warn">
+      <i class="fa fa-clock-o stat-icon"></i>
+      <div><p class="stat-num">{{ pendingBookings.length }}</p><p class="stat-label">En attente</p></div>
+    </div>
+    <div class="stat-card ok">
+      <i class="fa fa-calendar-check-o stat-icon"></i>
+      <div><p class="stat-num">{{ confirmedToday.length }}</p><p class="stat-label">Aujourd'hui</p></div>
+    </div>
+    <div class="stat-card">
+      <i class="fa fa-music stat-icon gold"></i>
+      <div><p class="stat-num">{{ activeProjects.length }}</p><p class="stat-label">Projets actifs</p></div>
+    </div>
+    <div class="stat-card">
+      <i class="fa fa-users stat-icon"></i>
+      <div><p class="stat-num">{{ bookings.length }}</p><p class="stat-label">Total réservations</p></div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <!-- Pending bookings -->
+    <div class="dash-card">
+      <div class="card-head">
+        <h2><i class="fa fa-clock-o"></i> Réservations en attente</h2>
+        <a routerLink="../bookings">Tout voir</a>
+      </div>
+      @if(loadingB) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(recentPending.length === 0) {
+        <div class="card-empty"><i class="fa fa-check-circle" style="color:#2ecc71"></i><p>Aucune réservation en attente.</p></div>
+      } @else {
+        @for(b of recentPending; track b._id) {
+          <a [routerLink]="['../booking-detail', b._id]" class="list-row">
+            <div class="list-date">
+              <span class="lday">{{ b.date | date:'dd' }}</span>
+              <span class="lmon">{{ b.date | date:'MMM' }}</span>
+            </div>
+            <div class="list-info">
+              <p class="li-main">{{ b.artist?.aka || b.artist?.firstName || 'Artiste' }}</p>
+              <p class="li-sub">{{ b.startTime }} · {{ b.type }}</p>
+            </div>
+            <span class="badge badge-warn">En attente</span>
+          </a>
+        }
+      }
+    </div>
+
+    <!-- Active projects -->
+    <div class="dash-card">
+      <div class="card-head">
+        <h2><i class="fa fa-music"></i> Projets en cours</h2>
+        <a routerLink="../projects">Tout voir</a>
+      </div>
+      @if(loadingP) {
+        <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(recentProjects.length === 0) {
+        <div class="card-empty"><i class="fa fa-music"></i><p>Aucun projet actif.</p></div>
+      } @else {
+        @for(p of recentProjects; track p._id) {
+          <a [routerLink]="['../project-detail', p._id]" class="list-row">
+            <div class="proj-stage-dot" [style.background]="stageColor(p.stage)"></div>
+            <div class="list-info">
+              <p class="li-main">{{ p.title }}</p>
+              <p class="li-sub" [style.color]="stageColor(p.stage)">{{ stageLabel(p.stage) }} · {{ p.progress }}%</p>
+            </div>
+            <div class="mini-bar">
+              <div class="mini-fill" [style.width]="p.progress+'%'" [style.background]="stageColor(p.stage)"></div>
+            </div>
+          </a>
+        }
+      }
+    </div>
+  </div>
+</div>
