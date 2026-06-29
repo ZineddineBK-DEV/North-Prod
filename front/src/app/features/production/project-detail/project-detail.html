@@ -1,0 +1,106 @@
+<div class="dash-page">
+  <div class="page-head">
+    <a routerLink="../.." class="btn-back"><i class="fa fa-arrow-left"></i> Retour aux projets</a>
+  </div>
+
+  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
+  @else if(project) {
+    @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
+    @if(err) { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
+
+    <!-- Header -->
+    <div class="project-header">
+      <div class="ph-info">
+        <div class="ph-stage" [style.color]="stageColor(project.stage)"
+             [style.border-color]="stageColor(project.stage)">{{ stageLabel(project.stage) }}</div>
+        <h1>{{ project.title }}</h1>
+        <p class="ph-artist"><i class="fa fa-user"></i> {{ project.artist?.aka || project.artist?.firstName || '—' }}</p>
+        @if(project.genre) { <p class="ph-genre"><i class="fa fa-music"></i> {{ project.genre }}</p> }
+      </div>
+      <div class="ph-progress">
+        <svg viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+          <circle cx="40" cy="40" r="34" fill="none"
+                  [attr.stroke]="stageColor(project.stage)" stroke-width="8" stroke-linecap="round"
+                  stroke-dasharray="213.6"
+                  [attr.stroke-dashoffset]="213.6 * (1 - project.progress/100)"
+                  transform="rotate(-90 40 40)"/>
+        </svg>
+        <div class="ph-pct"><span>{{ project.progress }}</span><small>%</small></div>
+      </div>
+    </div>
+
+    <!-- Stage timeline -->
+    <div class="dash-card">
+      <div class="card-head"><h2><i class="fa fa-road"></i> Étapes</h2></div>
+      <div class="stage-timeline">
+        @for(s of stageList; track s; let i = $index) {
+          <div class="step" [class.done]="stageIndex(project.stage) > i" [class.active]="project.stage === s">
+            <div class="step-dot"
+                 [style.background]="project.stage===s ? stageColor(s) : stageIndex(project.stage)>i ? '#2ecc71' : 'rgba(255,255,255,0.1)'">
+              @if(stageIndex(project.stage) > i) { <i class="fa fa-check"></i> }
+              @else { <span>{{ i+1 }}</span> }
+            </div>
+            <p class="step-lbl">{{ stageLabel(s) }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Update form -->
+    <div class="dash-card">
+      <div class="card-head"><h2><i class="fa fa-edit"></i> Mettre à jour</h2></div>
+      <form [formGroup]="advanceForm" (ngSubmit)="save()" class="update-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Nouvelle étape</label>
+            <select formControlName="stage">
+              @for(s of stageList; track s) {
+                <option [value]="s">{{ stageLabel(s) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Progression (%) — {{ advanceForm.value.progress }}%</label>
+            <input type="range" formControlName="progress" min="0" max="100" step="5" />
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Note pour l'artiste (optionnel)</label>
+          <textarea formControlName="comment" rows="3"
+                    placeholder="Ex: Mixage terminé, mastering en cours..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-gold" [disabled]="saving">
+            @if(saving) { <i class="fa fa-spinner fa-spin"></i> Sauvegarde... }
+            @else { <i class="fa fa-save"></i> Enregistrer la mise à jour }
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- History -->
+    <div class="dash-card">
+      <div class="card-head"><h2><i class="fa fa-history"></i> Historique</h2></div>
+      <div class="history-list">
+        @if(!project.history || project.history.length === 0) {
+          <div class="empty-inner"><i class="fa fa-history"></i><p>Aucun historique.</p></div>
+        } @else {
+          @for(h of project.history; track h._id) {
+            <div class="h-item">
+              <div class="h-dot" [style.background]="stageColor(h.stage)"></div>
+              <div class="h-content">
+                <div class="h-head">
+                  <span [style.color]="stageColor(h.stage)">{{ stageLabel(h.stage) }}</span>
+                  <span class="h-date">{{ h.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                @if(h.comment) { <p class="h-comment">{{ h.comment }}</p> }
+                <p class="h-by">par {{ h.updatedBy?.aka || h.updatedBy?.firstName || 'Équipe' }}</p>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>
