@@ -1,0 +1,82 @@
+<div class="dash-page">
+  <div class="dash-welcome">
+    <div class="welcome-avatar admin"><i class="fa fa-shield"></i></div>
+    <div class="welcome-text">
+      <h1>Administration — <span class="gold">NORTH PROD</span></h1>
+      <p>{{ auth.currentUser()?.aka }} · Panneau d'administration</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="dash-stats">
+    <div class="stat-card"><i class="fa fa-users stat-icon"></i>
+      <div><p class="stat-num">{{ stats.totalUsers }}</p><p class="stat-label">Utilisateurs</p></div></div>
+    <div class="stat-card"><i class="fa fa-microphone stat-icon gold"></i>
+      <div><p class="stat-num">{{ stats.totalArtists }}</p><p class="stat-label">Artistes</p></div></div>
+    <div class="stat-card warn"><i class="fa fa-clock-o stat-icon"></i>
+      <div><p class="stat-num">{{ stats.pendingBookings }}</p><p class="stat-label">Réservations en attente</p></div></div>
+    <div class="stat-card"><i class="fa fa-calendar stat-icon"></i>
+      <div><p class="stat-num">{{ stats.totalBookings }}</p><p class="stat-label">Total réservations</p></div></div>
+    <div class="stat-card"><i class="fa fa-music stat-icon"></i>
+      <div><p class="stat-num">{{ stats.activeProjects }}</p><p class="stat-label">Projets actifs</p></div></div>
+    <div class="stat-card ok"><i class="fa fa-money stat-icon"></i>
+      <div><p class="stat-num">{{ stats.revenue | number }} DT</p><p class="stat-label">Revenus</p></div></div>
+  </div>
+
+  <!-- Quick nav -->
+  <div class="admin-nav">
+    <a routerLink="../users"     class="admin-nav-item"><i class="fa fa-users"></i><span>Utilisateurs</span></a>
+    <a routerLink="../bookings"  class="admin-nav-item"><i class="fa fa-calendar"></i><span>Réservations</span></a>
+    <a routerLink="../portfolio" class="admin-nav-item"><i class="fa fa-image"></i><span>Portfolio</span></a>
+    <a routerLink="../services"  class="admin-nav-item"><i class="fa fa-list"></i><span>Services</span></a>
+    <a routerLink="../hero"      class="admin-nav-item"><i class="fa fa-film"></i><span>Hero Média</span></a>
+  </div>
+
+  <div class="dash-grid">
+    <!-- Recent bookings -->
+    <div class="dash-card">
+      <div class="card-head">
+        <h2><i class="fa fa-calendar"></i> Réservations récentes</h2>
+        <a routerLink="../bookings">Tout voir</a>
+      </div>
+      @if(loading) { <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div> }
+      @else if(recentBookings.length === 0) {
+        <div class="card-empty"><i class="fa fa-calendar-o"></i><p>Aucune réservation.</p></div>
+      } @else {
+        @for(b of recentBookings; track b._id) {
+          <div class="list-row">
+            <div class="list-info">
+              <p class="li-main">{{ b.artist?.aka || '—' }}</p>
+              <p class="li-sub">{{ b.date | date:'dd/MM/yyyy' }} · {{ b.startTime }}</p>
+            </div>
+            <span class="badge" [class]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+            <span class="li-price">{{ b.totalPrice | number }} DT</span>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Recent users -->
+    <div class="dash-card">
+      <div class="card-head">
+        <h2><i class="fa fa-users"></i> Utilisateurs récents</h2>
+        <a routerLink="../users">Tout voir</a>
+      </div>
+      @if(loading) { <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div> }
+      @else if(recentUsers.length === 0) {
+        <div class="card-empty"><i class="fa fa-user-o"></i><p>Aucun utilisateur.</p></div>
+      } @else {
+        @for(u of recentUsers; track u._id) {
+          <div class="list-row">
+            <div class="user-avatar-sm">{{ (u.aka||u.firstName||'U')[0].toUpperCase() }}</div>
+            <div class="list-info">
+              <p class="li-main">{{ u.aka || u.firstName }}</p>
+              <p class="li-sub">{{ u.email }}</p>
+            </div>
+            <span class="badge" [class]="roleClass(u.role)">{{ roleLabel(u.role) }}</span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<div class="dash-page">
+  <div class="page-head"><h1><i class="fa fa-film"></i> Hero Média</h1></div>
+
+  @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
+  @if(err) { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
+
+  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
+  @else {
+    <form [formGroup]="form" (ngSubmit)="save()" class="hero-form dash-card">
+      <div class="section-title"><i class="fa fa-video-camera"></i> Vidéo de fond</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Type de vidéo</label>
+          <select formControlName="videoType">
+            <option value="youtube">YouTube</option>
+            <option value="vimeo">Vimeo</option>
+            <option value="mp4">Fichier MP4 (URL)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>URL / ID de la vidéo</label>
+          <input type="text" formControlName="videoUrl" placeholder="https://youtube.com/watch?v=..." />
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fa fa-font"></i> Textes</div>
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>Titre principal *</label>
+          <input type="text" formControlName="headline" placeholder="NORTH PRODUCTION" />
+        </div>
+        <div class="form-field full">
+          <label>Sous-titre</label>
+          <input type="text" formControlName="subheadline" placeholder="Studio de production Son & Image" />
+        </div>
+        <div class="form-field">
+          <label>Bouton principal (CTA 1)</label>
+          <input type="text" formControlName="ctaPrimary" />
+        </div>
+        <div class="form-field">
+          <label>Bouton secondaire (CTA 2)</label>
+          <input type="text" formControlName="ctaSecondary" />
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle-label">
+          <input type="checkbox" formControlName="showStats" /><span>Afficher les statistiques (années, artistes, productions)</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-gold" [disabled]="saving">
+          @if(saving){<i class="fa fa-spinner fa-spin"></i> Sauvegarde...} @else {<i class="fa fa-save"></i> Sauvegarder}
+        </button>
+      </div>
+    </form>
+
+    <!-- Preview info -->
+    <div class="preview-box">
+      <div class="preview-label"><i class="fa fa-eye"></i> Aperçu actuel</div>
+      <div class="preview-content">
+        <p class="prev-headline">{{ form.value.headline || 'NORTH PRODUCTION' }}</p>
+        <p class="prev-sub">{{ form.value.subheadline || 'Studio de production Son & Image' }}</p>
+        <div class="prev-btns">
+          <span class="prev-btn primary">{{ form.value.ctaPrimary }}</span>
+          <span class="prev-btn secondary">{{ form.value.ctaSecondary }}</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,78 @@
+<div class="dash-page">
+  <div class="page-head">
+    <h1><i class="fa fa-image"></i> Portfolio</h1>
+    <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Ajouter</button>
+  </div>
+
+  @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
+  @if(err) { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
+
+  @if(showForm) {
+    <div class="dash-card form-card">
+      <div class="card-head">
+        <h2>{{ editId ? 'Modifier' : 'Ajouter' }} une production</h2>
+        <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="pf-form">
+        <div class="form-grid">
+          <div class="form-field"><label>Titre *</label><input type="text" formControlName="title" /></div>
+          <div class="form-field"><label>Artiste</label><input type="text" formControlName="artist" /></div>
+          <div class="form-field">
+            <label>Catégorie *</label>
+            <select formControlName="category">
+              @for(c of categories; track c) { <option [value]="c">{{ c }}</option> }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Description</label>
+            <input type="text" formControlName="description" />
+          </div>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" formControlName="isFeatured" />
+            <span>Mise en avant</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" formControlName="isPublished" />
+            <span>Publié</span>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-outline" (click)="showForm=false">Annuler</button>
+          <button type="submit" class="btn-gold" [disabled]="saving">
+            @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else { Sauvegarder }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
+  @else {
+    <div class="portfolio-grid">
+      @for(item of items; track item._id) {
+        <div class="pf-card" [class.unpublished]="!item.isPublished">
+          <div class="pf-img" [style.background-image]="'url(assets/images/music/portfolio/'+item.category.toLowerCase().replace(/[&\/]/g,\'\').replace(/ /g,\'_\')+'_1.jpg)'">
+            <div class="pf-overlay">
+              <span class="pf-cat">{{ item.category }}</span>
+              @if(item.isFeatured) { <span class="pf-feat"><i class="fa fa-star"></i></span> }
+              @if(!item.isPublished) { <span class="pf-draft">Brouillon</span> }
+            </div>
+          </div>
+          <div class="pf-info">
+            <p class="pf-title">{{ item.title }}</p>
+            @if(item.artist) { <p class="pf-artist">{{ item.artist }}</p> }
+          </div>
+          <div class="pf-actions">
+            <button class="btn-sm" (click)="openEdit(item)"><i class="fa fa-edit"></i></button>
+            <button class="btn-sm" [class]="item.isPublished ? 'warn' : 'ok'" (click)="toggle(item)">
+              <i class="fa fa-eye{{ item.isPublished ? '-slash' : '' }}"></i>
+            </button>
+            <button class="btn-sm err" (click)="remove(item._id)"><i class="fa fa-trash"></i></button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

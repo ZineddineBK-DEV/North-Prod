@@ -13,8 +13,8 @@ export class PortfolioService {
     let httpParams = new HttpParams();
     if (params?.category) httpParams = httpParams.set('category', params.category);
     if (params?.featured) httpParams = httpParams.set('featured', 'true');
-    if (params?.page) httpParams = httpParams.set('page', params.page.toString());
-    if (params?.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params?.page)     httpParams = httpParams.set('page', params.page.toString());
+    if (params?.limit)    httpParams = httpParams.set('limit', params.limit.toString());
     return this.http.get<{ success: boolean; items: PortfolioItem[]; total: number }>(
       this.API, { params: httpParams }
     );
@@ -22,6 +22,18 @@ export class PortfolioService {
 
   getItem(id: string) {
     return this.http.get<{ success: boolean; item: PortfolioItem }>(`${this.API}/${id}`);
+  }
+
+  createItem(data: Partial<PortfolioItem>) {
+    return this.http.post<{ success: boolean; item: PortfolioItem }>(this.API, data);
+  }
+
+  updateItem(id: string, data: Partial<PortfolioItem>) {
+    return this.http.put<{ success: boolean; item: PortfolioItem }>(`${this.API}/${id}`, data);
+  }
+
+  deleteItem(id: string) {
+    return this.http.delete<{ success: boolean }>(`${this.API}/${id}`);
   }
 }
 

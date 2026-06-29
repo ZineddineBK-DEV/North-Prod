@@ -1,0 +1,57 @@
+<div class="dash-page">
+  <div class="page-head"><h1><i class="fa fa-users"></i> Utilisateurs</h1></div>
+
+  <div class="toolbar">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <input formControlName="q" type="text" placeholder="Rechercher par nom ou email..." />
+      <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+    <div class="filter-bar">
+      @for(r of roles; track r.value) {
+        <button class="filter-btn" [class.active]="filterRole===r.value" (click)="setRole(r.value)">
+          {{ r.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
+  @else if(users.length === 0) {
+    <div class="empty-state"><i class="fa fa-users"></i><p>Aucun utilisateur trouvé.</p></div>
+  } @else {
+    <div class="user-table">
+      <div class="table-head">
+        <span>Utilisateur</span><span>Email</span><span>Rôle</span>
+        <span>Statut</span><span>Inscrit le</span><span>Actions</span>
+      </div>
+      @for(u of users; track u._id) {
+        <div class="table-row">
+          <span class="col-user">
+            <div class="ua">{{ (u.aka||u.firstName||'U')[0].toUpperCase() }}</div>
+            <div><strong>{{ u.aka || u.firstName }}</strong><small>{{ u.firstName }} {{ u.lastName }}</small></div>
+          </span>
+          <span class="col-email">{{ u.email }}</span>
+          <span>
+            <select class="role-select" [value]="u.role" (change)="changeRole(u, $any($event.target).value)">
+              <option value="artist">Artiste</option>
+              <option value="production">Production</option>
+              <option value="admin">Admin</option>
+            </select>
+          </span>
+          <span>
+            <span class="badge" [class]="u.isActive ? 'badge-ok' : 'badge-err'">
+              {{ u.isActive ? 'Actif' : 'Inactif' }}
+            </span>
+          </span>
+          <span class="col-date">{{ u.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span>
+            <button class="btn-sm" [class]="u.isActive ? 'err' : 'ok'" (click)="toggleActive(u)">
+              {{ u.isActive ? 'Désactiver' : 'Activer' }}
+            </button>
+          </span>
+        </div>
+      }
+    </div>
+    <p class="total-count">{{ total }} utilisateur(s) au total</p>
+  }
+</div>

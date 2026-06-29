@@ -1,0 +1,75 @@
+<div class="dash-page">
+  <div class="page-head">
+    <h1><i class="fa fa-list"></i> Services & Tarifs</h1>
+    <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Ajouter</button>
+  </div>
+
+  @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
+  @if(err) { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
+
+  @if(showForm) {
+    <div class="dash-card form-card">
+      <div class="card-head">
+        <h2>{{ editId ? 'Modifier' : 'Ajouter' }} un service</h2>
+        <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="sv-form">
+        <div class="form-grid">
+          <div class="form-field"><label>Nom du service *</label><input type="text" formControlName="name" /></div>
+          <div class="form-field">
+            <label>Unité *</label>
+            <select formControlName="unit">
+              @for(u of units; track u) { <option [value]="u">{{ u }}</option> }
+            </select>
+          </div>
+          <div class="form-field"><label>Prix (DT) *</label><input type="number" formControlName="price" min="0" /></div>
+          <div class="form-field"><label>Ordre d'affichage</label><input type="number" formControlName="order" min="0" /></div>
+        </div>
+        <div class="form-field full">
+          <label>Description</label>
+          <textarea formControlName="description" rows="3" placeholder="Détails du service..."></textarea>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" formControlName="isAvailable" /><span>Disponible</span>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-outline" (click)="showForm=false">Annuler</button>
+          <button type="submit" class="btn-gold" [disabled]="saving">
+            @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else { Sauvegarder }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
+  @else if(services.length === 0) {
+    <div class="empty-state"><i class="fa fa-list"></i><p>Aucun service configuré.</p></div>
+  } @else {
+    <div class="sv-grid">
+      @for(s of services; track s._id) {
+        <div class="sv-card" [class.unavailable]="!s.isAvailable">
+          <div class="sv-header">
+            <h3>{{ s.name }}</h3>
+            <div class="sv-price">{{ s.price | number }} DT<span> / {{ s.unit }}</span></div>
+          </div>
+          @if(s.description) { <p class="sv-desc">{{ s.description }}</p> }
+          <div class="sv-footer">
+            <span class="badge" [class]="s.isAvailable ? 'badge-ok' : 'badge-muted'">
+              {{ s.isAvailable ? 'Disponible' : 'Indisponible' }}
+            </span>
+            <div class="sv-actions">
+              <button class="btn-sm" (click)="openEdit(s)"><i class="fa fa-edit"></i></button>
+              <button class="btn-sm" [class]="s.isAvailable ? 'warn' : 'ok'" (click)="toggle(s)">
+                <i class="fa fa-toggle-{{s.isAvailable ? 'on' : 'off'}}"></i>
+              </button>
+              <button class="btn-sm err" (click)="remove(s._id)"><i class="fa fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
