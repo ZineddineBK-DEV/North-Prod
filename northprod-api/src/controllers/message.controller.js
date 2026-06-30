@@ -164,4 +164,20 @@ const getUnreadCount = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getThreads, getOrCreateThread, getMessages, sendMessage, getUnreadCount };
+// ── GET /api/messages/contact ─────────────────────────────
+// Returns the studio's primary contact (production/admin) so artists
+// can always reach someone, even before any thread exists.
+const getStudioContact = async (req, res, next) => {
+  try {
+    const User = require('../models/User');
+    const contact = await User.findOne({ role: 'production', isActive: true })
+      .select('_id aka avatar role')
+      .sort({ createdAt: 1 })
+      || await User.findOne({ role: 'admin', isActive: true }).select('_id aka avatar role');
+
+    if (!contact) return next(createError("Aucun contact studio disponible pour le moment.", 404));
+    res.json({ success: true, contact });
+  } catch (err) { next(err); }
+};
+
+module.exports = { getThreads, getOrCreateThread, getMessages, sendMessage, getUnreadCount, getStudioContact };

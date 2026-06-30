@@ -28,16 +28,16 @@ export class SocketService implements OnDestroy {
       transports: ['websocket'],
     });
 
-    this.socket.on('connect', () => console.log('Socket connected'));
+    this.socket.on('connect',    () => console.log('Socket connected'));
     this.socket.on('disconnect', () => console.log('Socket disconnected'));
 
-    this.socket.on('message:receive',         (data) => this.message$.next(data));
-    this.socket.on('notification:new',        (data) => this.notification$.next(data));
-    this.socket.on('message:typing',          (data) => this.typing$.next(data));
-    this.socket.on('message:stop-typing',     (data) => this.stopTyping$.next(data));
-    this.socket.on('booking:status-changed',  (data) => this.bookingUpdate$.next(data));
-    this.socket.on('project:updated',         (data) => this.projectUpdate$.next(data));
-    this.socket.on('file:uploaded',           (data) => this.fileUploaded$.next(data));
+    this.socket.on('message:receive',        (data: any) => this.message$.next(data));
+    this.socket.on('notification:new',       (data: any) => this.notification$.next(data));
+    this.socket.on('message:typing',         (data: any) => this.typing$.next(data));
+    this.socket.on('message:stop-typing',    (data: any) => this.stopTyping$.next(data));
+    this.socket.on('booking:status-changed', (data: any) => this.bookingUpdate$.next(data));
+    this.socket.on('project:updated',        (data: any) => this.projectUpdate$.next(data));
+    this.socket.on('file:uploaded',          (data: any) => this.fileUploaded$.next(data));
   }
 
   disconnect() {

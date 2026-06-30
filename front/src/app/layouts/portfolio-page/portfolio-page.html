@@ -1,0 +1,102 @@
+<div class="pf-page" [class.player-open]="playerOpen">
+  <!-- Header -->
+  <div class="pf-page-header">
+    <div class="container">
+      <a routerLink="/" class="pf-back"><i class="fa fa-arrow-left"></i> Retour à l'accueil</a>
+      <h1>Notre <span class="gold">Portfolio</span></h1>
+      <p>L'ensemble de nos productions, toutes catégories confondues</p>
+    </div>
+  </div>
+
+  <div class="pf-page-body container">
+    <!-- Category filters -->
+    <div class="pf-filters">
+      @for(cat of categories; track cat) {
+        <button class="filter-btn" [class.active]="activeCategory === cat" (click)="filter(cat)">
+          {{ cat }}
+        </button>
+      }
+    </div>
+
+    <!-- Grid -->
+    @if(loading) {
+      <div class="pf-grid">
+        @for(i of [1,2,3,4,5,6,7,8,9,10,11,12]; track i) {
+          <div class="pf-item skeleton"></div>
+        }
+      </div>
+    } @else if(filtered.length === 0) {
+      <div class="pf-empty">
+        <i class="fa fa-music"></i>
+        <p>Aucune production dans cette catégorie.</p>
+      </div>
+    } @else {
+      <div class="pf-grid">
+        @for(item of visibleItems; track item._id) {
+          <button class="pf-item" (click)="openItem(item)" [class.active]="current?._id === item._id"
+                  [style.background-image]="'url(' + getThumb(item) + ')'">
+            <div class="pf-overlay">
+              <span class="pf-cat">{{ item.category }}</span>
+              <div class="pf-play-btn"><i class="fa fa-play"></i></div>
+              <h4 class="pf-title">{{ item.title }}</h4>
+              @if(item.artist) { <p class="pf-artist">{{ item.artist }}</p> }
+            </div>
+          </button>
+        }
+      </div>
+
+      @if(hasMore) {
+        <div class="pf-loadmore">
+          <button class="btn-section" (click)="loadMore()" [disabled]="loadingMore">
+            @if(loadingMore) { <i class="fa fa-spinner fa-spin"></i> Chargement... }
+            @else { Charger plus <i class="fa fa-chevron-down"></i> }
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Side media player -->
+  @if(playerOpen && current) {
+    <div class="pf-player-overlay" (click)="closePlayer()"></div>
+    <aside class="pf-player">
+      <button class="player-close" (click)="closePlayer()"><i class="fa fa-times"></i></button>
+
+      <div class="player-art" [style.background-image]="'url(' + getThumb(current) + ')'">
+        <span class="player-cat">{{ current.category }}</span>
+      </div>
+
+      <div class="player-info">
+        <h3>{{ current.title }}</h3>
+        @if(current.artist) { <p class="player-artist">{{ current.artist }}</p> }
+        @if(current.description) { <p class="player-desc">{{ current.description }}</p> }
+      </div>
+
+      <!-- Audio controls (only rendered when mediaType is audio) -->
+      @if(current.mediaType === 'audio') {
+        <div class="player-controls">
+          <audio #audioEl [src]="getMediaUrl(current)" (ended)="isPlaying=false"></audio>
+          <button class="ctrl-btn" (click)="playPrev()"><i class="fa fa-step-backward"></i></button>
+          <button class="ctrl-btn play" (click)="togglePlay()">
+            <i class="fa" [class.fa-play]="!isPlaying" [class.fa-pause]="isPlaying"></i>
+          </button>
+          <button class="ctrl-btn" (click)="playNext()"><i class="fa fa-step-forward"></i></button>
+        </div>
+      } @else if(current.mediaType === 'video') {
+        <div class="player-video">
+          <video [src]="getMediaUrl(current)" controls autoplay></video>
+        </div>
+        <div class="player-controls">
+          <button class="ctrl-btn" (click)="playPrev()"><i class="fa fa-step-backward"></i></button>
+          <button class="ctrl-btn" (click)="playNext()"><i class="fa fa-step-forward"></i></button>
+        </div>
+      } @else {
+        <div class="player-controls">
+          <button class="ctrl-btn" (click)="playPrev()"><i class="fa fa-step-backward"></i></button>
+          <p class="player-no-media">Aperçu visuel uniquement</p>
+          <button class="ctrl-btn" (click)="playNext()"><i class="fa fa-step-forward"></i></button>
+        </div>
+      }
+    </aside>
+  }
+</div>

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -12,7 +12,7 @@ const GENRES = ['Rap','Trap','R&B','Drill','Afrobeats','Pop','Rock','Électro','
   selector: 'app-artist-profile',
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss'],
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TitleCasePipe],
 })
 export class ArtistProfileComponent implements OnInit {
   auth = inject(AuthService);

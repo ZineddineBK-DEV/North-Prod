@@ -8,8 +8,8 @@ export const Layout: Routes = [
   },
   {
     path: 'portfolio',
-    loadComponent: () => import('./music/music').then((m) => m.Music),
-    data: { title: 'Portfolio — NORTH PROD', section: 'portfolio' },
+    loadComponent: () => import('./portfolio-page/portfolio-page').then((m) => m.PortfolioPageComponent),
+    data: { title: 'Portfolio — NORTH PROD' },
   },
   {
     path: 'services',
