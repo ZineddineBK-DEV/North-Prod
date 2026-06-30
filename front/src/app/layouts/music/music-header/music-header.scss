@@ -18,27 +18,31 @@ $gold-dark: #a08040;
   z-index: 0;
 }
 
-.hero-video {
+.hero-logo-bg {
   width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: 0.45;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.22;
+  transform: scale(1.15);
+  filter: blur(1px);
+
+  // Ambient glow behind the logo, consistent with the brand's gold accent
+  &::before { content: ''; }
 }
 
-.hero-iframe {
-  width: 100%; height: 100%;
-  border: none;
-  opacity: 0.35;
-  pointer-events: none;
-  transform: scale(1.5);  // hide iframe controls
-}
-
-.hero-fallback {
-  width: 100%; height: 100%;
-  background:
-    radial-gradient(ellipse 70% 60% at 30% 60%, rgba(192,160,96,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 70% at 70% 30%, rgba(192,160,96,0.06) 0%, transparent 60%),
-    linear-gradient(160deg, #0d0d0d 0%, #1a1208 50%, #0d0d0d 100%);
-  animation: heroGlow 8s ease-in-out infinite alternate;
+.hero-video-wrap {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 30% 60%, rgba(192,160,96,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 70% at 70% 30%, rgba(192,160,96,0.05) 0%, transparent 60%),
+      linear-gradient(160deg, #0d0d0d 0%, #1a1208 50%, #0d0d0d 100%);
+    z-index: -1;
+    animation: heroGlow 8s ease-in-out infinite alternate;
+  }
 }
 
 @keyframes heroGlow {

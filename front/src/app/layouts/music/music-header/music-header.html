@@ -1,19 +1,9 @@
 <!-- NORTH PROD Hero Section -->
 <section class="np-hero" id="home">
 
-  <!-- Video background -->
+  <!-- Logo background (replaces video per design update) -->
   <div class="hero-video-wrap">
-    @if(hero?.mediaType === 'upload' && hero?.filePath) {
-      <video class="hero-video" autoplay muted loop playsinline>
-        <source [src]="'/uploads/' + hero!.filePath" type="video/mp4" />
-      </video>
-    } @else if(safeEmbedUrl) {
-      <iframe class="hero-iframe" [src]="safeEmbedUrl"
-        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    } @else {
-      <!-- Fallback animated gradient background -->
-      <div class="hero-fallback"></div>
-    }
+    <div class="hero-logo-bg" style="background-image: url('assets/images/logo/north-prod-logo-bg.png')"></div>
     <div class="hero-overlay"></div>
   </div>
 
@@ -73,10 +63,12 @@
             <a routerLink="/auth/register" class="btn-hero btn-hero-primary">
               Réserver une séance <i class="fa fa-calendar"></i>
             </a>
-            <a routerLink="/auth/register" class="btn-hero btn-hero-secondary">
-              Créer un compte
-            </a>
-            <a routerLink="/portfolio" class="btn-hero btn-hero-outline">
+            @if(!authService.isLoggedIn()) {
+              <a routerLink="/auth/register" class="btn-hero btn-hero-secondary">
+                Créer un compte
+              </a>
+            }
+            <a href="#gallery" class="btn-hero btn-hero-outline" (click)="scrollToStudio($event)">
               Découvrir nos productions
             </a>
           }
