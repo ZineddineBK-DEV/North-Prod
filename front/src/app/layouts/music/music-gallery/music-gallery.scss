@@ -1,8 +1,91 @@
 $gold: #c0a060;
+
 .np-gallery { padding: 80px 0 0; background: #111; }
 .gallery-header { margin-bottom: 40px; }
-.section-tag { display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: $gold; margin-bottom: 12px; &::before,&::after { content: '—'; margin: 0 8px; opacity: 0.5; } }
+.section-tag {
+  display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: $gold; margin-bottom: 12px;
+  &::before, &::after { content: '—'; margin: 0 8px; opacity: 0.5; }
+}
 .section-title { font-size: clamp(26px,3.5vw,38px); font-weight: 800; color: #fff; margin: 0; .gold { color: $gold; } }
-.gallery-strip { display: grid; grid-template-columns: repeat(5, 1fr); height: 280px; @media (max-width: 900px) { grid-template-columns: repeat(3,1fr); height: 200px; } @media (max-width: 500px) { grid-template-columns: repeat(2,1fr); height: 180px; } }
-.gallery-cell { background-size: cover; background-position: center; position: relative; overflow: hidden; cursor: pointer; background-color: #1a1a1a; &:hover .cell-overlay { opacity: 1; } }
-.cell-overlay { position: absolute; inset: 0; background: rgba($gold, 0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; i { font-size: 24px; color: #fff; } }
+
+.gallery-strip {
+  display: grid; grid-template-columns: repeat(6, 1fr); height: 280px;
+  @media (max-width: 900px) { grid-template-columns: repeat(3,1fr); height: 200px; }
+  @media (max-width: 500px) { grid-template-columns: repeat(2,1fr); height: 180px; }
+}
+
+.gallery-cell {
+  background-size: cover; background-position: center; position: relative;
+  overflow: hidden; cursor: pointer; background-color: #1a1a1a;
+  border: none; padding: 0; margin: 0; display: block; width: 100%; height: 100%;
+  appearance: none; -webkit-appearance: none; outline: none;
+  &:hover .cell-overlay, &:focus-visible .cell-overlay { opacity: 1; }
+}
+.cell-overlay {
+  position: absolute; inset: 0; background: rgba($gold, 0.3);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s;
+  i { font-size: 24px; color: #fff; }
+}
+
+// ── Lightbox ──────────────────────────────────────────────
+.lightbox-overlay {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(0,0,0,0.92);
+  display: flex; align-items: center; justify-content: center;
+  animation: lb-fade-in 0.2s ease;
+  padding: 24px;
+}
+@keyframes lb-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.lightbox-content {
+  max-width: 90vw; max-height: 85vh;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  animation: lb-zoom-in 0.25s ease;
+
+  img {
+    max-width: 90vw; max-height: 75vh; object-fit: contain;
+    border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    border: 1px solid rgba($gold, 0.2);
+  }
+}
+@keyframes lb-zoom-in { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.lightbox-caption {
+  color: rgba(255,255,255,0.7); font-size: 13px; letter-spacing: 0.5px; margin: 0; text-align: center;
+}
+
+.lightbox-close {
+  position: absolute; top: 20px; right: 20px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-size: 18px; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3010;
+  &:hover { background: rgba($gold, 0.2); border-color: $gold; color: $gold; }
+}
+
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 50px; height: 50px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-size: 18px; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3010;
+  &:hover { background: rgba($gold, 0.2); border-color: $gold; color: $gold; }
+
+  &.lightbox-prev { left: 20px; }
+  &.lightbox-next { right: 20px; }
+
+  @media (max-width: 600px) {
+    width: 40px; height: 40px; font-size: 15px;
+    &.lightbox-prev { left: 8px; }
+    &.lightbox-next { right: 8px; }
+  }
+}
+
+@media (max-width: 600px) {
+  .lightbox-close { top: 12px; right: 12px; width: 38px; height: 38px; font-size: 15px; }
+  .lightbox-content img { max-height: 65vh; }
+}

@@ -97,11 +97,12 @@
       position: absolute;
       bottom: -2px; left: 0;
       width: 0; height: 1px;
-      background: var(--gold);
+      background: #c0a060;
       transition: width 0.3s;
     }
-    &:hover, &.active {
-      color: var(--gold);
+    &:hover,
+    &.active {
+      color: #c0a060 !important;
       &::after { width: 100%; }
     }
   }

@@ -14,6 +14,7 @@ export class ArtistProjectsComponent implements OnInit {
   private svc = inject(ProjectService);
   projects: Project[] = [];
   loading = true;
+  err = '';
   filterStage = 'all';
 
   stages = [
@@ -37,10 +38,14 @@ export class ArtistProjectsComponent implements OnInit {
       : this.projects.filter(p => p.stage === this.filterStage);
   }
 
-  ngOnInit() {
+  ngOnInit() { this.reload(); }
+
+  reload() {
+    this.loading = true;
+    this.err = '';
     this.svc.getMyProjects().subscribe({
-      next: r => { this.projects = r.projects; this.loading = false; },
-      error: () => { this.loading = false; },
+      next: r => { this.projects = r.projects || []; this.loading = false; },
+      error: () => { this.loading = false; this.err = "Impossible de charger vos projets."; },
     });
   }
 

@@ -58,6 +58,12 @@
       </div>
       @if(loadingBookings) {
         <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(bookingsErr) {
+        <div class="card-empty">
+          <i class="fa fa-exclamation-triangle"></i>
+          <p>{{ bookingsErr }}</p>
+          <button class="btn-dash-sm" (click)="loadBookings()">Réessayer</button>
+        </div>
       } @else if(upcomingBookings.length === 0) {
         <div class="card-empty">
           <i class="fa fa-calendar-o"></i>
@@ -91,6 +97,12 @@
       </div>
       @if(loadingProjects) {
         <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div>
+      } @else if(projectsErr) {
+        <div class="card-empty">
+          <i class="fa fa-exclamation-triangle"></i>
+          <p>{{ projectsErr }}</p>
+          <button class="btn-dash-sm" (click)="loadProjects()">Réessayer</button>
+        </div>
       } @else if(activeProjects.length === 0) {
         <div class="card-empty">
           <i class="fa fa-music"></i>
@@ -99,7 +111,7 @@
       } @else {
         <div class="project-list">
           @for(p of activeProjects; track p._id) {
-            <a [routerLink]="['../project-detail', p._id]" class="project-row">
+            <a [routerLink]="['../projects', p._id]" class="project-row">
               <div class="project-info">
                 <p class="project-title">{{ p.title }}</p>
                 <p class="project-stage">{{ stageLabel(p.stage) }}</p>

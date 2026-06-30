@@ -4,10 +4,30 @@
     <h2 class="section-title">Le Studio en <span class="gold">Images</span></h2>
   </div>
   <div class="gallery-strip">
-    @for(img of images; track img.alt) {
-      <div class="gallery-cell" [style.background-image]="'url(' + img.src + ')'">
+    @for(img of images; track img.alt; let i = $index) {
+      <button class="gallery-cell" [style.background-image]="'url(' + img.src + ')'" (click)="open(i)" [attr.aria-label]="'Agrandir : ' + img.alt">
         <div class="cell-overlay"><i class="fa fa-expand"></i></div>
-      </div>
+      </button>
     }
   </div>
 </section>
+
+<!-- Lightbox -->
+@if(lightboxOpen && activeImage) {
+  <div class="lightbox-overlay" (click)="close()">
+    <button class="lightbox-close" (click)="close()" aria-label="Fermer"><i class="fa fa-times"></i></button>
+
+    <button class="lightbox-nav lightbox-prev" (click)="prev($event)" aria-label="Image précédente">
+      <i class="fa fa-chevron-left"></i>
+    </button>
+
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <img [src]="activeImage.src" [alt]="activeImage.alt" />
+      <p class="lightbox-caption">{{ activeImage.alt }}</p>
+    </div>
+
+    <button class="lightbox-nav lightbox-next" (click)="next($event)" aria-label="Image suivante">
+      <i class="fa fa-chevron-right"></i>
+    </button>
+  </div>
+}

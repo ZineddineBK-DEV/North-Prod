@@ -22,8 +22,11 @@ export class ArtistDashboardComponent implements OnInit {
 
   bookings: Booking[] = [];
   projects: Project[] = [];
+
   loadingBookings = true;
   loadingProjects = true;
+  bookingsErr = '';
+  projectsErr = '';
 
   get user() { return this.auth.currentUser()!; }
 
@@ -43,13 +46,31 @@ export class ArtistDashboardComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadBookings();
+    this.loadProjects();
+  }
+
+  loadBookings() {
+    this.loadingBookings = true;
+    this.bookingsErr = '';
     this.bookingSvc.getMyBookings({ limit: 20 }).subscribe({
-      next: r => { this.bookings = r.bookings; this.loadingBookings = false; },
-      error: () => { this.loadingBookings = false; },
+      next: r => { this.bookings = r.bookings || []; this.loadingBookings = false; },
+      error: () => {
+        this.loadingBookings = false;
+        this.bookingsErr = "Impossible de charger vos réservations.";
+      },
     });
+  }
+
+  loadProjects() {
+    this.loadingProjects = true;
+    this.projectsErr = '';
     this.projectSvc.getMyProjects().subscribe({
-      next: r => { this.projects = r.projects; this.loadingProjects = false; },
-      error: () => { this.loadingProjects = false; },
+      next: r => { this.projects = r.projects || []; this.loadingProjects = false; },
+      error: () => {
+        this.loadingProjects = false;
+        this.projectsErr = "Impossible de charger vos projets.";
+      },
     });
   }
 

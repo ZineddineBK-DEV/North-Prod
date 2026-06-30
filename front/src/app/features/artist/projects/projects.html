@@ -13,6 +13,12 @@
 
   @if(loading) {
     <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(err) {
+    <div class="empty-state">
+      <i class="fa fa-exclamation-triangle"></i>
+      <p>{{ err }}</p>
+      <button class="btn-retry" (click)="reload()">Réessayer</button>
+    </div>
   } @else if(filtered.length === 0) {
     <div class="empty-state">
       <i class="fa fa-music"></i>
@@ -21,7 +27,7 @@
   } @else {
     <div class="project-grid">
       @for(p of filtered; track p._id) {
-        <a [routerLink]="['../project-detail', p._id]" class="project-card">
+        <a [routerLink]="['../projects', p._id]" class="project-card">
           <div class="pc-top">
             <div class="pc-stage-dot" [style.background]="stageColor(p.stage)"></div>
             <span class="pc-stage" [style.color]="stageColor(p.stage)">{{ stageLabel(p.stage) }}</span>
