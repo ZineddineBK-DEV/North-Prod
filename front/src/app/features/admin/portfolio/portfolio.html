@@ -53,7 +53,7 @@
     <div class="portfolio-grid">
       @for(item of items; track item._id) {
         <div class="pf-card" [class.unpublished]="!item.isPublished">
-          <div class="pf-img" [style.background-image]="'url(assets/images/music/portfolio/'+item.category.toLowerCase().replace(/[&\/]/g,\'\').replace(/ /g,\'_\')+'_1.jpg)'">
+          <div class="pf-img" [style.background-image]="getPortfolioImage(item.category)">
             <div class="pf-overlay">
               <span class="pf-cat">{{ item.category }}</span>
               @if(item.isFeatured) { <span class="pf-feat"><i class="fa fa-star"></i></span> }

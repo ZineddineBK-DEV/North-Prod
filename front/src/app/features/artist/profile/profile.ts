@@ -12,7 +12,7 @@ const GENRES = ['Rap','Trap','R&B','Drill','Afrobeats','Pop','Rock','Électro','
   selector: 'app-artist-profile',
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss'],
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class ArtistProfileComponent implements OnInit {
   auth = inject(AuthService);

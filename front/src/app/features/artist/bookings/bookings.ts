@@ -9,7 +9,7 @@ import { Booking, BookingType } from '../../../core/models/booking.model';
   selector: 'app-artist-bookings',
   templateUrl: './bookings.html',
   styleUrls: ['./bookings.scss'],
-  imports: [CommonModule, RouterLink, DatePipe, ReactiveFormsModule],
+  imports: [CommonModule,  DatePipe, ReactiveFormsModule],
 })
 export class ArtistBookingsComponent implements OnInit {
   private svc = inject(BookingService);

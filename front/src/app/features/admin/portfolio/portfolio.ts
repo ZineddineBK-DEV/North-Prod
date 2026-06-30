@@ -10,7 +10,7 @@ const CATEGORIES = ['Rap','Trap','R&B','Drill','Afrobeats','Mixage','Mastering']
   selector: 'app-admin-portfolio',
   templateUrl: './portfolio.html',
   styleUrls: ['./portfolio.scss'],
-  imports: [CommonModule, DatePipe, ReactiveFormsModule],
+  imports: [CommonModule,  ReactiveFormsModule],
 })
 export class AdminPortfolioComponent implements OnInit {
   private svc = inject(PortfolioService);
@@ -43,7 +43,14 @@ export class AdminPortfolioComponent implements OnInit {
       error: () => { this.loading = false; },
     });
   }
+getPortfolioImage(category: string): string {
+  const file = category
+    .toLowerCase()
+    .replace(/[&/]/g, '')
+    .replace(/ /g, '_');
 
+  return `url(assets/images/music/portfolio/${file}_1.jpg)`;
+}
   openAdd() { this.editId = null; this.form.reset({ category:'Rap', isFeatured:false, isPublished:true }); this.showForm = true; this.msg=''; this.err=''; }
 
   openEdit(item: PortfolioItem) {

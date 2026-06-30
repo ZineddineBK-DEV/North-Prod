@@ -43,7 +43,13 @@ export class ProductionBookingsComponent implements OnInit {
   confirm(id: string) {
     this.svc.updateStatus(id, 'confirmed').subscribe({ next: () => this.load() });
   }
+getBookingCount(status: string): number {
+  if (status === 'all') {
+    return this.bookings.length;
+  }
 
+  return this.bookings.filter(b => b.status === status).length;
+}
   reject(id: string) {
     const reason = prompt('Motif du refus (optionnel) :') ?? '';
     this.svc.updateStatus(id, 'rejected', reason).subscribe({ next: () => this.load() });

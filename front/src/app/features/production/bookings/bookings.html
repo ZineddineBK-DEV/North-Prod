@@ -8,7 +8,7 @@
       <button class="filter-btn" [class.active]="filterStatus===opt.value"
               (click)="filterStatus=opt.value">
         {{ opt.label }}
-        <span class="count">{{ opt.value==='all' ? bookings.length : bookings.filter(b=>b.status===opt.value).length }}</span>
+        <span class="count">{{ getBookingCount(opt.value) }}</span>
       </button>
     }
   </div>

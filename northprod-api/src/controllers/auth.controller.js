@@ -77,7 +77,7 @@ const verifyEmail = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password, rememberMe } = req.body;
-
+    console.log(req.body)
     const user = await User.findOne({ email }).select('+password +refreshToken');
     if (!user || !(await user.comparePassword(password))) {
       return next(createError('Email ou mot de passe incorrect.', 401));

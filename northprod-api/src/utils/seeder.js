@@ -95,7 +95,7 @@ const seed = async () => {
       { label: 'Découvrir nos productions', link: '/portfolio', style: 'outline' },
     ],
     autoplay: true,
-    muted: true,
+    muted: false,
     loop: true,
   });
   console.log('✅  Default hero media seeded');
