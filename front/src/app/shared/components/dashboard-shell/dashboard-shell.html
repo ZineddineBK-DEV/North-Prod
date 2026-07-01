@@ -1,0 +1,105 @@
+<div class="shell">
+  <!-- Topbar (mobile + desktop) -->
+  <header class="shell-topbar">
+    <button class="shell-hamburger mobile-only" (click)="toggleSidebar()" [class.open]="sidebarOpen" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <a routerLink="/" class="shell-logo">
+      NORTH <span class="accent">PROD</span>
+    </a>
+
+    <div class="shell-actions">
+      <!-- Notification bell -->
+      <div class="notif-wrap">
+        <button class="shell-bell" (click)="toggleNotifications($event)" [class.active]="notifOpen">
+          <i class="fa fa-bell"></i>
+          @if(notifService.unreadCount() > 0) {
+            <span class="badge">{{ notifService.unreadCount() }}</span>
+          }
+        </button>
+
+        @if(notifOpen) {
+          <div class="notif-panel" (click)="$event.stopPropagation()">
+            <div class="notif-header">
+              <span>Notifications</span>
+              @if(notifService.unreadCount() > 0) {
+                <button class="mark-all" (click)="markAllRead($event)">Tout lire</button>
+              }
+            </div>
+            <div class="notif-body">
+              @if(notifsLoading) {
+                <div class="notif-empty"><i class="fa fa-spinner fa-spin"></i><p>Chargement...</p></div>
+              } @else if(notifications.length === 0) {
+                <div class="notif-empty">
+                  <i class="fa fa-bell-slash"></i>
+                  <p>Aucune notification</p>
+                </div>
+              } @else {
+                @for(n of notifications; track n._id) {
+                  <div class="notif-item" [class.unread]="!n.isRead">
+                    <div class="notif-dot"></div>
+                    <div class="notif-content">
+                      <p class="notif-title">{{ n.title }}</p>
+                      <p class="notif-msg">{{ n.message }}</p>
+                      <span class="notif-time">{{ n.createdAt | date:'dd/MM HH:mm' }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- User dropdown -->
+      <div class="shell-user" (click)="toggleUserMenu($event)" [class.open]="userMenuOpen">
+        <div class="user-avatar">
+          @if(auth.currentUser()?.avatarUrl) {
+            <img [src]="auth.currentUser()!.avatarUrl!" [alt]="auth.currentUser()!.aka" />
+          } @else {
+            <span>{{ (auth.currentUser()?.aka || 'U')[0].toUpperCase() }}</span>
+          }
+        </div>
+        <span class="user-aka desktop-only">{{ auth.currentUser()?.aka }}</span>
+        <i class="fa fa-chevron-down desktop-only" [class.rotated]="userMenuOpen"></i>
+
+        @if(userMenuOpen) {
+          <div class="user-dropdown" (click)="$event.stopPropagation()">
+            <a routerLink="/" (click)="userMenuOpen=false"><i class="fa fa-home"></i> Site public</a>
+            <hr />
+            <button (click)="logout()"><i class="fa fa-sign-out"></i> Déconnexion</button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="shell-body">
+    <!-- Sidebar -->
+    <aside class="shell-sidebar" [class.open]="sidebarOpen">
+      <div class="sidebar-role">{{ roleLabel() }}</div>
+      <nav class="sidebar-nav">
+        @for(item of navItems(); track item.path) {
+          <a [routerLink]="item.path"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{exact: false}"
+             (click)="closeSidebar()">
+            <i class="fa" [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+      <button class="sidebar-logout" (click)="logout()">
+        <i class="fa fa-sign-out"></i>
+        <span>Déconnexion</span>
+      </button>
+    </aside>
+    <div class="shell-overlay" [class.open]="sidebarOpen" (click)="closeSidebar()"></div>
+
+    <!-- Page content -->
+    <main class="shell-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
