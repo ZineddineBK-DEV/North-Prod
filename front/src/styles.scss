@@ -1,3 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "../public/assets/scss/app.scss";
+
+// ── Global overrides — North Prod design system ──────────────
+// Prevent Bootstrap/theme globals from clobbering the navbar link colors.
+.northprod-nav .nav-links li a {
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none;
+
+  &:hover,
+  &.active {
+    color: #c0a060 !important;
+  }
+}
+
+// Notification dropdown text colors — ensure legibility on dark background
+.northprod-nav .notif-panel,
+.shell-topbar .notif-panel {
+  .notif-title { color: #e0e0e0 !important; }
+  .notif-msg   { color: #888 !important; }
+  .notif-time  { color: rgba(255,255,255,0.35) !important; }
+}
+
+// User dropdown links inside public nav and dashboard shell
+.northprod-nav .user-dropdown a,
+.northprod-nav .user-dropdown button,
+.shell-topbar .user-dropdown a,
+.shell-topbar .user-dropdown button {
+  color: #d0d0d0 !important;
+
+  &:hover { color: #c0a060 !important; }
+}
+
+// Footer "Créer un compte" / login links keep the same light-on-dark treatment
+.northprod-footer a {
+  color: rgba(255,255,255,0.65);
+  &:hover { color: #c0a060; }
+}
+

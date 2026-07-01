@@ -1,15 +1,18 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { TapToTop } from '../../../shared/components/tap-to-top/tap-to-top';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-music-footer',
   templateUrl: './music-footer.html',
   styleUrls: ['./music-footer.scss'],
-  imports: [ReactiveFormsModule, RouterLink, TapToTop],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule, TapToTop],
 })
 export class MusicFooter {
+  auth = inject(AuthService);
   private fb = inject(FormBuilder);
   form = this.fb.group({
     name:    ['', Validators.required],

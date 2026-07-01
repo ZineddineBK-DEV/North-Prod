@@ -4,6 +4,9 @@ import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { PortfolioService } from '../../core/services/portfolio.service';
 import { PortfolioItem } from '../../core/models/portfolio.model';
+import { MusicNav } from '../music/music-nav/music-nav';
+import { MusicFooter } from '../music/music-footer/music-footer';
+import { MusicCopyright } from '../music/music-copyright/music-copyright';
 
 const CATEGORIES = ['Tous', 'Rap', 'Trap', 'R&B', 'Drill', 'Afrobeats', 'Mixage', 'Mastering'];
 const PAGE_SIZE = 12;
@@ -36,7 +39,7 @@ const LOCAL_ITEMS: PortfolioItem[] = [
   selector: 'app-portfolio-page',
   templateUrl: './portfolio-page.html',
   styleUrls: ['./portfolio-page.scss'],
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MusicNav, MusicFooter, MusicCopyright],
 })
 export class PortfolioPageComponent implements OnInit, OnDestroy {
   @ViewChild('audioEl') audioEl?: ElementRef<HTMLAudioElement>;

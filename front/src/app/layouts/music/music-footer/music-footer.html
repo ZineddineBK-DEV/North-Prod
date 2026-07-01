@@ -29,8 +29,10 @@
       <div class="footer-links">
         <h5>Espace Artiste</h5>
         <ul>
-          <li><a routerLink="/auth/register">Créer un compte</a></li>
-          <li><a routerLink="/auth/login">Se connecter</a></li>
+          @if(!auth.isLoggedIn()) {
+            <li><a routerLink="/auth/register">Créer un compte</a></li>
+            <li><a routerLink="/auth/login">Se connecter</a></li>
+          }
           <li><a routerLink="/artist/bookings">Mes réservations</a></li>
           <li><a routerLink="/artist/projects">Mes projets</a></li>
           <li><a routerLink="/artist/messages">Messages</a></li>
