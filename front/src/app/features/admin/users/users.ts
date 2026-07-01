@@ -49,12 +49,12 @@ export class AdminUsersComponent implements OnInit {
   setRole(role: string) { this.filterRole = role; this.page = 1; this.load(); }
 
   toggleActive(u: any) {
-    this.http.put<any>(`${environment.apiUrl}/admin/users/${u._id}/status`,
+    this.http.put<any>(`${environment.apiUrl}/admin/users/${u._id}`,
                        { isActive: !u.isActive }).subscribe({ next: r => u.isActive = r.user.isActive });
   }
 
   changeRole(u: any, role: string) {
-    this.http.put<any>(`${environment.apiUrl}/admin/users/${u._id}/role`,
+    this.http.put<any>(`${environment.apiUrl}/admin/users/${u._id}`,
                        { role }).subscribe({ next: r => u.role = r.user.role });
   }
 
