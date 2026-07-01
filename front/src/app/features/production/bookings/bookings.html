@@ -35,7 +35,7 @@
           <span class="col-price">{{ b.totalPrice | number }} DT</span>
           <span><span class="badge" [class]="statusClass(b.status)">{{ statusLabel(b.status) }}</span></span>
           <span class="col-actions">
-            <a [routerLink]="['../booking-detail', b._id]" class="btn-sm">Voir</a>
+            <a [routerLink]="['../bookings', b._id]" class="btn-sm">Voir</a>
             @if(b.status === 'pending') {
               <button class="btn-sm ok" (click)="confirm(b._id)">Confirmer</button>
               <button class="btn-sm err" (click)="reject(b._id)">Refuser</button>

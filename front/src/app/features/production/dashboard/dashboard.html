@@ -67,7 +67,7 @@
         <div class="card-empty"><i class="fa fa-music"></i><p>Aucun projet actif.</p></div>
       } @else {
         @for(p of recentProjects; track p._id) {
-          <a [routerLink]="['../project-detail', p._id]" class="list-row">
+          <a [routerLink]="['../projects', p._id]" class="list-row">
             <div class="proj-stage-dot" [style.background]="stageColor(p.stage)"></div>
             <div class="list-info">
               <p class="li-main">{{ p.title }}</p>

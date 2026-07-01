@@ -35,7 +35,7 @@
           </span>
           <span class="col-date">{{ p.updatedAt | date:'dd/MM/yy' }}</span>
           <span class="col-actions">
-            <a [routerLink]="['../project-detail', p._id]" class="btn-sm">Voir</a>
+            <a [routerLink]="['../projects', p._id]" class="btn-sm">Voir</a>
             @if(p.stage !== 'delivered') {
               <button class="btn-sm ok" (click)="updateStage(p._id, p.stage, p.stage)">
                 Avancer <i class="fa fa-arrow-right"></i>
