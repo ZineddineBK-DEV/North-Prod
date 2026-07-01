@@ -3,8 +3,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
-import { BookingService } from '../../../core/services/booking.service';
-import { ProjectService } from '../../../core/services/project.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -15,27 +13,33 @@ import { environment } from '../../../../environments/environment';
 })
 export class AdminDashboardComponent implements OnInit {
   auth = inject(AuthService);
-  private http       = inject(HttpClient);
-  private bookingSvc = inject(BookingService);
-  private projectSvc = inject(ProjectService);
+  private http = inject(HttpClient);
 
   stats = { totalUsers:0, totalArtists:0, totalBookings:0, pendingBookings:0,
             totalProjects:0, activeProjects:0, revenue:0 };
-
   recentBookings: any[] = [];
   recentUsers:    any[] = [];
   loading = true;
 
   ngOnInit() {
+    // One call — backend returns stats + recentUsers + pendingBookingsList
     this.http.get<any>(`${environment.apiUrl}/admin/stats`).subscribe({
-      next: r => { this.stats = r.stats; this.loading = false; },
+      next: r => {
+        const s = r.stats;
+        this.stats = {
+          totalUsers:     s.users?.total      || 0,
+          totalArtists:   s.users?.artists    || 0,
+          totalBookings:  s.bookings?.total   || 0,
+          pendingBookings:s.bookings?.pending  || 0,
+          totalProjects:  s.projects?.total   || 0,
+          activeProjects: s.projects?.active  || 0,
+          revenue:        s.revenue?.thisMonth|| 0,
+        };
+        this.recentUsers    = r.recentUsers          || [];
+        this.recentBookings = r.pendingBookingsList   || [];
+        this.loading = false;
+      },
       error: () => { this.loading = false; },
-    });
-    this.bookingSvc.getAllBookings({ page: 1 }).subscribe({
-      next: r => { this.recentBookings = r.bookings.slice(0, 5); },
-    });
-    this.http.get<any>(`${environment.apiUrl}/admin/users?limit=5`).subscribe({
-      next: r => { this.recentUsers = r.users; },
     });
   }
 
@@ -47,10 +51,6 @@ export class AdminDashboardComponent implements OnInit {
     return ({pending:'En attente',confirmed:'Confirmé',rejected:'Refusé',
              cancelled:'Annulé',completed:'Terminé'})[s] || s;
   }
-  roleLabel(r: string) {
-    return ({artist:'Artiste',production:'Production',admin:'Admin'})[r] || r;
-  }
-  roleClass(r: string) {
-    return ({artist:'badge-ok',production:'badge-blue',admin:'badge-gold'})[r] || '';
-  }
+  roleLabel(r: string) { return ({artist:'Artiste',production:'Production',admin:'Admin'})[r] || r; }
+  roleClass(r: string) { return ({artist:'badge-ok',production:'badge-blue',admin:'badge-gold'})[r] || ''; }
 }

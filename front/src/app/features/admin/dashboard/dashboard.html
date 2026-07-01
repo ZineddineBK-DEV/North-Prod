@@ -26,7 +26,7 @@
   <!-- Quick nav -->
   <div class="admin-nav">
     <a routerLink="../users"     class="admin-nav-item"><i class="fa fa-users"></i><span>Utilisateurs</span></a>
-    <a routerLink="../bookings"  class="admin-nav-item"><i class="fa fa-calendar"></i><span>Réservations</span></a>
+    <a routerLink="/production/bookings"  class="admin-nav-item"><i class="fa fa-calendar"></i><span>Réservations</span></a>
     <a routerLink="../portfolio" class="admin-nav-item"><i class="fa fa-image"></i><span>Portfolio</span></a>
     <a routerLink="../services"  class="admin-nav-item"><i class="fa fa-list"></i><span>Services</span></a>
     <a routerLink="../hero"      class="admin-nav-item"><i class="fa fa-film"></i><span>Hero Média</span></a>
@@ -37,7 +37,7 @@
     <div class="dash-card">
       <div class="card-head">
         <h2><i class="fa fa-calendar"></i> Réservations récentes</h2>
-        <a routerLink="../bookings">Tout voir</a>
+        <a routerLink="/production/bookings">Tout voir</a>
       </div>
       @if(loading) { <div class="card-loading"><i class="fa fa-spinner fa-spin"></i></div> }
       @else if(recentBookings.length === 0) {
