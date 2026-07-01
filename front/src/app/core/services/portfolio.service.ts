@@ -24,12 +24,12 @@ export class PortfolioService {
     return this.http.get<{ success: boolean; item: PortfolioItem }>(`${this.API}/${id}`);
   }
 
-  createItem(data: Partial<PortfolioItem>) {
-    return this.http.post<{ success: boolean; item: PortfolioItem }>(this.API, data);
+  createItem(fd: FormData) {
+    return this.http.post<{ success: boolean; item: PortfolioItem }>(this.API, fd);
   }
 
-  updateItem(id: string, data: Partial<PortfolioItem>) {
-    return this.http.put<{ success: boolean; item: PortfolioItem }>(`${this.API}/${id}`, data);
+  updateItem(id: string, fd: FormData) {
+    return this.http.put<{ success: boolean; item: PortfolioItem }>(`${this.API}/${id}`, fd);
   }
 
   deleteItem(id: string) {

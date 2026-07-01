@@ -69,10 +69,17 @@ const uploadProjectFile = multer({
   limits: { fileSize: MAX_PROJECT_FILE_SIZE },
 });
 
+const portfolioMediaFilter = (req, file, cb) => {
+  const imageOk = /jpeg|jpg|png|webp|gif/.test(file.mimetype);
+  const audioOk = /audio\//.test(file.mimetype) || /mp3|wav|aiff|flac|ogg/.test(require('path').extname(file.originalname).toLowerCase());
+  if (imageOk || audioOk) return cb(null, true);
+  cb(new Error('Format non supporté. Images ou audio uniquement.'));
+};
+
 const uploadPortfolioMedia = multer({
   storage: makeStorage('portfolio'),
-  fileFilter: imageFilter,
-  limits: { fileSize: MAX_IMAGE_SIZE },
+  fileFilter: portfolioMediaFilter,
+  limits: { fileSize: 50 * 1024 * 1024 },
 });
 
 const uploadHeroVideo = multer({

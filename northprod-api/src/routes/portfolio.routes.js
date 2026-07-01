@@ -40,20 +40,22 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // POST /api/portfolio (admin)
-router.post('/', protect, authorize('admin'), uploadPortfolioMedia.single('thumbnail'), async (req, res, next) => {
+router.post('/', protect, authorize('admin'), uploadPortfolioMedia.fields([{name:'thumbnail',maxCount:1},{name:'media',maxCount:1}]), async (req, res, next) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.thumbnail = `portfolio/${req.file.filename}`;
+    if (req.files?.thumbnail?.[0]) data.thumbnail = `portfolio/${req.files.thumbnail[0].filename}`;
+    if (req.files?.media?.[0])     data.mediaUrl  = `portfolio/${req.files.media[0].filename}`;
     const item = await Portfolio.create(data);
     res.status(201).json({ success: true, item });
   } catch (err) { next(err); }
 });
 
 // PUT /api/portfolio/:id (admin)
-router.put('/:id', protect, authorize('admin'), uploadPortfolioMedia.single('thumbnail'), async (req, res, next) => {
+router.put('/:id', protect, authorize('admin'), uploadPortfolioMedia.fields([{name:'thumbnail',maxCount:1},{name:'media',maxCount:1}]), async (req, res, next) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.thumbnail = `portfolio/${req.file.filename}`;
+    if (req.files?.thumbnail?.[0]) data.thumbnail = `portfolio/${req.files.thumbnail[0].filename}`;
+    if (req.files?.media?.[0])     data.mediaUrl  = `portfolio/${req.files.media[0].filename}`;
     const item = await Portfolio.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true });
     if (!item) return next(createError('Élément introuvable.', 404));
     res.json({ success: true, item });

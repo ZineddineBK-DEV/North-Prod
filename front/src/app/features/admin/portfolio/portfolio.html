@@ -1,6 +1,6 @@
 <div class="dash-page">
   <div class="page-head">
-    <h1><i class="fa fa-image"></i> Portfolio</h1>
+    <h1><i class="fa fa-music"></i> Portfolio — Bibliothèque musicale</h1>
     <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Ajouter</button>
   </div>
 
@@ -13,35 +13,80 @@
         <h2>{{ editId ? 'Modifier' : 'Ajouter' }} une production</h2>
         <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
       </div>
-      <form [formGroup]="form" (ngSubmit)="save()" class="pf-form">
+      <form [formGroup]="form" (ngSubmit)="save()" class="pf-form" enctype="multipart/form-data">
         <div class="form-grid">
           <div class="form-field"><label>Titre *</label><input type="text" formControlName="title" /></div>
-          <div class="form-field"><label>Artiste</label><input type="text" formControlName="artist" /></div>
+
+          <!-- Artist text input with datalist suggestions -->
+          <div class="form-field">
+            <label>Artiste</label>
+            <input type="text" formControlName="artist" list="artist-list" autocomplete="off" />
+            <datalist id="artist-list">
+              @for(a of artists; track a) { <option [value]="a"></option> }
+            </datalist>
+          </div>
+
           <div class="form-field">
             <label>Catégorie *</label>
             <select formControlName="category">
               @for(c of categories; track c) { <option [value]="c">{{ c }}</option> }
             </select>
           </div>
+
           <div class="form-field">
-            <label>Description</label>
-            <input type="text" formControlName="description" />
+            <label>Type de média</label>
+            <select formControlName="mediaType">
+              <option value="audio">Audio</option>
+              <option value="image">Image</option>
+              <option value="video">Vidéo</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Année</label>
+            <input type="number" formControlName="year" min="2000" [max]="2030" />
+          </div>
+
+          <div class="form-field">
+            <label>Ordre d'affichage</label>
+            <input type="number" formControlName="order" min="0" />
           </div>
         </div>
+
+        <div class="form-field full">
+          <label>Description</label>
+          <textarea formControlName="description" rows="2"></textarea>
+        </div>
+
+        <div class="form-field full">
+          <label>Embed URL (YouTube / SoundCloud)</label>
+          <input type="url" formControlName="embedUrl" placeholder="https://..." />
+        </div>
+
+        <!-- File uploads -->
+        <div class="form-grid upload-grid">
+          <div class="form-field">
+            <label>Image de couverture</label>
+            <input type="file" accept="image/*" (change)="onThumbnail($event)" />
+            @if(thumbnailPreview) {
+              <img [src]="thumbnailPreview" alt="preview" class="thumb-preview" />
+            }
+          </div>
+          <div class="form-field">
+            <label>Fichier Audio (MP3/WAV)</label>
+            <input type="file" accept="audio/*" (change)="onAudio($event)" />
+            @if(audioFile) { <p class="file-name"><i class="fa fa-music"></i> {{ audioFile.name }}</p> }
+          </div>
+        </div>
+
         <div class="toggle-row">
-          <label class="toggle-label">
-            <input type="checkbox" formControlName="isFeatured" />
-            <span>Mise en avant</span>
-          </label>
-          <label class="toggle-label">
-            <input type="checkbox" formControlName="isPublished" />
-            <span>Publié</span>
-          </label>
+          <label class="toggle-label"><input type="checkbox" formControlName="isFeatured" /><span>Mise en avant</span></label>
+          <label class="toggle-label"><input type="checkbox" formControlName="isPublished" /><span>Publié</span></label>
         </div>
         <div class="form-actions">
           <button type="button" class="btn-outline" (click)="showForm=false">Annuler</button>
           <button type="submit" class="btn-gold" [disabled]="saving">
-            @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else { Sauvegarder }
+            @if(saving){<i class="fa fa-spinner fa-spin"></i> Sauvegarde...} @else { Sauvegarder }
           </button>
         </div>
       </form>
@@ -49,13 +94,16 @@
   }
 
   @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
-  @else {
+  @else if(items.length === 0) {
+    <div class="empty-state"><i class="fa fa-music"></i><p>Aucune production. Ajoutez la première.</p></div>
+  } @else {
     <div class="portfolio-grid">
       @for(item of items; track item._id) {
         <div class="pf-card" [class.unpublished]="!item.isPublished">
-          <div class="pf-img" [style.background-image]="getPortfolioImage(item.category)">
+          <div class="pf-img" [style.background-image]="'url(' + thumbUrl(item) + ')'">
             <div class="pf-overlay">
               <span class="pf-cat">{{ item.category }}</span>
+              <span class="pf-type"><i class="fa fa-{{item.mediaType==='audio'?'music':item.mediaType==='video'?'film':'image'}}"></i></span>
               @if(item.isFeatured) { <span class="pf-feat"><i class="fa fa-star"></i></span> }
               @if(!item.isPublished) { <span class="pf-draft">Brouillon</span> }
             </div>
