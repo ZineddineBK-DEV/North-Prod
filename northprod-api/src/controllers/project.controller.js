@@ -11,9 +11,8 @@ const getMyProjects = async (req, res, next) => {
 
     if (req.user.role === 'artist') {
       filter.artist = req.user._id;
-    } else if (req.user.role === 'production') {
-      filter.engineer = req.user._id;
     }
+    // production and admin see all projects (no user-scoped filter)
 
     if (stage) filter.stage = stage;
     filter.isArchived = archived === 'true';

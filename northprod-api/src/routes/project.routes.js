@@ -6,7 +6,7 @@ const {
   updateProjectStage, addComment, updateProjectDetails,
 } = require('../controllers/project.controller');
 
-router.get('/all', protect, authorize('admin'), getAllProjects);
+router.get('/all', protect, authorize('production', 'admin'), getAllProjects);
 router.get('/', protect, getMyProjects);
 router.get('/:id', protect, getProject);
 router.put('/:id/stage', protect, authorize('production', 'admin'), updateProjectStage);
