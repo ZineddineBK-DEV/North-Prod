@@ -1,72 +1,117 @@
 <div class="dash-page">
-  <div class="page-head"><h1><i class="fa fa-film"></i> Hero Média</h1></div>
+  <div class="page-head">
+    <h1><i class="fa fa-film"></i> Hero Média</h1>
+    <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Nouveau</button>
+  </div>
 
   @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
   @if(err) { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
 
+  @if(showForm) {
+    <div class="dash-card form-card">
+      <div class="card-head">
+        <h2>{{ editId ? 'Modifier' : 'Créer' }} un Hero</h2>
+        <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="hero-form">
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Type de média *</label>
+            <select formControlName="mediaType">
+              <option value="youtube">YouTube</option>
+              <option value="vimeo">Vimeo</option>
+              <option value="upload">Vidéo uploadée</option>
+            </select>
+          </div>
+
+          @if(form.value.mediaType !== 'upload') {
+            <div class="form-field">
+              <label>URL Embed</label>
+              <input type="url" formControlName="embedUrl" placeholder="https://www.youtube.com/embed/..." />
+            </div>
+            <div class="form-field">
+              <label>Video ID</label>
+              <input type="text" formControlName="videoId" placeholder="ID de la vidéo" />
+            </div>
+          } @else {
+            <div class="form-field">
+              <label>Fichier Vidéo</label>
+              <input type="file" accept="video/*" (change)="onVideo($event)" />
+            </div>
+          }
+
+          <div class="form-field full">
+            <label>Titre *</label>
+            <input type="text" formControlName="title" placeholder="NORTH PRODUCTION" />
+          </div>
+          <div class="form-field full">
+            <label>Sous-titre</label>
+            <input type="text" formControlName="subtitle" placeholder="Studio de production Son & Image" />
+          </div>
+        </div>
+
+        <!-- CTA buttons -->
+        <div class="section-sep"><span>Boutons CTA</span> <button type="button" class="btn-add-cta" (click)="addCta()"><i class="fa fa-plus"></i> Ajouter</button></div>
+        <div formArrayName="cta">
+          @for(ctrl of ctaArray.controls; track $index) {
+            <div [formGroupName]="$index" class="cta-row">
+              <input type="text" formControlName="label" placeholder="Libellé" />
+              <input type="text" formControlName="link"  placeholder="/lien ou #section" />
+              <select formControlName="style">
+                <option value="primary">Primary</option>
+                <option value="secondary">Secondary</option>
+                <option value="outline">Outline</option>
+              </select>
+              <button type="button" class="btn-icon err" (click)="removeCta($index)"><i class="fa fa-trash"></i></button>
+            </div>
+          }
+        </div>
+
+        <!-- Playback options -->
+        <div class="toggle-row">
+          <label class="toggle-label"><input type="checkbox" formControlName="autoplay"/><span>Autoplay</span></label>
+          <label class="toggle-label"><input type="checkbox" formControlName="muted"/><span>Muet</span></label>
+          <label class="toggle-label"><input type="checkbox" formControlName="loop"/><span>Loop</span></label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-outline" (click)="showForm=false">Annuler</button>
+          <button type="submit" class="btn-gold" [disabled]="saving">
+            @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else { Sauvegarder }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
   @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
-  @else {
-    <form [formGroup]="form" (ngSubmit)="save()" class="hero-form dash-card">
-      <div class="section-title"><i class="fa fa-video-camera"></i> Vidéo de fond</div>
-      <div class="form-grid">
-        <div class="form-field">
-          <label>Type de vidéo</label>
-          <select formControlName="videoType">
-            <option value="youtube">YouTube</option>
-            <option value="vimeo">Vimeo</option>
-            <option value="mp4">Fichier MP4 (URL)</option>
-          </select>
+  @else if(heroes.length === 0) {
+    <div class="empty-state"><i class="fa fa-film"></i><p>Aucun Hero configuré.</p></div>
+  } @else {
+    <div class="hero-list">
+      @for(h of heroes; track h._id) {
+        <div class="hero-card" [class.active]="h.isActive">
+          <div class="hero-card-info">
+            <div class="hero-card-left">
+              <span class="hero-type-badge">{{ h.mediaType }}</span>
+              @if(h.isActive) { <span class="badge badge-ok"><i class="fa fa-check"></i> Actif</span> }
+            </div>
+            <div>
+              <p class="hero-title">{{ h.title || '(Sans titre)' }}</p>
+              @if(h.subtitle) { <p class="hero-sub">{{ h.subtitle }}</p> }
+              @if(h.embedUrl)  { <p class="hero-url">{{ h.embedUrl }}</p> }
+            </div>
+          </div>
+          <div class="hero-card-actions">
+            @if(!h.isActive) {
+              <button class="btn-sm ok" (click)="activate(h)"><i class="fa fa-bolt"></i> Activer</button>
+            }
+            <button class="btn-sm" (click)="openEdit(h)"><i class="fa fa-edit"></i> Modifier</button>
+            <button class="btn-sm err" (click)="remove(h._id)"><i class="fa fa-trash"></i></button>
+          </div>
         </div>
-        <div class="form-field">
-          <label>URL / ID de la vidéo</label>
-          <input type="text" formControlName="videoUrl" placeholder="https://youtube.com/watch?v=..." />
-        </div>
-      </div>
-
-      <div class="section-title"><i class="fa fa-font"></i> Textes</div>
-      <div class="form-grid">
-        <div class="form-field full">
-          <label>Titre principal *</label>
-          <input type="text" formControlName="headline" placeholder="NORTH PRODUCTION" />
-        </div>
-        <div class="form-field full">
-          <label>Sous-titre</label>
-          <input type="text" formControlName="subheadline" placeholder="Studio de production Son & Image" />
-        </div>
-        <div class="form-field">
-          <label>Bouton principal (CTA 1)</label>
-          <input type="text" formControlName="ctaPrimary" />
-        </div>
-        <div class="form-field">
-          <label>Bouton secondaire (CTA 2)</label>
-          <input type="text" formControlName="ctaSecondary" />
-        </div>
-      </div>
-
-      <div class="toggle-row">
-        <label class="toggle-label">
-          <input type="checkbox" formControlName="showStats" /><span>Afficher les statistiques (années, artistes, productions)</span>
-        </label>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn-gold" [disabled]="saving">
-          @if(saving){<i class="fa fa-spinner fa-spin"></i> Sauvegarde...} @else {<i class="fa fa-save"></i> Sauvegarder}
-        </button>
-      </div>
-    </form>
-
-    <!-- Preview info -->
-    <div class="preview-box">
-      <div class="preview-label"><i class="fa fa-eye"></i> Aperçu actuel</div>
-      <div class="preview-content">
-        <p class="prev-headline">{{ form.value.headline || 'NORTH PRODUCTION' }}</p>
-        <p class="prev-sub">{{ form.value.subheadline || 'Studio de production Son & Image' }}</p>
-        <div class="prev-btns">
-          <span class="prev-btn primary">{{ form.value.ctaPrimary }}</span>
-          <span class="prev-btn secondary">{{ form.value.ctaSecondary }}</span>
-        </div>
-      </div>
+      }
     </div>
   }
 </div>

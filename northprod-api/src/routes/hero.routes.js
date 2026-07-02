@@ -52,12 +52,13 @@ router.put('/:id/activate', protect, authorize('admin'), async (req, res, next) 
 });
 
 // PUT /api/hero/:id  (admin - update)
-router.put('/:id', protect, authorize('admin'), async (req, res, next) => {
+router.put('/:id', protect, authorize('admin'), uploadHeroVideo.single('video'), async (req, res, next) => {
   try {
     const data = { ...req.body };
     if (typeof data.cta === 'string') {
       try { data.cta = JSON.parse(data.cta); } catch { data.cta = []; }
     }
+    if (req.file) { data.mediaType = 'upload'; data.filePath = `hero/${req.file.filename}`; data.fileName = req.file.originalname; }
     const hero = await HeroMedia.findByIdAndUpdate(req.params.id, data, { new: true });
     if (!hero) return next(createError('Hero introuvable.', 404));
     res.json({ success: true, hero });

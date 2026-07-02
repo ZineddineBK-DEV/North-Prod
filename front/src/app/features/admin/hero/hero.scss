@@ -37,3 +37,29 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
 .prev-btn{padding:10px 24px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:1px;
   &.primary{background:$gold;color:#000;}
   &.secondary{border:1px solid rgba(255,255,255,0.3);color:#fff;}}
+
+.hero-list { display:flex; flex-direction:column; gap:12px; }
+.hero-card { background:#161616; border:1px solid rgba(192,160,96,0.15); border-radius:10px;
+  padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+  &.active { border-color:rgba(46,204,113,0.3); }
+  @media(max-width:600px){ flex-direction:column; align-items:flex-start; } }
+.hero-card-info { display:flex; align-items:flex-start; gap:14px; flex:1; min-width:0; }
+.hero-card-left { display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+.hero-type-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+  padding:3px 8px; border-radius:4px; background:rgba(192,160,96,0.15); color:#c0a060; }
+.hero-title { margin:0 0 4px; font-size:15px; font-weight:700; color:#fff; }
+.hero-sub   { margin:0 0 4px; font-size:12px; color:#888; }
+.hero-url   { margin:0; font-size:11px; color:rgba(136,136,136,0.6); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:300px; }
+.hero-card-actions { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; }
+.section-sep { display:flex; align-items:center; justify-content:space-between;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#c0a060;
+  margin:16px 0 10px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06); }
+.btn-add-cta { padding:5px 12px; border:1px solid rgba(192,160,96,0.4); background:transparent;
+  color:#c0a060; font-size:11px; border-radius:4px; cursor:pointer; font-family:inherit;
+  &:hover { background:rgba(192,160,96,0.08); } }
+.cta-row { display:flex; gap:8px; margin-bottom:8px; align-items:center; flex-wrap:wrap;
+  input,select { flex:1; min-width:120px; background:#1e1e1e; border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px; padding:8px 10px; color:#e0e0e0; font-size:12px; font-family:inherit;
+    &:focus { outline:none; border-color:#c0a060; } } }
+.empty-state { text-align:center; padding:60px; color:#888;
+  i { font-size:40px; display:block; margin-bottom:16px; } p { margin:0; } }
