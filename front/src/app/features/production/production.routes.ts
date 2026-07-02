@@ -31,6 +31,11 @@ export const ProductionRoutes: Routes = [
         loadComponent: () => import('./project-detail/project-detail').then((m) => m.ProductionProjectDetailComponent),
         data: { title: 'Projet — NORTH PROD' },
       },
+      {
+        path: 'messages',
+        loadComponent: () => import('./messages/messages').then((m) => m.ProductionMessagesComponent),
+        data: { title: 'Messages — NORTH PROD' },
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

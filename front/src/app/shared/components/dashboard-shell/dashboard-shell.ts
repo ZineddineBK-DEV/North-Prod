@@ -44,6 +44,7 @@ export class DashboardShellComponent implements OnInit {
         { path: '/admin/portfolio', label: 'Portfolio',       icon: 'fa-image' },
         { path: '/admin/services',  label: 'Services & Tarifs', icon: 'fa-list' },
         { path: '/admin/hero',      label: 'Hero Média',      icon: 'fa-film' },
+        { path: '/admin/messages',  label: 'Messages',        icon: 'fa-comments' },
       ];
     }
     if (this.auth.isProduction()) {
@@ -51,6 +52,7 @@ export class DashboardShellComponent implements OnInit {
         { path: '/production/dashboard', label: 'Tableau de bord', icon: 'fa-th-large' },
         { path: '/production/bookings',  label: 'Réservations',    icon: 'fa-calendar' },
         { path: '/production/projects',  label: 'Projets',         icon: 'fa-music' },
+        { path: '/production/messages',  label: 'Messages',        icon: 'fa-comments' },
       ];
     }
     return [

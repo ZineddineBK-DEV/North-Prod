@@ -31,6 +31,11 @@ export const AdminRoutes: Routes = [
         loadComponent: () => import('./hero/hero').then((m) => m.AdminHeroComponent),
         data: { title: 'Hero Media — NORTH PROD' },
       },
+      {
+        path: 'messages',
+        loadComponent: () => import('./messages/messages').then((m) => m.AdminMessagesComponent),
+        data: { title: 'Messages — NORTH PROD' },
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
