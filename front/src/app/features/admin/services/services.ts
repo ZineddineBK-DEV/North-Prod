@@ -15,18 +15,17 @@ export class AdminServicesComponent implements OnInit {
   private fb   = inject(FormBuilder);
 
   services: any[] = [];
-  loading  = true;
-  showForm = false;
-  saving   = false;
+  loading = true; showForm = false; saving = false;
   editId: string | null = null;
   msg = ''; err = '';
 
+  // Model fields: name, slug (auto), description, price, unit, isActive, order
   form = this.fb.group({
     name:        ['', Validators.required],
     description: [''],
     price:       [0, [Validators.required, Validators.min(0)]],
     unit:        ['heure', Validators.required],
-    isAvailable: [true],
+    isActive:    [true],
     order:       [0],
   });
 
@@ -44,25 +43,34 @@ export class AdminServicesComponent implements OnInit {
 
   openAdd() {
     this.editId = null;
-    this.form.reset({ unit:'heure', isAvailable:true, price:0, order:0 });
-    this.showForm = true; this.msg=''; this.err='';
+    this.form.reset({ unit:'heure', isActive:true, price:0, order:0 });
+    this.showForm = true; this.msg = ''; this.err = '';
   }
 
   openEdit(s: any) {
     this.editId = s._id;
-    this.form.patchValue(s);
-    this.showForm = true; this.msg=''; this.err='';
+    this.form.patchValue({
+      name: s.name, description: s.description || '', price: s.price,
+      unit: s.unit, isActive: s.isActive, order: s.order || 0,
+    });
+    this.showForm = true; this.msg = ''; this.err = '';
+  }
+
+  private toSlug(name: string): string {
+    return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   }
 
   save() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving = true;
-    const api = this.editId
-      ? this.http.put<any>(`${environment.apiUrl}/services/${this.editId}`, this.form.value)
-      : this.http.post<any>(`${environment.apiUrl}/services`, this.form.value);
-    api.subscribe({
+    const payload = { ...this.form.value, slug: this.toSlug(this.form.value.name!) };
+    const req = this.editId
+      ? this.http.put<any>(`${environment.apiUrl}/services/${this.editId}`, payload)
+      : this.http.post<any>(`${environment.apiUrl}/services`, payload);
+    req.subscribe({
       next: () => { this.msg = 'Sauvegardé !'; this.saving = false; this.showForm = false; this.load(); },
-      error: e => { this.err = e.error?.message||'Erreur.'; this.saving = false; },
+      error: e => { this.err = e.error?.message || 'Erreur.'; this.saving = false; },
     });
   }
 
@@ -73,7 +81,7 @@ export class AdminServicesComponent implements OnInit {
   }
 
   toggle(s: any) {
-    this.http.put<any>(`${environment.apiUrl}/services/${s._id}`, { isAvailable: !s.isAvailable })
-      .subscribe({ next: r => s.isAvailable = r.service.isAvailable });
+    this.http.put<any>(`${environment.apiUrl}/services/${s._id}`, { isActive: !s.isActive })
+      .subscribe({ next: r => s.isActive = r.service.isActive });
   }
 }

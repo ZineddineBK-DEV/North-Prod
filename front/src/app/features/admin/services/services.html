@@ -31,7 +31,7 @@
         </div>
         <div class="toggle-row">
           <label class="toggle-label">
-            <input type="checkbox" formControlName="isAvailable" /><span>Disponible</span>
+            <input type="checkbox" formControlName="isActive" /><span>Disponible</span>
           </label>
         </div>
         <div class="form-actions">
@@ -50,20 +50,20 @@
   } @else {
     <div class="sv-grid">
       @for(s of services; track s._id) {
-        <div class="sv-card" [class.unavailable]="!s.isAvailable">
+        <div class="sv-card" [class.unavailable]="!s.isActive">
           <div class="sv-header">
             <h3>{{ s.name }}</h3>
             <div class="sv-price">{{ s.price | number }} DT<span> / {{ s.unit }}</span></div>
           </div>
           @if(s.description) { <p class="sv-desc">{{ s.description }}</p> }
           <div class="sv-footer">
-            <span class="badge" [class]="s.isAvailable ? 'badge-ok' : 'badge-muted'">
-              {{ s.isAvailable ? 'Disponible' : 'Indisponible' }}
+            <span class="badge" [class]="s.isActive ? 'badge-ok' : 'badge-muted'">
+              {{ s.isActive ? 'Disponible' : 'Indisponible' }}
             </span>
             <div class="sv-actions">
               <button class="btn-sm" (click)="openEdit(s)"><i class="fa fa-edit"></i></button>
-              <button class="btn-sm" [class]="s.isAvailable ? 'warn' : 'ok'" (click)="toggle(s)">
-                <i class="fa fa-toggle-{{s.isAvailable ? 'on' : 'off'}}"></i>
+              <button class="btn-sm" [class]="s.isActive ? 'warn' : 'ok'" (click)="toggle(s)">
+                <i class="fa fa-toggle-{{s.isActive ? 'on' : 'off'}}"></i>
               </button>
               <button class="btn-sm err" (click)="remove(s._id)"><i class="fa fa-trash"></i></button>
             </div>
