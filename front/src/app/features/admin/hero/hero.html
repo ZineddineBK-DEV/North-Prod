@@ -1,7 +1,7 @@
 <div class="dash-page">
   <div class="page-head">
     <h1><i class="fa fa-film"></i> Hero Média</h1>
-    <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Nouveau</button>
+    <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Nouveau Hero</button>
   </div>
 
   @if(msg) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> {{ msg }}</div> }
@@ -10,11 +10,12 @@
   @if(showForm) {
     <div class="dash-card form-card">
       <div class="card-head">
-        <h2>{{ editId ? 'Modifier' : 'Créer' }} un Hero</h2>
-        <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
+        <h2><i class="fa fa-{{editId ? 'edit' : 'plus-circle'}}"></i> {{ editId ? 'Modifier' : 'Créer' }} un Hero</h2>
+        <button class="btn-icon" (click)="showForm=false" title="Fermer"><i class="fa fa-times"></i></button>
       </div>
       <form [formGroup]="form" (ngSubmit)="save()" class="hero-form">
 
+        <div class="form-section-label">Média</div>
         <div class="form-grid">
           <div class="form-field">
             <label>Type de média *</label>
@@ -28,88 +29,145 @@
           @if(form.value.mediaType !== 'upload') {
             <div class="form-field">
               <label>URL Embed</label>
-              <input type="url" formControlName="embedUrl" placeholder="https://www.youtube.com/embed/..." />
+              <input type="url" formControlName="embedUrl" placeholder="https://www.youtube.com/embed/ID" />
             </div>
             <div class="form-field">
               <label>Video ID</label>
-              <input type="text" formControlName="videoId" placeholder="ID de la vidéo" />
+              <input type="text" formControlName="videoId" placeholder="ex: dQw4w9WgXcQ" />
             </div>
           } @else {
             <div class="form-field">
-              <label>Fichier Vidéo</label>
+              <label>Fichier Vidéo (MP4)</label>
               <input type="file" accept="video/*" (change)="onVideo($event)" />
             </div>
           }
+        </div>
 
+        <div class="form-section-label">Textes</div>
+        <div class="form-grid">
           <div class="form-field full">
-            <label>Titre *</label>
+            <label>Titre principal *</label>
             <input type="text" formControlName="title" placeholder="NORTH PRODUCTION" />
           </div>
           <div class="form-field full">
             <label>Sous-titre</label>
-            <input type="text" formControlName="subtitle" placeholder="Studio de production Son & Image" />
+            <input type="text" formControlName="subtitle" placeholder="Studio de production Son & Image — Ariana, Tunisie" />
           </div>
         </div>
 
-        <!-- CTA buttons -->
-        <div class="section-sep"><span>Boutons CTA</span> <button type="button" class="btn-add-cta" (click)="addCta()"><i class="fa fa-plus"></i> Ajouter</button></div>
+        <div class="form-section-label">
+          Boutons CTA
+          <button type="button" class="btn-add-cta" (click)="addCta()">
+            <i class="fa fa-plus"></i> Ajouter un bouton
+          </button>
+        </div>
+
         <div formArrayName="cta">
           @for(ctrl of ctaArray.controls; track $index) {
             <div [formGroupName]="$index" class="cta-row">
-              <input type="text" formControlName="label" placeholder="Libellé" />
-              <input type="text" formControlName="link"  placeholder="/lien ou #section" />
-              <select formControlName="style">
-                <option value="primary">Primary</option>
-                <option value="secondary">Secondary</option>
-                <option value="outline">Outline</option>
-              </select>
-              <button type="button" class="btn-icon err" (click)="removeCta($index)"><i class="fa fa-trash"></i></button>
+              <div class="cta-field">
+                <label>Libellé</label>
+                <input type="text" formControlName="label" placeholder="Réserver une séance" />
+              </div>
+              <div class="cta-field">
+                <label>Lien</label>
+                <input type="text" formControlName="link" placeholder="/auth/register" />
+              </div>
+              <div class="cta-field cta-style">
+                <label>Style</label>
+                <select formControlName="style">
+                  <option value="primary">Primary (or)</option>
+                  <option value="secondary">Secondary</option>
+                  <option value="outline">Outline</option>
+                </select>
+              </div>
+              <button type="button" class="btn-cta-remove" (click)="removeCta($index)" title="Supprimer">
+                <i class="fa fa-trash"></i>
+              </button>
             </div>
+          }
+          @if(ctaArray.length === 0) {
+            <p class="cta-empty">Aucun bouton CTA. Cliquez sur « Ajouter un bouton » pour en créer.</p>
           }
         </div>
 
-        <!-- Playback options -->
+        <div class="form-section-label">Options de lecture</div>
         <div class="toggle-row">
           <label class="toggle-label"><input type="checkbox" formControlName="autoplay"/><span>Autoplay</span></label>
           <label class="toggle-label"><input type="checkbox" formControlName="muted"/><span>Muet</span></label>
-          <label class="toggle-label"><input type="checkbox" formControlName="loop"/><span>Loop</span></label>
+          <label class="toggle-label"><input type="checkbox" formControlName="loop"/><span>Boucle</span></label>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-outline" (click)="showForm=false">Annuler</button>
+          <button type="button" class="btn-outline" (click)="showForm=false">
+            <i class="fa fa-times"></i> Annuler
+          </button>
           <button type="submit" class="btn-gold" [disabled]="saving">
-            @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else { Sauvegarder }
+            @if(saving) { <i class="fa fa-spinner fa-spin"></i> Sauvegarde... }
+            @else { <i class="fa fa-save"></i> Sauvegarder }
           </button>
         </div>
       </form>
     </div>
   }
 
-  @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
-  @else if(heroes.length === 0) {
-    <div class="empty-state"><i class="fa fa-film"></i><p>Aucun Hero configuré.</p></div>
+  @if(loading) {
+    <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+  } @else if(heroes.length === 0) {
+    <div class="empty-state">
+      <i class="fa fa-film"></i>
+      <p>Aucun Hero configuré.</p>
+      <button class="btn-gold" (click)="openAdd()"><i class="fa fa-plus"></i> Créer le premier Hero</button>
+    </div>
   } @else {
     <div class="hero-list">
       @for(h of heroes; track h._id) {
-        <div class="hero-card" [class.active]="h.isActive">
-          <div class="hero-card-info">
-            <div class="hero-card-left">
-              <span class="hero-type-badge">{{ h.mediaType }}</span>
-              @if(h.isActive) { <span class="badge badge-ok"><i class="fa fa-check"></i> Actif</span> }
-            </div>
-            <div>
-              <p class="hero-title">{{ h.title || '(Sans titre)' }}</p>
-              @if(h.subtitle) { <p class="hero-sub">{{ h.subtitle }}</p> }
-              @if(h.embedUrl)  { <p class="hero-url">{{ h.embedUrl }}</p> }
-            </div>
+        <div class="hero-card" [class.is-active]="h.isActive">
+
+          <!-- Status strip -->
+          <div class="hero-card-status">
+            <span class="hero-type-badge">
+              <i class="fa fa-{{h.mediaType === 'youtube' ? 'youtube-play' : h.mediaType === 'vimeo' ? 'vimeo' : 'upload'}}"></i>
+              {{ h.mediaType }}
+            </span>
+            @if(h.isActive) {
+              <span class="badge badge-active"><i class="fa fa-check-circle"></i> Actif</span>
+            } @else {
+              <span class="badge badge-inactive">Inactif</span>
+            }
           </div>
+
+          <!-- Info -->
+          <div class="hero-card-body">
+            <p class="hero-title">{{ h.title || '(Sans titre)' }}</p>
+            @if(h.subtitle) { <p class="hero-sub">{{ h.subtitle }}</p> }
+            @if(h.embedUrl) {
+              <p class="hero-url"><i class="fa fa-link"></i> {{ h.embedUrl }}</p>
+            }
+            @if(h.cta?.length) {
+              <div class="hero-cta-chips">
+                @for(c of h.cta; track c.label) {
+                  <span class="cta-chip cta-chip-{{c.style}}">{{ c.label }}</span>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Actions -->
           <div class="hero-card-actions">
             @if(!h.isActive) {
-              <button class="btn-sm ok" (click)="activate(h)"><i class="fa fa-bolt"></i> Activer</button>
+              <button class="btn-action btn-activate" (click)="activate(h)" title="Activer ce Hero">
+                <i class="fa fa-bolt"></i> Activer
+              </button>
             }
-            <button class="btn-sm" (click)="openEdit(h)"><i class="fa fa-edit"></i> Modifier</button>
-            <button class="btn-sm err" (click)="remove(h._id)"><i class="fa fa-trash"></i></button>
+            <button class="btn-action btn-edit" (click)="openEdit(h)" title="Modifier">
+              <i class="fa fa-pencil"></i> Modifier
+            </button>
+            <button class="btn-action btn-delete" (click)="remove(h._id)" title="Supprimer">
+              <i class="fa fa-trash"></i>
+            </button>
           </div>
+
         </div>
       }
     </div>

@@ -20,7 +20,7 @@ import { CommonModule } from '@angular/common';
       </div>
     }
   `,
-  styles: [\`
+  styles: [`
     .cd-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;
       display:flex;align-items:center;justify-content:center;animation:cdIn 0.18s ease;}
     @keyframes cdIn{from{opacity:0}to{opacity:1}}
@@ -40,12 +40,12 @@ import { CommonModule } from '@angular/common';
       border-radius:6px;color:#e74c3c;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
       transition:all 0.2s;}
     .cd-confirm:hover{background:rgba(231,76,60,0.25);border-color:#e74c3c;}
-  \`]
+  `]
 })
 export class ConfirmDialogComponent {
-  @Input() visible    = false;
-  @Input() title      = 'Confirmer la suppression';
-  @Input() message    = 'Cette action est irréversible.';
+  @Input() visible      = false;
+  @Input() title        = 'Confirmer la suppression';
+  @Input() message      = 'Cette action est irréversible.';
   @Input() confirmLabel = 'Supprimer';
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
