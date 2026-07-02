@@ -65,7 +65,7 @@
               <button class="btn-sm" [class]="s.isActive ? 'warn' : 'ok'" (click)="toggle(s)">
                 <i class="fa fa-toggle-{{s.isActive ? 'on' : 'off'}}"></i>
               </button>
-              <button class="btn-sm err" (click)="remove(s._id)"><i class="fa fa-trash"></i></button>
+              <button class="btn-sm err" (click)="askRemove(s._id, s.name)"><i class="fa fa-trash"></i></button>
             </div>
           </div>
         </div>
@@ -73,3 +73,12 @@
     </div>
   }
 </div>
+
+<!-- Confirm dialog -->
+<app-confirm-dialog
+  [visible]="confirmVisible"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  (confirmed)="onConfirmDelete()"
+  (cancelled)="onCancelDelete()">
+</app-confirm-dialog>
