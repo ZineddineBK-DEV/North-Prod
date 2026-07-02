@@ -17,17 +17,30 @@ const seed = async () => {
   if (!existing) {
     await User.create({
       aka: 'Admin',
-      firstName: 'North',
-      lastName: 'Prod',
+      firstName: 'ADMIN',
+      lastName: 'ADMIN',
       email: 'admin@northprod.tn',
-      password: 'NorthProd2026!',
+      password: 'Connect*123',
       role: 'admin',
       isEmailVerified: true,
       isActive: true,
     });
-    console.log('✅  Admin user created: admin@northprod.tn / NorthProd2026!');
+  }
+    const existingProd = await User.findOne({ email: 'prod@northprod.tn' });
+  if (!existingProd) {
+    await User.create({
+      aka: 'Prod',
+      firstName: 'PROD',
+      lastName: 'PROD',
+      email: 'prod@northprod.tn',
+      password: 'Connect*123',
+      role: 'production',
+      isEmailVerified: true,
+      isActive: true,
+    });
+    console.log('✅  Admin and Prod user created: admin@northprod.tn - prod@northprod.tn / Connect*123');
   } else {
-    console.log('ℹ️   Admin user already exists');
+    console.log('ℹ️   Admin and Prod user already exists');
   }
 
   // ── Services (pricing) ───────────────────────────────────
