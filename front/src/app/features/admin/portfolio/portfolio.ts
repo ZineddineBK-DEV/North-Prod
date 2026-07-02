@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { PortfolioService } from '../../../core/services/portfolio.service';
 import { PortfolioItem } from '../../../core/models/portfolio.model';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { environment } from '../../../../environments/environment';
 
 const CATEGORIES = [
@@ -15,7 +16,7 @@ const CATEGORIES = [
   selector: 'app-admin-portfolio',
   templateUrl: './portfolio.html',
   styleUrls: ['./portfolio.scss'],
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmDialogComponent],
 })
 export class AdminPortfolioComponent implements OnInit {
   private svc  = inject(PortfolioService);
@@ -23,7 +24,8 @@ export class AdminPortfolioComponent implements OnInit {
   private http = inject(HttpClient);
 
   items: PortfolioItem[] = [];
-  artists: string[] = [];          // artist name suggestions from existing items
+  // Artists from User API (role=artist)
+  artistUsers: { _id: string; aka: string }[] = [];
   loading = true; showForm = false; saving = false;
   editId: string | null = null;
   msg = ''; err = '';
@@ -33,6 +35,12 @@ export class AdminPortfolioComponent implements OnInit {
   thumbnailPreview = '';
 
   categories = CATEGORIES;
+
+  // Confirm dialog state
+  confirmVisible  = false;
+  confirmTitle    = '';
+  confirmMessage  = '';
+  private pendingDeleteId: string | null = null;
 
   form = this.fb.group({
     title:       ['', Validators.required],
@@ -47,18 +55,23 @@ export class AdminPortfolioComponent implements OnInit {
     isPublished: [true],
   });
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    this.load();
+    this.loadArtists();
+  }
 
   load() {
     this.loading = true;
     this.svc.getItems({ limit: 200 }).subscribe({
-      next: r => {
-        this.items = r.items;
-        // Build unique artist suggestions from existing items
-        this.artists = [...new Set(r.items.map((i: PortfolioItem) => i.artist).filter(Boolean))] as string[];
-        this.loading = false;
-      },
+      next: r  => { this.items = r.items; this.loading = false; },
       error: () => { this.loading = false; },
+    });
+  }
+
+  loadArtists() {
+    this.http.get<any>(`${environment.apiUrl}/admin/users?role=artist&limit=200`).subscribe({
+      next: r => { this.artistUsers = (r.users || []).map((u: any) => ({ _id: u._id, aka: u.aka })); },
+      error: () => {},
     });
   }
 
@@ -123,9 +136,23 @@ export class AdminPortfolioComponent implements OnInit {
     this.svc.updateItem(item._id, fd).subscribe({ next: r => item.isPublished = r.item.isPublished });
   }
 
-  remove(id: string) {
-    if (!confirm('Supprimer cet item ?')) return;
-    this.svc.deleteItem(id).subscribe({ next: () => this.load() });
+  // Opens custom confirm dialog instead of browser confirm()
+  askRemove(id: string, title: string) {
+    this.pendingDeleteId = id;
+    this.confirmTitle   = 'Supprimer la production';
+    this.confirmMessage = `Voulez-vous vraiment supprimer "${title}" ? Cette action est irréversible.`;
+    this.confirmVisible = true;
+  }
+
+  onConfirmDelete() {
+    this.confirmVisible = false;
+    if (!this.pendingDeleteId) return;
+    this.svc.deleteItem(this.pendingDeleteId).subscribe({ next: () => { this.pendingDeleteId = null; this.load(); } });
+  }
+
+  onCancelDelete() {
+    this.confirmVisible  = false;
+    this.pendingDeleteId = null;
   }
 
   thumbUrl(item: PortfolioItem): string {

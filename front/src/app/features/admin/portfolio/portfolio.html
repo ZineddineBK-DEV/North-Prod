@@ -13,17 +13,19 @@
         <h2>{{ editId ? 'Modifier' : 'Ajouter' }} une production</h2>
         <button class="btn-icon" (click)="showForm=false"><i class="fa fa-times"></i></button>
       </div>
-      <form [formGroup]="form" (ngSubmit)="save()" class="pf-form" enctype="multipart/form-data">
+      <form [formGroup]="form" (ngSubmit)="save()" class="pf-form">
         <div class="form-grid">
           <div class="form-field"><label>Titre *</label><input type="text" formControlName="title" /></div>
 
-          <!-- Artist text input with datalist suggestions -->
+          <!-- Artist dropdown populated from User API -->
           <div class="form-field">
             <label>Artiste</label>
-            <input type="text" formControlName="artist" list="artist-list" autocomplete="off" />
-            <datalist id="artist-list">
-              @for(a of artists; track a) { <option [value]="a"></option> }
-            </datalist>
+            <select formControlName="artist">
+              <option value="">— Sélectionner un artiste —</option>
+              @for(a of artistUsers; track a._id) {
+                <option [value]="a.aka">{{ a.aka }}</option>
+              }
+            </select>
           </div>
 
           <div class="form-field">
@@ -53,9 +55,10 @@
           </div>
         </div>
 
+        <!-- Description — full width, styled textarea -->
         <div class="form-field full">
           <label>Description</label>
-          <textarea formControlName="description" rows="2"></textarea>
+          <textarea formControlName="description" rows="3"></textarea>
         </div>
 
         <div class="form-field full">
@@ -95,7 +98,10 @@
 
   @if(loading) { <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div> }
   @else if(items.length === 0) {
-    <div class="empty-state"><i class="fa fa-music"></i><p>Aucune production. Ajoutez la première.</p></div>
+    <div class="empty-state">
+      <i class="fa fa-music"></i>
+      <p>Aucune production. Ajoutez la première.</p>
+    </div>
   } @else {
     <div class="portfolio-grid">
       @for(item of items; track item._id) {
@@ -117,10 +123,19 @@
             <button class="btn-sm" [class]="item.isPublished ? 'warn' : 'ok'" (click)="toggle(item)">
               <i class="fa fa-eye{{ item.isPublished ? '-slash' : '' }}"></i>
             </button>
-            <button class="btn-sm err" (click)="remove(item._id)"><i class="fa fa-trash"></i></button>
+            <button class="btn-sm err" (click)="askRemove(item._id, item.title)"><i class="fa fa-trash"></i></button>
           </div>
         </div>
       }
     </div>
   }
 </div>
+
+<!-- Confirm dialog -->
+<app-confirm-dialog
+  [visible]="confirmVisible"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  (confirmed)="onConfirmDelete()"
+  (cancelled)="onCancelDelete()">
+</app-confirm-dialog>
