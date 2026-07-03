@@ -185,3 +185,40 @@ $topbar-h: 64px;
   }
   .shell-content { margin-left:0; }
 }
+
+// ── Section 7: Page loading indicator ─────────────────────
+.shell-loader {
+  position: fixed;
+  top: 64px; left: 0; right: 0;
+  height: 3px;
+  z-index: 999;
+  background: rgba(192, 160, 96, 0.1);
+  overflow: hidden;
+}
+.shell-loader-bar {
+  height: 100%;
+  background: #c0a060;
+  animation: loaderSlide 1.2s ease-in-out infinite;
+  border-radius: 2px;
+}
+@keyframes loaderSlide {
+  0%   { transform: translateX(-100%) scaleX(0.4); }
+  50%  { transform: translateX(0%)    scaleX(1); }
+  100% { transform: translateX(100%)  scaleX(0.4); }
+}
+
+// ── Section 6: Notification click interaction ──────────────
+.notif-item[role="button"] {
+  cursor: pointer;
+}
+.notif-arrow {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.2);
+  align-self: center;
+  flex-shrink: 0;
+  margin-left: 4px;
+  transition: color 0.15s;
+}
+.notif-item:hover .notif-arrow {
+  color: #c0a060;
+}

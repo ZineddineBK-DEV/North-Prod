@@ -37,13 +37,15 @@
                 </div>
               } @else {
                 @for(n of notifications; track n._id) {
-                  <div class="notif-item" [class.unread]="!n.isRead">
+                  <div class="notif-item" [class.unread]="!n.isRead"
+                       (click)="navigateNotification(n)" role="button">
                     <div class="notif-dot"></div>
                     <div class="notif-content">
                       <p class="notif-title">{{ n.title }}</p>
                       <p class="notif-msg">{{ n.message }}</p>
                       <span class="notif-time">{{ n.createdAt | date:'dd/MM HH:mm' }}</span>
                     </div>
+                    <i class="fa fa-chevron-right notif-arrow"></i>
                   </div>
                 }
               }
@@ -99,6 +101,9 @@
 
     <!-- Page content -->
     <main class="shell-content">
+      @if(routerLoading) {
+        <div class="shell-loader"><div class="shell-loader-bar"></div></div>
+      }
       <router-outlet></router-outlet>
     </main>
   </div>
