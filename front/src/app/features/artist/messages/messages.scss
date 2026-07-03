@@ -1,8 +1,8 @@
 $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e0e0;$muted:#888;
-:host{display:block;background:$bg;height:calc(100vh - 60px);}
-.messages-layout{display:grid;grid-template-columns:300px 1fr;height:100%;
+:host{display:flex;flex-direction:column;background:$bg;height:calc(100vh - 64px);overflow:hidden;}
+.messages-layout{display:grid;grid-template-columns:300px 1fr;flex:1;overflow:hidden;min-height:0;
   @media(max-width:768px){grid-template-columns:1fr;}}
-.convo-sidebar{background:#111;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto;
+.convo-sidebar{background:#111;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto;min-height:0;
   .sidebar-head{padding:20px;border-bottom:1px solid rgba(255,255,255,0.05);
     h2{margin:0;font-size:16px;color:#fff;}}}
 .convo-item{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;
@@ -14,9 +14,9 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
     .convo-name{margin:0 0 2px;font-size:13px;font-weight:600;color:$text;}
     .convo-last{margin:0;font-size:11px;color:$muted;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
   .convo-time{font-size:10px;color:rgba($muted,0.6);flex-shrink:0;}}
-.chat-panel{display:flex;flex-direction:column;height:100%;}
+.chat-panel{display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex:1;color:$muted;i{font-size:48px;margin-bottom:16px;}p{font-size:14px;}}
+  flex:1;color:rgba(255,255,255,0.65);i{font-size:48px;margin-bottom:16px;color:$gold;opacity:0.5;}p{font-size:14px;margin:0;}}
 .chat-head{display:flex;align-items:center;gap:12px;padding:16px 20px;
   border-bottom:1px solid rgba(255,255,255,0.06);background:#111;
   .chat-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,$gold,darken($gold,15%));

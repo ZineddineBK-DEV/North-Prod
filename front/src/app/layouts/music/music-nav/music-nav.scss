@@ -189,8 +189,8 @@
   top: calc(100% + 14px);
   right: -10px;
   width: 320px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: #1a1a1a;
+  border: 1px solid rgba(192, 160, 96, 0.2);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 12px 40px rgba(0,0,0,0.6);
@@ -205,7 +205,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.06);
     font-size: 13px;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff;
     letter-spacing: 0.5px;
   }
 
@@ -213,7 +213,7 @@
     background: none;
     border: none;
     font-size: 11px;
-    color: var(--gold);
+    color: #c0a060;
     cursor: pointer;
     font-family: inherit;
     letter-spacing: 0.5px;
@@ -224,7 +224,7 @@
     max-height: 320px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-color: rgba(192, 160, 96, 0.2) transparent;
   }
 
   .notif-loading, .notif-empty {
@@ -233,11 +233,11 @@
     align-items: center;
     justify-content: center;
     padding: 32px 16px;
-    color: var(--text-muted);
+    color: #999999;
     font-size: 13px;
     gap: 8px;
     i { font-size: 22px; }
-    p { margin: 0; }
+    p { margin: 0; color: #999999; }
   }
 
   .notif-item {
@@ -249,17 +249,17 @@
     cursor: pointer;
 
     &:last-child { border-bottom: none; }
-    &:hover { background: rgba(255,255,255,0.03); }
+    &:hover { background: rgba(255,255,255,0.05); }
 
     &.unread {
-      background: rgba(192,160,96,0.04);
-      .notif-dot { background: var(--gold); }
+      background: rgba(192,160,96,0.06);
+      .notif-dot { background: #c0a060; }
     }
 
     .notif-dot {
       width: 8px; height: 8px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.2);
       flex-shrink: 0;
       margin-top: 5px;
     }
@@ -269,7 +269,7 @@
     .notif-title {
       font-size: 13px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: #e8e8e8 !important;
       margin: 0 0 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -278,7 +278,7 @@
 
     .notif-msg {
       font-size: 12px;
-      color: var(--text-muted);
+      color: #aaaaaa !important;
       margin: 0 0 4px;
       overflow: hidden;
       display: -webkit-box;
@@ -288,7 +288,7 @@
 
     .notif-time {
       font-size: 10px;
-      color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.4);
     }
   }
 }
