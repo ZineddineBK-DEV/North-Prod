@@ -2,13 +2,14 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-hero',
   templateUrl: './hero.html',
   styleUrls: ['./hero.scss'],
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmDialogComponent],
 })
 export class AdminHeroComponent implements OnInit {
   private http = inject(HttpClient);
@@ -21,6 +22,10 @@ export class AdminHeroComponent implements OnInit {
   showForm = false;
   msg = ''; err = '';
   videoFile: File | null = null;
+  confirmVisible  = false;
+  confirmTitle    = '';
+  confirmMessage  = '';
+  private pendingDeleteId: string | null = null;
 
   form = this.fb.group({
     mediaType: ['youtube', Validators.required],
@@ -105,9 +110,19 @@ export class AdminHeroComponent implements OnInit {
     });
   }
 
-  remove(id: string) {
-    if (!confirm('Supprimer ce Hero ?')) return;
-    this.http.delete<any>(`${environment.apiUrl}/hero/${id}`)
-      .subscribe({ next: () => this.load() });
+  askRemove(id: string) {
+    this.pendingDeleteId = id;
+    this.confirmTitle   = 'Supprimer ce Hero';
+    this.confirmMessage = 'Voulez-vous vraiment supprimer cette configuration Hero ? Cette action est irréversible.';
+    this.confirmVisible = true;
   }
+  onConfirmDelete() {
+    this.confirmVisible = false;
+    if (!this.pendingDeleteId) return;
+    this.http.delete<any>(`${environment.apiUrl}/hero/${this.pendingDeleteId}`)
+      .subscribe({ next: () => { this.pendingDeleteId = null; this.load(); } });
+  }
+  onCancelDelete() { this.confirmVisible = false; this.pendingDeleteId = null; }
+
+  remove(id: string) { this.askRemove(id); }
 }

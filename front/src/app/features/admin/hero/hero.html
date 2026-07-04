@@ -163,7 +163,7 @@
             <button class="btn-action btn-edit" (click)="openEdit(h)" title="Modifier">
               <i class="fa fa-pencil"></i> Modifier
             </button>
-            <button class="btn-action btn-delete" (click)="remove(h._id)" title="Supprimer">
+            <button class="btn-action btn-delete" (click)="askRemove(h._id)" title="Supprimer">
               <i class="fa fa-trash"></i>
             </button>
           </div>
@@ -173,3 +173,12 @@
     </div>
   }
 </div>
+
+<!-- Confirm dialog -->
+<app-confirm-dialog
+  [visible]="confirmVisible"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  (confirmed)="onConfirmDelete()"
+  (cancelled)="onCancelDelete()">
+</app-confirm-dialog>

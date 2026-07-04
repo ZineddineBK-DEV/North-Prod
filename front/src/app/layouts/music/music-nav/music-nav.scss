@@ -290,6 +290,16 @@
       font-size: 10px;
       color: rgba(255,255,255,0.4);
     }
+
+    .notif-arrow {
+      font-size: 10px;
+      color: rgba(255,255,255,0.2);
+      flex-shrink: 0;
+      align-self: center;
+      transition: color 0.15s;
+    }
+
+    &:hover .notif-arrow { color: #c0a060; }
   }
 }
 
