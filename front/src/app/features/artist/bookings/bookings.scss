@@ -34,7 +34,7 @@ $gold:#c0a060; $bg:#0f0f0f; $card:#161616; $border:rgba(192,160,96,0.15); $text:
   &.active,&:hover{border-color:$gold;color:$gold;background:rgba($gold,0.08);
     .count{background:rgba($gold,0.15);color:$gold;}}}
 .loading-state{text-align:center;padding:60px;color:$gold;}
-.empty-state{text-align:center;padding:60px;color:$muted;
+.empty-state{text-align:center;padding:60px;color:rgba(255,255,255,0.55);
   i{font-size:40px;display:block;margin-bottom:16px;}
   p{margin:0 0 20px;font-size:14px;}}
 .booking-cards{display:flex;flex-direction:column;gap:12px;}

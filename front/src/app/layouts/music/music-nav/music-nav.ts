@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { NavService } from '../../../shared/service/nav.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { Notification } from '../../../core/models/notification.model';
+import { Notification, NotificationType } from '../../../core/models/notification.model';
 
 @Component({
   selector: 'app-music-nav',
@@ -80,6 +80,33 @@ export class MusicNav implements OnInit, OnDestroy {
     e.stopPropagation();
     this.notifService.markAllAsRead().subscribe();
     this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
+  }
+
+  navigateNotification(n: Notification) {
+    this.notifOpen = false;
+    if (!n.isRead) {
+      this.notifService.markAsRead(n._id).subscribe();
+      this.notifications = this.notifications.map(x =>
+        x._id === n._id ? { ...x, isRead: true } : x
+      );
+      const cur = this.notifService.unreadCount();
+      if (cur > 0) this.notifService.unreadCount.set(cur - 1);
+    }
+    const route = this.resolveNotifRoute(n);
+    if (route) this.router.navigateByUrl(route);
+  }
+
+  private resolveNotifRoute(n: Notification): string | null {
+    if (n.link) return n.link;
+    switch (n.type as NotificationType) {
+      case 'message_received':  return '/artist/messages';
+      case 'booking_confirmed':
+      case 'booking_rejected':
+      case 'booking_reminder':  return '/artist/bookings';
+      case 'project_updated':
+      case 'project_delivered': return '/artist/projects';
+      default:                  return '/artist/dashboard';
+    }
   }
 
   logout() {

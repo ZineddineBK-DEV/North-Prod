@@ -10,7 +10,7 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
   .count{background:rgba(255,255,255,0.08);border-radius:10px;padding:1px 6px;font-size:10px;}
   &.active,&:hover{border-color:$gold;color:$gold;background:rgba($gold,0.08);}}
 .loading-state{text-align:center;padding:60px;color:$gold;}
-.empty-state{text-align:center;padding:60px;color:$muted;
+.empty-state{text-align:center;padding:60px;color:rgba(255,255,255,0.55);
   i{font-size:40px;display:block;margin-bottom:16px;}p{margin:0;}}
 .booking-table{background:$card;border:1px solid $border;border-radius:10px;overflow:hidden;}
 .table-head{display:grid;grid-template-columns:1.8fr 1fr 1.2fr 0.6fr 0.8fr 1fr 1.4fr;
