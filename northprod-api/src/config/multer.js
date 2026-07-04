@@ -46,9 +46,18 @@ const videoFilter = (req, file, cb) => {
   cb(new Error('Seuls les fichiers vidéo sont acceptés (mp4, mov, webm, avi)'));
 };
 
-// ── 2 GB in bytes ─────────────────────────────────────────
+// ── Image-only filter for message attachments ─────────────
+const messageImageFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|webp|gif/;
+  const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
+  const mimeOk = /^image\//.test(file.mimetype);
+  if (extOk && mimeOk) return cb(null, true);
+  cb(new Error('Seules les images sont acceptées en pièce jointe (jpeg, jpg, png, webp, gif)'));
+};
+
+// ── Size constants ────────────────────────────────────────
 const MAX_PROJECT_FILE_SIZE = 2 * 1024 * 1024 * 1024;
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB for avatars/covers/portfolio
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 // ── Multer instances ──────────────────────────────────────
 const uploadAvatar = multer({
@@ -69,28 +78,23 @@ const uploadProjectFile = multer({
   limits: { fileSize: MAX_PROJECT_FILE_SIZE },
 });
 
-const portfolioMediaFilter = (req, file, cb) => {
-  const imageOk = /jpeg|jpg|png|webp|gif/.test(file.mimetype);
-  const audioOk = /audio\//.test(file.mimetype) || /mp3|wav|aiff|flac|ogg/.test(require('path').extname(file.originalname).toLowerCase());
-  if (imageOk || audioOk) return cb(null, true);
-  cb(new Error('Format non supporté. Images ou audio uniquement.'));
-};
-
 const uploadPortfolioMedia = multer({
   storage: makeStorage('portfolio'),
-  fileFilter: portfolioMediaFilter,
-  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: imageFilter,
+  limits: { fileSize: MAX_IMAGE_SIZE },
 });
 
 const uploadHeroVideo = multer({
   storage: makeStorage('hero'),
   fileFilter: videoFilter,
-  limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB for hero video
+  limits: { fileSize: 500 * 1024 * 1024 },
 });
 
+// Images only for message attachments (max 10 MB)
 const uploadMessageAttachment = multer({
   storage: makeStorage('messages'),
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB for message attachments
+  fileFilter: messageImageFilter,
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 module.exports = {

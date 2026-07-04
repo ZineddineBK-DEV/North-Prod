@@ -1,14 +1,22 @@
 const { Thread, Message } = require('../models/Message');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 const { createError } = require('../middleware/error');
 const { emitToUser } = require('../config/socket');
+
+// ── Role-aware message link ────────────────────────────────
+const messageLinkForRole = (role) => {
+  if (role === 'admin')      return '/admin/messages';
+  if (role === 'production') return '/production/messages';
+  return '/artist/messages';
+};
 
 // ── GET /api/messages/threads ─────────────────────────────
 const getThreads = async (req, res, next) => {
   try {
     const threads = await Thread.find({ participants: req.user._id })
       .sort({ lastMessageAt: -1 })
-      .populate('participants', 'aka avatar role lastSeen')
+      .populate('participants', 'aka avatar role lastSeen isActive')
       .populate('lastMessage', 'content createdAt sender');
 
     res.json({ success: true, threads });
@@ -16,7 +24,6 @@ const getThreads = async (req, res, next) => {
 };
 
 // ── GET /api/messages/thread/:userId ─────────────────────
-// Get or create thread between current user and another user
 const getOrCreateThread = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -25,7 +32,7 @@ const getOrCreateThread = async (req, res, next) => {
 
     let thread = await Thread.findOne({
       participants: { $all: [myId, userId] },
-    }).populate('participants', 'aka avatar role lastSeen');
+    }).populate('participants', 'aka avatar role lastSeen isActive');
 
     if (!thread) {
       thread = await Thread.create({
@@ -35,7 +42,7 @@ const getOrCreateThread = async (req, res, next) => {
           { user: userId, count: 0 },
         ],
       });
-      thread = await thread.populate('participants', 'aka avatar role lastSeen');
+      thread = await thread.populate('participants', 'aka avatar role lastSeen isActive');
     }
 
     res.json({ success: true, thread });
@@ -62,20 +69,22 @@ const getMessages = async (req, res, next) => {
       Message.countDocuments({ thread: thread._id, isDeleted: false }),
     ]);
 
-    // Mark as read
+    // Mark as read + emit read status
     await Message.updateMany(
       { thread: thread._id, receiver: req.user._id, isRead: false },
       { isRead: true, readAt: new Date() }
     );
-    // Reset unread count
     await Thread.updateOne(
       { _id: thread._id, 'unreadCounts.user': req.user._id },
       { $set: { 'unreadCounts.$.count': 0 } }
     );
 
+    // Emit read receipt to the other participant
+    emitToUser(userId, 'message:read', { threadId: thread._id, readBy: req.user._id });
+
     res.json({
       success: true,
-      messages: messages.reverse(), // oldest first
+      messages: messages.reverse(),
       total,
       page: parseInt(page),
       pages: Math.ceil(total / limit),
@@ -88,7 +97,7 @@ const sendMessage = async (req, res, next) => {
   try {
     const { toUserId, content } = req.body;
     if (!toUserId) return next(createError('Destinataire requis.', 400));
-    if (!content?.trim() && !req.file) return next(createError('Message ou fichier requis.', 400));
+    if (!content?.trim() && !req.file) return next(createError('Message ou image requise.', 400));
 
     // Get or create thread
     let thread = await Thread.findOne({
@@ -104,7 +113,7 @@ const sendMessage = async (req, res, next) => {
       });
     }
 
-    // Build attachment if file was uploaded
+    // Build image attachment if file was uploaded
     let attachment;
     if (req.file) {
       attachment = {
@@ -137,13 +146,22 @@ const sendMessage = async (req, res, next) => {
     // Real-time delivery
     emitToUser(toUserId, 'message:receive', { message, threadId: thread._id });
 
-    // Push notification
+    // Emit delivered status back to sender
+    emitToUser(req.user._id.toString(), 'message:delivered', {
+      messageId: message._id,
+      threadId: thread._id,
+    });
+
+    // Role-aware notification link
+    const recipient = await User.findById(toUserId).select('role');
+    const notifLink = messageLinkForRole(recipient?.role || 'artist');
+
     await Notification.createAndEmit({
       recipient: toUserId,
       type: 'message_received',
       title: `Nouveau message de ${req.user.aka}`,
-      message: content?.substring(0, 80) || 'Vous avez reçu un fichier.',
-      link: `/artist/messages`,
+      message: content?.substring(0, 80) || 'Vous avez reçu une image.',
+      link: notifLink,
       resourceId: message._id,
       resourceType: 'Message',
     });
@@ -165,19 +183,34 @@ const getUnreadCount = async (req, res, next) => {
 };
 
 // ── GET /api/messages/contact ─────────────────────────────
-// Returns the studio's primary contact (production/admin) so artists
-// can always reach someone, even before any thread exists.
 const getStudioContact = async (req, res, next) => {
   try {
-    const User = require('../models/User');
     const contact = await User.findOne({ role: 'production', isActive: true })
       .select('_id aka avatar role')
       .sort({ createdAt: 1 })
       || await User.findOne({ role: 'admin', isActive: true }).select('_id aka avatar role');
 
-    if (!contact) return next(createError("Aucun contact studio disponible pour le moment.", 404));
+    if (!contact) return next(createError('Aucun contact studio disponible pour le moment.', 404));
     res.json({ success: true, contact });
   } catch (err) { next(err); }
 };
 
-module.exports = { getThreads, getOrCreateThread, getMessages, sendMessage, getUnreadCount, getStudioContact };
+// ── GET /api/messages/artists ─────────────────────────────
+// Returns all verified artists so an artist can start a peer conversation
+const getArtistList = async (req, res, next) => {
+  try {
+    const artists = await User.find({
+      role: 'artist',
+      isActive: true,
+      isEmailVerified: true,
+      _id: { $ne: req.user._id },
+    }).select('_id aka avatar role').sort({ aka: 1 });
+
+    res.json({ success: true, artists });
+  } catch (err) { next(err); }
+};
+
+module.exports = {
+  getThreads, getOrCreateThread, getMessages, sendMessage,
+  getUnreadCount, getStudioContact, getArtistList,
+};
