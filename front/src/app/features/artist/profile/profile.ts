@@ -72,7 +72,7 @@ export class ArtistProfileComponent implements OnInit {
   saveInfo() {
     if (this.form.invalid) return;
     this.saving = true; this.err = ''; this.saved = false;
-    this.http.put<any>(`${this.API}/profile`, this.form.value).subscribe({
+    this.http.put<any>(`${this.API}/me`, this.form.value).subscribe({
       next: r => {
         this.auth.updateCurrentUser(r.user);
         this.saved = true; this.saving = false;
@@ -84,7 +84,7 @@ export class ArtistProfileComponent implements OnInit {
 
   saveSocial() {
     this.saving = true;
-    this.http.put<any>(`${this.API}/profile`, { socialLinks: this.socialForm.value }).subscribe({
+    this.http.put<any>(`${this.API}/me`, { socialLinks: this.socialForm.value }).subscribe({
       next: r => { this.auth.updateCurrentUser(r.user); this.saved = true; this.saving = false; setTimeout(()=>this.saved=false,3000); },
       error: e => { this.err = e.error?.message||'Erreur.'; this.saving = false; },
     });
@@ -93,7 +93,7 @@ export class ArtistProfileComponent implements OnInit {
   changePass() {
     if (this.passForm.invalid) return;
     this.saving = true;
-    this.http.put<any>(`${this.API}/change-password`, this.passForm.value).subscribe({
+    this.http.put<any>(`${this.API}/me/password`, this.passForm.value).subscribe({
       next: () => { this.saved = true; this.saving = false; this.passForm.reset(); setTimeout(()=>this.saved=false,3000); },
       error: e => { this.err = e.error?.message||'Erreur.'; this.saving = false; },
     });

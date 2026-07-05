@@ -17,7 +17,7 @@ const getThreads = async (req, res, next) => {
     const threads = await Thread.find({ participants: req.user._id })
       .sort({ lastMessageAt: -1 })
       .populate('participants', 'aka avatar role lastSeen isActive')
-      .populate('lastMessage', 'content createdAt sender');
+      .populate('lastMessage', 'content createdAt sender attachment');
 
     res.json({ success: true, threads });
   } catch (err) { next(err); }
@@ -69,22 +69,26 @@ const getMessages = async (req, res, next) => {
       Message.countDocuments({ thread: thread._id, isDeleted: false }),
     ]);
 
-    // Mark as read + emit read status
+    // Mark messages sent TO me as read
     await Message.updateMany(
       { thread: thread._id, receiver: req.user._id, isRead: false },
       { isRead: true, readAt: new Date() }
     );
+    // Reset my unread count
     await Thread.updateOne(
       { _id: thread._id, 'unreadCounts.user': req.user._id },
       { $set: { 'unreadCounts.$.count': 0 } }
     );
 
-    // Emit read receipt to the other participant
-    emitToUser(userId, 'message:read', { threadId: thread._id, readBy: req.user._id });
+    // Tell the OTHER user (sender) that their messages were read
+    emitToUser(userId, 'message:read', {
+      threadId: thread._id.toString(),
+      readBy: req.user._id.toString(),
+    });
 
     res.json({
       success: true,
-      messages: messages.reverse(),
+      messages: messages.reverse(), // oldest first
       total,
       page: parseInt(page),
       pages: Math.ceil(total / limit),
@@ -113,7 +117,7 @@ const sendMessage = async (req, res, next) => {
       });
     }
 
-    // Build image attachment if file was uploaded
+    // Build image attachment
     let attachment;
     if (req.file) {
       attachment = {
@@ -132,7 +136,7 @@ const sendMessage = async (req, res, next) => {
       attachment,
     });
 
-    // Update thread
+    // Update thread lastMessage + increment RECEIVER's unread count
     await Thread.findByIdAndUpdate(thread._id, {
       lastMessage: message._id,
       lastMessageAt: new Date(),
@@ -143,16 +147,13 @@ const sendMessage = async (req, res, next) => {
 
     await message.populate('sender', 'aka avatar role');
 
-    // Real-time delivery
-    emitToUser(toUserId, 'message:receive', { message, threadId: thread._id });
-
-    // Emit delivered status back to sender
-    emitToUser(req.user._id.toString(), 'message:delivered', {
-      messageId: message._id,
-      threadId: thread._id,
+    // Emit ONLY to the receiver — NOT to the sender
+    emitToUser(toUserId, 'message:receive', {
+      message,
+      threadId: thread._id.toString(),
     });
 
-    // Role-aware notification link
+    // Notify receiver (role-aware link)
     const recipient = await User.findById(toUserId).select('role');
     const notifLink = messageLinkForRole(recipient?.role || 'artist');
 
@@ -160,7 +161,7 @@ const sendMessage = async (req, res, next) => {
       recipient: toUserId,
       type: 'message_received',
       title: `Nouveau message de ${req.user.aka}`,
-      message: content?.substring(0, 80) || 'Vous avez reçu une image.',
+      message: content?.substring(0, 80) || '📷 Image reçue.',
       link: notifLink,
       resourceId: message._id,
       resourceType: 'Message',
@@ -183,20 +184,36 @@ const getUnreadCount = async (req, res, next) => {
 };
 
 // ── GET /api/messages/contact ─────────────────────────────
+// Returns the first production team member, falling back to admin
 const getStudioContact = async (req, res, next) => {
   try {
     const contact = await User.findOne({ role: 'production', isActive: true })
       .select('_id aka avatar role')
-      .sort({ createdAt: 1 })
-      || await User.findOne({ role: 'admin', isActive: true }).select('_id aka avatar role');
+    || await User.findOne({ role: 'admin', isActive: true }).select('_id aka avatar role');
 
-    if (!contact) return next(createError('Aucun contact studio disponible pour le moment.', 404));
+    if (!contact) return next(createError('Aucun contact studio disponible.', 404));
     res.json({ success: true, contact });
   } catch (err) { next(err); }
 };
 
-// ── GET /api/messages/artists ─────────────────────────────
-// Returns all verified artists so an artist can start a peer conversation
+// ── GET /api/messages/contacts ────────────────────────────
+// Returns ALL users the current user can message:
+// - All verified artists (except self)
+// - All production team members
+// - All admins
+const getContacts = async (req, res, next) => {
+  try {
+    const contacts = await User.find({
+      _id: { $ne: req.user._id },
+      isActive: true,
+      isEmailVerified: true,
+    }).select('_id aka firstName avatar role').sort({ role: 1, aka: 1 });
+
+    res.json({ success: true, contacts });
+  } catch (err) { next(err); }
+};
+
+// ── GET /api/messages/artists (kept for backwards compat) ─
 const getArtistList = async (req, res, next) => {
   try {
     const artists = await User.find({
@@ -212,5 +229,5 @@ const getArtistList = async (req, res, next) => {
 
 module.exports = {
   getThreads, getOrCreateThread, getMessages, sendMessage,
-  getUnreadCount, getStudioContact, getArtistList,
+  getUnreadCount, getStudioContact, getContacts, getArtistList,
 };

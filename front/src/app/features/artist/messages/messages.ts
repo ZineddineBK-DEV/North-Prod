@@ -1,8 +1,12 @@
-import { Component, OnInit, OnDestroy, inject, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import {
+  Component, OnInit, OnDestroy, inject, ElementRef,
+  ViewChild, AfterViewChecked, signal
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { SocketService } from '../../../core/services/socket.service';
@@ -16,7 +20,7 @@ interface ChatMessage {
   isDelivered?: boolean; createdAt: string;
 }
 interface Thread {
-  _id: string; participants: ChatUser[]; lastMessage?: ChatMessage;
+  _id: string; participants: ChatUser[]; lastMessage?: any;
   lastMessageAt?: string; unreadCounts?: { user: string; count: number }[];
 }
 
@@ -30,8 +34,9 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   @ViewChild('msgEnd') msgEnd!: ElementRef;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  private http   = inject(HttpClient);
-  private fb     = inject(FormBuilder);
+  private http      = inject(HttpClient);
+  private sanitizer = inject(DomSanitizer);
+  private fb        = inject(FormBuilder);
   auth   = inject(AuthService);
   socket = inject(SocketService);
 
@@ -39,7 +44,7 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   private BASE = environment.apiUrl.replace('/api', '');
   private subs = new Subscription();
 
-  threads: Thread[]   = [];
+  threads: Thread[]      = [];
   activeThread: Thread | null = null;
   activeOther: ChatUser | null = null;
   messages: ChatMessage[] = [];
@@ -48,54 +53,83 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   loadingMsgs    = false;
   sending        = false;
   threadsErr     = '';
-  msgsErr        = ''
-  noContact      = false;
+  msgsErr        = '';
 
+  // Typing — show ONLY when the OTHER person is typing
   otherTyping = false;
-  private typingTimeout: any;
-  private typingDebounce: any;
+  private typingTimer: any;
+  private stopTypingTimer: any;
 
   // Image attachment
   selectedImage: File | null = null;
   imagePreview: string | null = null;
 
-  // New conversation modal
+  // Lightbox
+  lightboxUrl: SafeUrl | null = null;
+  lightboxOpen = false;
+
+  // Contact picker
   showContactPicker = false;
-  contactList: ChatUser[] = [];
-  loadingContacts   = false;
-  contactSearch     = '';
+  contactList: ChatUser[]  = [];
+  loadingContacts  = false;
+  contactSearch    = '';
 
   form = this.fb.group({ content: [''] });
 
   private shouldScroll = false;
-  private myId() { return this.auth.currentUser()?._id; }
+  private myId() { return this.auth.currentUser()?._id ?? ''; }
 
+  // ── Lifecycle ──────────────────────────────────────────
   ngOnInit() {
     this.socket.connect();
     this.loadThreads();
+    this.subscribeToSocket();
+  }
 
+  ngOnDestroy() {
+    this.subs.unsubscribe();
+    clearTimeout(this.typingTimer);
+    clearTimeout(this.stopTypingTimer);
+  }
+
+  ngAfterViewChecked() {
+    if (this.shouldScroll) {
+      try { this.msgEnd?.nativeElement.scrollIntoView({ behavior: 'smooth' }); } catch {}
+      this.shouldScroll = false;
+    }
+  }
+
+  // ── Socket subscriptions ───────────────────────────────
+  private subscribeToSocket() {
+    // A message sent TO me by someone else
     this.subs.add(this.socket.message$.subscribe((data: any) => {
-      const msg: ChatMessage = data.message || data;
-      if (this.activeThread && msg.thread === this.activeThread._id) {
-        // Avoid duplicates
+      const msg: ChatMessage = data.message ?? data;
+      const threadId = data.threadId ?? msg.thread;
+
+      // Only show if it's from the OTHER person (not my own send echoed back)
+      if (msg.sender?._id === this.myId()) return;
+
+      if (this.activeThread && threadId === this.activeThread._id) {
         if (!this.messages.find(m => m._id === msg._id)) {
           this.messages = [...this.messages, msg];
           this.shouldScroll = true;
         }
-        this.markThreadRead(this.activeThread._id);
+        // Mark as read immediately since the panel is open
         if (this.activeOther) {
           this.socket.sendRead(this.activeThread._id, this.activeOther._id);
         }
       }
-      this.loadThreads();
+      // Refresh thread list to update last-message preview + unread count
+      this.refreshThreads();
     }));
 
+    // The other person is typing — guard: only show if it's the OTHER user, not me
     this.subs.add(this.socket.typing$.subscribe((data: any) => {
-      if (this.activeOther && data.fromUserId === this.activeOther._id) {
-        this.otherTyping = true;
-        clearTimeout(this.typingTimeout);
-        this.typingTimeout = setTimeout(() => this.otherTyping = false, 3000);
-      }
+      if (!this.activeOther) return;
+      if (data.fromUserId !== this.activeOther._id) return; // ignore own typing bounced back
+      this.otherTyping = true;
+      clearTimeout(this.typingTimer);
+      this.typingTimer = setTimeout(() => (this.otherTyping = false), 3000);
     }));
 
     this.subs.add(this.socket.stopTyping$.subscribe((data: any) => {
@@ -104,95 +138,85 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
       }
     }));
 
+    // The OTHER user read MY messages → update isRead on my sent messages
     this.subs.add(this.socket.messageRead$.subscribe((data: any) => {
-      // Mark our sent messages as read when the other person reads them
-      if (this.activeThread && data.threadId === this.activeThread._id) {
-        this.messages = this.messages.map(m =>
-          m.sender?._id === this.myId() ? { ...m, isRead: true } : m
-        );
-      }
+      if (!this.activeThread) return;
+      if (data.threadId !== this.activeThread._id) return;
+      this.messages = this.messages.map(m =>
+        m.sender?._id === this.myId() ? { ...m, isRead: true } : m
+      );
     }));
 
-    this.subs.add(this.socket.messageDelivered$.subscribe((data: any) => {
-      if (this.activeThread && data.threadId === this.activeThread._id) {
-        this.messages = this.messages.map(m =>
-          m._id === data.messageId ? { ...m, isDelivered: true } : m
-        );
-      }
-    }));
-
-    // Online/offline status refresh
+    // Online/offline — just subscribe so the signal updates trigger CD
     this.subs.add(this.socket.userOnline$.subscribe(() => {}));
     this.subs.add(this.socket.userOffline$.subscribe(() => {}));
   }
 
-  ngOnDestroy() {
-    this.subs.unsubscribe();
-    clearTimeout(this.typingTimeout);
-    clearTimeout(this.typingDebounce);
-  }
-
-  ngAfterViewChecked() {
-    if (this.shouldScroll && this.msgEnd) {
-      this.msgEnd.nativeElement.scrollIntoView({ behavior: 'smooth' });
-      this.shouldScroll = false;
-    }
-  }
-
   // ── Thread management ──────────────────────────────────
   loadThreads() {
-    this.loadingThreads = true; this.threadsErr = '';
+    this.loadingThreads = true;
     this.http.get<any>(`${this.API}/threads`).subscribe({
       next: r => {
-        this.threads = r.threads || [];
+        this.threads        = r.threads ?? [];
         this.loadingThreads = false;
+        // Auto-open first thread only when no thread is active yet
         if (!this.activeThread && this.threads.length > 0) {
           this.openThread(this.threads[0]);
         }
       },
-      error: () => { this.loadingThreads = false; this.threadsErr = 'Impossible de charger les conversations.'; },
+      error: () => {
+        this.loadingThreads = false;
+        this.threadsErr = 'Impossible de charger les conversations.';
+      },
+    });
+  }
+
+  /** Refresh thread list without auto-opening any thread */
+  private refreshThreads() {
+    this.http.get<any>(`${this.API}/threads`).subscribe({
+      next: r => { this.threads = r.threads ?? []; },
     });
   }
 
   openThread(t: Thread) {
     this.activeThread = t;
-    this.activeOther  = this.getOtherParticipant(t);
-    this.loadMessagesForActiveThread();
+    this.activeOther  = this.otherParticipant(t);
+    this.otherTyping  = false;
+    this.messages     = [];
+    this.msgsErr      = '';
+    this.loadMsgs();
   }
 
   openWithUser(user: ChatUser) {
-    this.loadingMsgs = true; this.msgsErr = '';
-    this.activeOther = user;
     this.showContactPicker = false;
+    this.activeOther = user;
+    this.otherTyping = false;
+    this.messages    = [];
     this.http.get<any>(`${this.API}/thread/${user._id}`).subscribe({
-      next: r => { this.activeThread = r.thread; this.loadMessagesForActiveThread(); },
-      error: () => { this.loadingMsgs = false; this.msgsErr = "Impossible d'ouvrir la conversation."; },
+      next: r => {
+        this.activeThread = r.thread;
+        this.loadMsgs();
+      },
+      error: () => { this.msgsErr = "Impossible d'ouvrir la conversation."; },
     });
   }
 
-  private loadMessagesForActiveThread() {
-    if (!this.activeOther) { this.loadingMsgs = false; return; }
-    this.loadingMsgs = true; this.msgsErr = '';
+  private loadMsgs() {
+    if (!this.activeOther) return;
+    this.loadingMsgs = true;
     this.http.get<any>(`${this.API}/thread/${this.activeOther._id}/messages`).subscribe({
       next: r => {
-        this.messages = r.messages || [];
+        this.messages    = r.messages ?? [];
         this.loadingMsgs = false;
         this.shouldScroll = true;
-        if (this.activeThread) {
-          this.markThreadRead(this.activeThread._id);
-          this.socket.sendRead(this.activeThread._id, this.activeOther!._id);
+        // Mark as read via socket
+        if (this.activeThread && this.activeOther) {
+          this.socket.sendRead(this.activeThread._id, this.activeOther._id);
         }
+        this.refreshThreads();
       },
       error: () => { this.loadingMsgs = false; this.msgsErr = 'Impossible de charger les messages.'; },
     });
-  }
-
-  private markThreadRead(threadId: string) {
-    const t = this.threads.find(x => x._id === threadId);
-    if (t?.unreadCounts) {
-      const mine = t.unreadCounts.find(u => u.user === this.myId());
-      if (mine) mine.count = 0;
-    }
   }
 
   // ── Contact picker ────────────────────────────────────
@@ -204,37 +228,24 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
 
   loadContacts() {
     this.loadingContacts = true;
-    // Load studio contacts first
-    this.http.get<any>(`${this.API}/contact`).subscribe({
-      next: r => {
-        // Load artist peers
-        this.http.get<any>(`${this.API}/artists`).subscribe({
-          next: a => {
-            const studio = r.contact ? [r.contact] : [];
-            this.contactList = [...studio, ...(a.artists || [])];
-            this.loadingContacts = false;
-          },
-          error: () => {
-            this.contactList = r.contact ? [r.contact] : [];
-            this.loadingContacts = false;
-          },
-        });
-      },
+    // Single endpoint returns ALL messageable users (artists + production + admin)
+    this.http.get<any>(`${this.API}/contacts`).subscribe({
+      next: r => { this.contactList = r.contacts ?? []; this.loadingContacts = false; },
       error: () => {
-        // Fall back to artist list only
+        // Fallback: try legacy /artists
         this.http.get<any>(`${this.API}/artists`).subscribe({
-          next: a => { this.contactList = a.artists || []; this.loadingContacts = false; },
-          error: () => { this.loadingContacts = false; this.noContact = true; },
+          next: a => { this.contactList = a.artists ?? []; this.loadingContacts = false; },
+          error: () => { this.loadingContacts = false; },
         });
       },
     });
   }
 
   get filteredContacts(): ChatUser[] {
-    if (!this.contactSearch) return this.contactList;
+    if (!this.contactSearch.trim()) return this.contactList;
     const q = this.contactSearch.toLowerCase();
     return this.contactList.filter(c =>
-      (c.aka || c.firstName || '').toLowerCase().includes(q)
+      (c.aka ?? c.firstName ?? '').toLowerCase().includes(q)
     );
   }
 
@@ -242,43 +253,56 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   onImageSelected(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      alert('Seules les images sont acceptées (jpg, png, gif, webp)');
-      return;
-    }
     this.selectedImage = file;
     const reader = new FileReader();
-    reader.onload = (r) => this.imagePreview = r.target?.result as string;
+    reader.onload = ev => (this.imagePreview = ev.target?.result as string);
     reader.readAsDataURL(file);
   }
 
   clearImage() {
     this.selectedImage = null;
     this.imagePreview  = null;
-    if (this.fileInput) this.fileInput.nativeElement.value = '';
+    if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = '';
+  }
+
+  // ── Lightbox ──────────────────────────────────────────
+  openLightbox(url: string) {
+    this.lightboxUrl  = this.sanitizer.bypassSecurityTrustUrl(url);
+    this.lightboxOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox() {
+    this.lightboxOpen = false;
+    this.lightboxUrl  = null;
+    document.body.style.overflow = '';
   }
 
   // ── Send ──────────────────────────────────────────────
   send() {
-    const content = this.form.value.content?.trim() || '';
+    const content = (this.form.value.content ?? '').trim();
     if ((!content && !this.selectedImage) || !this.activeOther || this.sending) return;
 
     this.sending = true;
+    clearTimeout(this.stopTypingTimer);
     this.socket.sendStopTyping(this.activeOther._id);
 
     const fd = new FormData();
     fd.append('toUserId', this.activeOther._id);
-    if (content) fd.append('content', content);
-    if (this.selectedImage) fd.append('attachment', this.selectedImage);
+    if (content)             fd.append('content', content);
+    if (this.selectedImage)  fd.append('attachment', this.selectedImage);
 
     this.http.post<any>(this.API, fd).subscribe({
       next: r => {
-        this.messages = [...this.messages, r.message];
-        this.sending = false;
+        // Add the sent message directly — do NOT wait for socket echo
+        if (!this.messages.find(m => m._id === r.message._id)) {
+          this.messages = [...this.messages, r.message];
+        }
+        this.sending      = false;
         this.shouldScroll = true;
         this.form.reset();
         this.clearImage();
-        this.loadThreads();
+        this.refreshThreads();
       },
       error: () => {
         this.sending = false;
@@ -290,33 +314,60 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   onTyping() {
     if (!this.activeOther) return;
     this.socket.sendTyping(this.activeOther._id);
-    clearTimeout(this.typingDebounce);
-    this.typingDebounce = setTimeout(() => {
+    clearTimeout(this.stopTypingTimer);
+    this.stopTypingTimer = setTimeout(() => {
       if (this.activeOther) this.socket.sendStopTyping(this.activeOther._id);
     }, 2000);
   }
 
-  isOnline(userId: string) { return this.socket.isOnline(userId); }
-
   // ── Helpers ───────────────────────────────────────────
-  getOtherParticipant(t: Thread): ChatUser | null {
+  otherParticipant(t: Thread): ChatUser | null {
     const me = this.myId();
-    return t.participants?.find(p => p._id !== me) || null;
+    return t.participants?.find(p => p._id !== me) ?? null;
   }
+
   unreadFor(t: Thread): number {
-    return t.unreadCounts?.find(u => u.user === this.myId())?.count || 0;
+    return t.unreadCounts?.find(u => u.user === this.myId())?.count ?? 0;
   }
-  isMe(msg: ChatMessage) { return msg.sender?._id === this.myId(); }
-  displayName(u: ChatUser | null) { return u?.aka || u?.firstName || 'NORTH PROD'; }
-  initial(u: ChatUser | null) { return (this.displayName(u))[0]?.toUpperCase() || 'N'; }
+
+  isMe(m: ChatMessage) { return m.sender?._id === this.myId(); }
+
+  displayName(u: ChatUser | null) { return u?.aka ?? u?.firstName ?? 'NORTH PROD'; }
+
+  initial(u: ChatUser | null) {
+    return (this.displayName(u))[0]?.toUpperCase() ?? 'N';
+  }
+
   roleLabel(u: ChatUser | null) {
-    const map: Record<string,string> = { admin:'Administration', production:'Équipe Production', artist:'Artiste' };
-    return u?.role ? (map[u.role] || u.role) : '';
+    if (!u?.role) return '';
+    const map: Record<string, string> = {
+      admin: 'Administration',
+      production: 'Équipe Production',
+      artist: 'Artiste',
+    };
+    return map[u.role] ?? u.role;
   }
-  attachmentIsImage(a: Attachment) { return a.mimeType?.startsWith('image/'); }
-  attachmentUrl(a: Attachment) {
+
+  roleBadgeClass(u: ChatUser | null) {
+    return u?.role === 'admin' ? 'badge-admin'
+      : u?.role === 'production' ? 'badge-prod'
+      : 'badge-artist';
+  }
+
+  isImage(a?: Attachment) { return !!a && a.mimeType?.startsWith('image/'); }
+
+  attachUrl(a: Attachment) {
+    if (!a.url) return '';
     if (a.url.startsWith('http')) return a.url;
     return `${this.BASE}${a.url}`;
   }
-  startNewConversation() { this.openContactPicker(); }
+
+  isOnline(id?: string) { return id ? this.socket.isOnline(id) : false; }
+
+  lastMsgPreview(t: Thread): string {
+    const lm = t.lastMessage;
+    if (!lm) return 'Démarrer la conversation';
+    if (lm.attachment && !lm.content) return '📷 Image';
+    return lm.content ?? '';
+  }
 }

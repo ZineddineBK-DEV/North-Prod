@@ -24,6 +24,19 @@ router.get('/', protect, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ⚠️  IMPORTANT: /read-all MUST come before /:id/read — otherwise Express matches
+//     "read-all" as the :id param and returns 404 (notification not found).
+// PUT /api/notifications/read-all
+router.put('/read-all', protect, async (req, res, next) => {
+  try {
+    await Notification.updateMany(
+      { recipient: req.user._id, isRead: false },
+      { isRead: true, readAt: new Date() }
+    );
+    res.json({ success: true, message: 'Toutes les notifications marquées comme lues.' });
+  } catch (err) { next(err); }
+});
+
 // PUT /api/notifications/:id/read
 router.put('/:id/read', protect, async (req, res, next) => {
   try {
@@ -34,17 +47,6 @@ router.put('/:id/read', protect, async (req, res, next) => {
     );
     if (!notif) return next(createError('Notification introuvable.', 404));
     res.json({ success: true, notification: notif });
-  } catch (err) { next(err); }
-});
-
-// PUT /api/notifications/read-all
-router.put('/read-all', protect, async (req, res, next) => {
-  try {
-    await Notification.updateMany(
-      { recipient: req.user._id, isRead: false },
-      { isRead: true, readAt: new Date() }
-    );
-    res.json({ success: true, message: 'Toutes les notifications marquées comme lues.' });
   } catch (err) { next(err); }
 });
 
