@@ -137,13 +137,18 @@ const sendMessage = async (req, res, next) => {
     // Real-time delivery
     emitToUser(toUserId, 'message:receive', { message, threadId: thread._id });
 
+    // Resolve recipient role for a role-aware notification link
+    const User = require('../models/User');
+    const recipient = await User.findById(toUserId).select('role').lean();
+    const recipientRole = recipient?.role || 'artist';
+
     // Push notification
     await Notification.createAndEmit({
       recipient: toUserId,
       type: 'message_received',
       title: `Nouveau message de ${req.user.aka}`,
-      message: content?.substring(0, 80) || 'Vous avez reçu un fichier.',
-      link: `/artist/messages`,
+      message: content?.substring(0, 80) || 'Vous avez reçu une image.',
+      link: `/${recipientRole}/messages`,
       resourceId: message._id,
       resourceType: 'Message',
     });
@@ -180,4 +185,26 @@ const getStudioContact = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getThreads, getOrCreateThread, getMessages, sendMessage, getUnreadCount, getStudioContact };
+
+// ── GET /api/messages/contacts ────────────────────────────
+// Returns all users the current user can message:
+// - All verified artists (for artist→artist)
+// - Admin and production staff (for artist→studio)
+// Excludes the calling user themselves.
+const getContacts = async (req, res, next) => {
+  try {
+    const User = require('../models/User');
+    const contacts = await User.find({
+      _id: { $ne: req.user._id },
+      isActive: true,
+      isEmailVerified: true,
+      role: { $in: ['artist', 'admin', 'production'] },
+    })
+    .select('_id aka avatar role firstName lastName')
+    .sort({ role: 1, aka: 1 })
+    .lean();
+    res.json({ success: true, contacts });
+  } catch (err) { next(err); }
+};
+
+module.exports = { getThreads, getOrCreateThread, getMessages, sendMessage, getUnreadCount, getStudioContact, getContacts };

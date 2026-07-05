@@ -90,7 +90,8 @@ const uploadHeroVideo = multer({
 
 const uploadMessageAttachment = multer({
   storage: makeStorage('messages'),
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB for message attachments
+  fileFilter: imageFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB — images only
 });
 
 module.exports = {

@@ -1,20 +1,39 @@
 <div class="dash-page messages-layout">
-  <!-- Sidebar: conversations -->
+
+  <!-- ── Sidebar ──────────────────────────────────────────── -->
   <div class="convo-sidebar">
     <div class="sidebar-head">
       <h2>Messages</h2>
-      <button class="btn-new-convo" (click)="startNewConversation()" title="Nouvelle conversation">
+      <button class="btn-new-convo" (click)="toggleContacts()" [class.active]="showContacts" title="Nouveau message">
         <i class="fa fa-pencil-square-o"></i>
       </button>
     </div>
 
-    @if(noContact) {
-      <div class="empty-small">
-        <i class="fa fa-exclamation-circle"></i>
-        <p>Aucun contact studio disponible pour le moment.</p>
+    <!-- Contacts picker -->
+    @if(showContacts) {
+      <div class="contacts-panel">
+        <input type="text" class="contacts-search" (input)="contactSearch = $any($event.target).value" [value]="contactSearch"
+               placeholder="Rechercher un utilisateur..." />
+        @if(contactsLoading) {
+          <div class="empty-small"><i class="fa fa-spinner fa-spin"></i></div>
+        } @else if(filteredContacts.length === 0) {
+          <div class="empty-small"><i class="fa fa-user-o"></i><p>Aucun contact trouvé.</p></div>
+        } @else {
+          @for(c of filteredContacts; track c._id) {
+            <div class="contact-item" (click)="openWithUser(c)">
+              <div class="convo-avatar contact-avatar" [class.online]="isOnline(c)">{{ initial(c) }}</div>
+              <div class="contact-info">
+                <p class="contact-name">{{ displayName(c) }}</p>
+                <p class="contact-role">{{ roleLabel(c) }}</p>
+              </div>
+              @if(isOnline(c)) { <span class="online-dot"></span> }
+            </div>
+          }
+        }
       </div>
     }
 
+    <!-- Thread list -->
     @if(loadingThreads) {
       <div class="loading-state"><i class="fa fa-spinner fa-spin"></i></div>
     } @else if(threadsErr) {
@@ -23,19 +42,24 @@
         <p>{{ threadsErr }}</p>
         <button class="btn-retry" (click)="loadThreads()">Réessayer</button>
       </div>
-    } @else if(threads.length === 0) {
+    } @else if(threads.length === 0 && !showContacts) {
       <div class="empty-small">
         <i class="fa fa-comments-o"></i>
-        <p>Aucune conversation pour le moment.</p>
-        <button class="btn-retry" (click)="startNewConversation()">Contacter le studio</button>
+        <p>Aucune conversation.</p>
+        <button class="btn-retry" (click)="toggleContacts()">Nouveau message</button>
       </div>
     } @else {
       @for(t of threads; track t._id) {
         <div class="convo-item" [class.active]="activeThread?._id===t._id" (click)="openThread(t)">
-          <div class="convo-avatar">{{ initial(getOtherParticipant(t)) }}</div>
+          <div class="convo-avatar" [class.online]="isOnline(getOtherParticipant(t))">
+            {{ initial(getOtherParticipant(t)) }}
+          </div>
           <div class="convo-info">
             <p class="convo-name">{{ displayName(getOtherParticipant(t)) }}</p>
-            <p class="convo-last">{{ t.lastMessage?.content || 'Démarrer la conversation' }}</p>
+            <p class="convo-last">
+              @if(t.lastMessage?.attachment) { <i class="fa fa-image"></i> Image }
+              @else { {{ t.lastMessage?.content || 'Démarrer la conversation' }} }
+            </p>
           </div>
           <div class="convo-meta">
             @if(t.lastMessageAt) { <span class="convo-time">{{ t.lastMessageAt | date:'HH:mm' }}</span> }
@@ -46,26 +70,32 @@
     }
   </div>
 
-  <!-- Chat panel -->
+  <!-- ── Chat panel ────────────────────────────────────────── -->
   <div class="chat-panel">
     @if(!activeThread && !activeOther) {
       <div class="chat-empty">
         <i class="fa fa-comments"></i>
-        <p>Sélectionnez une conversation ou contactez le studio</p>
-        <button class="btn-retry" (click)="startNewConversation()">Contacter le studio</button>
+        <p>Sélectionnez une conversation ou démarrez-en une nouvelle.</p>
+        <button class="btn-retry" (click)="toggleContacts()">Nouveau message</button>
       </div>
     } @else {
+
+      <!-- Chat header -->
       <div class="chat-head">
-        <div class="chat-avatar">{{ initial(activeOther) }}</div>
+        <div class="chat-avatar" [class.online]="isOnline(activeOther)">
+          {{ initial(activeOther) }}
+        </div>
         <div class="chat-head-info">
           <p class="chat-name">{{ displayName(activeOther) }}</p>
           <p class="chat-role">
-            @if(otherTyping) { <span class="typing">en train d'écrire...</span> }
-            @else { Équipe NORTH PRODUCTION }
+            @if(otherTyping) { <span class="typing"><i class="fa fa-ellipsis-h"></i> en train d'écrire...</span> }
+            @else if(isOnline(activeOther)) { <span class="online-text">En ligne</span> }
+            @else { {{ roleLabel(activeOther) }} }
           </p>
         </div>
       </div>
 
+      <!-- Messages -->
       <div class="chat-messages">
         @if(loadingMsgs) {
           <div class="loading-state"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
@@ -82,12 +112,20 @@
         } @else {
           @for(m of messages; track m._id) {
             <div class="msg-row" [class.mine]="isMe(m)">
+              @if(!isMe(m)) {
+                <div class="msg-avatar">{{ initial(m.sender) }}</div>
+              }
               <div class="msg-bubble">
                 @if(m.content) { <p>{{ m.content }}</p> }
                 @if(m.attachment) {
-                  <a class="msg-attachment" [href]="m.attachment.url" target="_blank">
-                    <i class="fa fa-paperclip"></i> {{ m.attachment.name }}
-                  </a>
+                  @if(isImage(m.attachment)) {
+                    <img class="msg-image" [src]="apiBase + m.attachment.url"
+                         [alt]="m.attachment.name" (click)="openImage(apiBase + m.attachment.url)" />
+                  } @else {
+                    <a class="msg-attachment" [href]="apiBase + m.attachment.url" target="_blank">
+                      <i class="fa fa-paperclip"></i> {{ m.attachment.name }}
+                    </a>
+                  }
                 }
                 <span class="msg-time">{{ m.createdAt | date:'HH:mm' }}</span>
               </div>
@@ -97,12 +135,27 @@
         }
       </div>
 
+      <!-- Image preview bar -->
+      @if(imagePreview) {
+        <div class="img-preview-bar">
+          <img [src]="imagePreview" alt="preview" class="img-preview-thumb" />
+          <span class="img-preview-name">{{ selectedImage?.name }}</span>
+          <button class="img-preview-remove" (click)="clearImage()"><i class="fa fa-times"></i></button>
+        </div>
+      }
+
+      <!-- Input form -->
       <form [formGroup]="form" (ngSubmit)="send()" class="chat-form">
+        <label class="btn-attach" title="Joindre une image">
+          <i class="fa fa-image"></i>
+          <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+        </label>
         <input formControlName="content" type="text" placeholder="Écrire un message..."
                (input)="onTyping()"
                (keydown.enter)="send(); $event.preventDefault()" />
-        <button type="submit" [disabled]="form.invalid || sending">
-          @if(sending) { <i class="fa fa-spinner fa-spin"></i> } @else { <i class="fa fa-paper-plane"></i> }
+        <button type="submit" [disabled]="(form.value.content?.trim() === '' && !selectedImage) || sending">
+          @if(sending) { <i class="fa fa-spinner fa-spin"></i> }
+          @else { <i class="fa fa-paper-plane"></i> }
         </button>
       </form>
     }

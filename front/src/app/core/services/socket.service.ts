@@ -16,6 +16,10 @@ export class SocketService implements OnDestroy {
   bookingUpdate$  = new Subject<any>();
   projectUpdate$  = new Subject<any>();
   fileUploaded$   = new Subject<any>();
+  userOnline$     = new Subject<any>();
+  userOffline$    = new Subject<any>();
+  delivered$      = new Subject<any>();
+  read$           = new Subject<any>();
 
   constructor(private authService: AuthService) {}
 
@@ -38,6 +42,10 @@ export class SocketService implements OnDestroy {
     this.socket.on('booking:status-changed', (data: any) => this.bookingUpdate$.next(data));
     this.socket.on('project:updated',        (data: any) => this.projectUpdate$.next(data));
     this.socket.on('file:uploaded',          (data: any) => this.fileUploaded$.next(data));
+    this.socket.on('user:online',            (data: any) => this.userOnline$.next(data));
+    this.socket.on('user:offline',           (data: any) => this.userOffline$.next(data));
+    this.socket.on('message:delivered',      (data: any) => this.delivered$.next(data));
+    this.socket.on('message:read',           (data: any) => this.read$.next(data));
   }
 
   disconnect() {
@@ -45,25 +53,16 @@ export class SocketService implements OnDestroy {
     this.socket = null;
   }
 
-  sendMessage(toUserId: string, content: string) {
-    this.socket?.emit('message:send', { toUserId, content });
+  sendTyping(toUserId: string)     { this.socket?.emit('message:typing',      { toUserId }); }
+  sendStopTyping(toUserId: string) { this.socket?.emit('message:stop-typing', { toUserId }); }
+  sendDelivered(toUserId: string, messageId: string) {
+    this.socket?.emit('message:delivered', { toUserId, messageId });
   }
-
-  sendTyping(toUserId: string) {
-    this.socket?.emit('message:typing', { toUserId });
+  sendRead(toUserId: string, threadId: string) {
+    this.socket?.emit('message:read', { toUserId, threadId });
   }
-
-  sendStopTyping(toUserId: string) {
-    this.socket?.emit('message:stop-typing', { toUserId });
-  }
-
-  joinRoom(roomId: string) {
-    this.socket?.emit('room:join', roomId);
-  }
-
-  leaveRoom(roomId: string) {
-    this.socket?.emit('room:leave', roomId);
-  }
+  joinRoom(roomId: string)  { this.socket?.emit('room:join',  roomId); }
+  leaveRoom(roomId: string) { this.socket?.emit('room:leave', roomId); }
 
   ngOnDestroy() { this.disconnect(); }
 }

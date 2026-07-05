@@ -58,3 +58,78 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
 .typing{color:$gold;font-style:italic;}
 .msg-attachment{display:flex;align-items:center;gap:6px;color:$gold;text-decoration:none;font-size:12px;
   margin:4px 0;i{font-size:11px;}&:hover{text-decoration:underline;}}
+
+// ── Contacts panel ─────────────────────────────────────────
+.contacts-panel {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.15);
+  max-height: 320px;
+  overflow-y: auto;
+}
+.contacts-search {
+  width: 100%; box-sizing: border-box;
+  background: #1a1a1a; border: none; border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 14px; color: #e0e0e0; font-size: 13px; font-family: inherit;
+  &:focus { outline: none; border-bottom-color: $gold; }
+  &::placeholder { color: rgba($muted,0.5); }
+}
+.contact-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  cursor: pointer; transition: background 0.15s;
+  &:hover { background: rgba($gold,0.06); }
+}
+.contact-avatar { flex-shrink: 0; }
+.contact-info { flex: 1; min-width: 0;
+  .contact-name { margin: 0 0 1px; font-size: 13px; font-weight: 600; color: #e0e0e0; }
+  .contact-role { margin: 0; font-size: 11px; color: $muted; }
+}
+
+// ── Online status ──────────────────────────────────────────
+.convo-avatar.online, .chat-avatar.online, .msg-avatar.online {
+  border: 2px solid #2ecc71;
+}
+.online-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #2ecc71; flex-shrink: 0;
+  box-shadow: 0 0 4px rgba(46,204,113,0.6);
+}
+.online-text { color: #2ecc71; font-size: 11px; }
+
+// ── Message avatar (for received messages) ─────────────────
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; align-self: flex-end;
+  background: linear-gradient(135deg, $gold, darken($gold, 15%));
+  display: flex; align-items: center; justify-content: center;
+  color: #000; font-size: 11px; font-weight: 800;
+}
+
+// ── Image messages ─────────────────────────────────────────
+.msg-image {
+  max-width: 220px; max-height: 220px; border-radius: 8px;
+  display: block; cursor: pointer; margin-bottom: 4px;
+  object-fit: cover; border: 1px solid rgba(255,255,255,0.08);
+  &:hover { opacity: 0.9; }
+}
+
+// ── Image preview bar (above input) ───────────────────────
+.img-preview-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: rgba($gold, 0.06);
+  border-top: 1px solid rgba($gold, 0.15);
+  .img-preview-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+  .img-preview-name  { flex: 1; font-size: 12px; color: $muted; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .img-preview-remove { background: none; border: none; color: $muted; cursor: pointer; font-size: 14px; padding: 2px 6px;
+    &:hover { color: #e74c3c; } }
+}
+
+// ── Attach button ──────────────────────────────────────────
+.btn-attach {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  color: $muted; cursor: pointer; transition: color 0.2s, background 0.2s;
+  &:hover { color: $gold; background: rgba($gold, 0.1); }
+  i { font-size: 16px; }
+}
+
+// ── Button new-convo active state ──────────────────────────
+.btn-new-convo.active { color: $gold; background: rgba($gold, 0.12); }

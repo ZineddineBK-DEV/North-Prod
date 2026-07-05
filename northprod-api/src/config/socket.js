@@ -63,8 +63,29 @@ const initSocket = (server) => {
       socket.leave(`room:${roomId}`);
     });
 
+    // ── Online/offline presence ──────────────────────────
+    // Broadcast this user's online status to all their thread participants
+    io.emit('user:online', { userId: socket.userId });
+
+    socket.on('message:delivered', (data) => {
+      // data: { toUserId, messageId }
+      io.to(`user:${data.toUserId}`).emit('message:delivered', {
+        messageId: data.messageId,
+        fromUserId: socket.userId,
+      });
+    });
+
+    socket.on('message:read', (data) => {
+      // data: { toUserId, threadId }
+      io.to(`user:${data.toUserId}`).emit('message:read', {
+        threadId: data.threadId,
+        fromUserId: socket.userId,
+      });
+    });
+
     socket.on('disconnect', () => {
       console.log(`🔌  Socket disconnected: user ${socket.userId}`);
+      io.emit('user:offline', { userId: socket.userId });
     });
   });
 
