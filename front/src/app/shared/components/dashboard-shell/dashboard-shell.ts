@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener, inject, ElementRef, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import { SocketService } from '../../../core/services/socket.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Notification, NotificationType } from '../../../core/models/notification.model';
@@ -22,6 +23,7 @@ export interface ShellNavItem {
 export class DashboardShellComponent implements OnInit, OnDestroy {
   auth         = inject(AuthService);
   notifService = inject(NotificationService);
+  private socketSvc = inject(SocketService);
   private router = inject(Router);
   private elRef   = inject(ElementRef);
 
@@ -70,6 +72,13 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.auth.isLoggedIn()) {
       this.notifService.refreshCount();
+      this.socketSvc.connect();
+      // Real-time notification counter update
+      this.routerSub.add(
+        this.socketSvc.notification$.subscribe(() => {
+          this.notifService.unreadCount.set(this.notifService.unreadCount() + 1);
+        })
+      );
     }
     this.routerSub = this.router.events.subscribe(e => {
       if (e instanceof NavigationStart)   { this.routerLoading = true; }
