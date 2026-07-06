@@ -133,3 +133,10 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
 
 // ── Button new-convo active state ──────────────────────────
 .btn-new-convo.active { color: $gold; background: rgba($gold, 0.12); }
+
+// ── Avatar grouping ────────────────────────────────────────
+// Successive messages from the same sender have no avatar — add left
+// margin to align the bubble with the ones that do have an avatar
+.msg-row.no-avatar {
+  padding-left: 40px; // 28px avatar + 12px gap
+}

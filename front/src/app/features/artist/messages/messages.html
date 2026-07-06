@@ -110,9 +110,9 @@
             <p>Aucun message. Dites bonjour !</p>
           </div>
         } @else {
-          @for(m of messages; track m._id) {
-            <div class="msg-row" [class.mine]="isMe(m)">
-              @if(!isMe(m)) {
+          @for(m of messages; track m._id; let i = $index) {
+            <div class="msg-row" [class.mine]="isMe(m)" [class.no-avatar]="!isMe(m) && !showAvatar(i)">
+              @if(!isMe(m) && showAvatar(i)) {
                 <div class="msg-avatar">{{ initial(m.sender) }}</div>
               }
               <div class="msg-bubble">

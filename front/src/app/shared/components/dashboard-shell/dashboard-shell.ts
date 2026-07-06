@@ -79,8 +79,8 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
       // Real-time notification badge update via socket
       this.subs.add(
         this.socketSvc.notification$.subscribe(() => {
-          this.notifService.unreadCount.set(this.notifService.unreadCount() + 1);
-          // If dropdown is open, reload the list so new item appears
+          // Use authoritative HTTP count to avoid race with other increment paths
+          this.notifService.refreshCount();
           if (this.notifOpen) this.loadNotifications();
         })
       );

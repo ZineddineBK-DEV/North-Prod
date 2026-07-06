@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { SocketService } from '../../../core/services/socket.service';
-import { NotificationService } from '../../../core/services/notification.service';
 import { environment } from '../../../../environments/environment';
 
 interface ChatUser   { _id: string; aka?: string; firstName?: string; avatar?: string; role?: string; }
@@ -33,7 +32,6 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   private fb       = inject(FormBuilder);
   auth             = inject(AuthService);
   private socket   = inject(SocketService);
-  private notifSvc = inject(NotificationService);
 
   private API  = `${environment.apiUrl}/messages`;
   private subs = new Subscription();
@@ -108,7 +106,6 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
         this.loadThreads();
       }
 
-      this.notifSvc.refreshCount();
     }));
 
     // ── Typing ────────────────────────────────────────────
@@ -303,4 +300,12 @@ export class ArtistMessagesComponent implements OnInit, OnDestroy, AfterViewChec
   isImage(a: Attachment)  { return a?.mimeType?.startsWith('image/'); }
   openImage(url: string)  { window.open(url, '_blank'); }
   apiBase = environment.apiUrl.replace('/api', '');
+
+  /** Show avatar only for the first message in a consecutive block from the same sender */
+  showAvatar(index: number): boolean {
+    if (index === 0) return true;
+    const prev = this.messages[index - 1];
+    const curr = this.messages[index];
+    return prev.sender?._id !== curr.sender?._id;
+  }
 }
