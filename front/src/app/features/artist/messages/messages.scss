@@ -40,7 +40,7 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
   button{width:42px;height:42px;border-radius:50%;background:$gold;border:none;
     color:#000;font-size:14px;cursor:pointer;transition:opacity 0.2s;flex-shrink:0;
     &:hover{opacity:0.85;}&:disabled{opacity:0.4;cursor:not-allowed;}}}
-.empty-small{text-align:center;padding:40px 16px;color:$muted;
+.empty-small{text-align:center;padding:40px 16px;color:rgba(255,255,255,0.65);
   i{font-size:28px;display:block;margin-bottom:10px;}p{margin:0;font-size:13px;}}
 
 // ── Additional elements for full messaging system ──────────

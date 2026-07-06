@@ -14,7 +14,7 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
   border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.2s;
   &.active,&:hover{border-color:$gold;color:$gold;background:rgba($gold,0.08);}}
 .loading-state{text-align:center;padding:60px;color:$gold;}
-.empty-state{text-align:center;padding:60px;color:$muted;i{font-size:40px;display:block;margin-bottom:16px;}p{margin:0;}}
+.empty-state{text-align:center;padding:60px;color:rgba(255,255,255,0.65);i{font-size:40px;display:block;margin-bottom:16px;}p{margin:0;}}
 .user-table{background:$card;border:1px solid $border;border-radius:10px;overflow:hidden;}
 .table-head{display:grid;grid-template-columns:1.6fr 1.8fr 1fr 0.8fr 0.8fr 0.8fr;
   padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
