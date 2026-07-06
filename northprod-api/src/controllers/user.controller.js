@@ -3,11 +3,14 @@ const { createError } = require('../middleware/error');
 const path = require('path');
 const fs = require('fs');
 
+// Helper: serialize user including virtuals
+const serializeUser = (user) => user.toObject({ virtuals: true });
+
 // ── GET /api/users/me ─────────────────────────────────────
 const getProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
-    res.json({ success: true, user });
+    res.json({ success: true, user: serializeUser(user) });
   } catch (err) { next(err); }
 };
 
@@ -26,7 +29,7 @@ const updateProfile = async (req, res, next) => {
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
       new: true, runValidators: true,
     });
-    res.json({ success: true, message: 'Profil mis à jour.', user });
+    res.json({ success: true, message: 'Profil mis à jour.', user: serializeUser(user) });
   } catch (err) { next(err); }
 };
 
@@ -36,7 +39,6 @@ const uploadAvatar = async (req, res, next) => {
     if (!req.file) return next(createError('Aucun fichier reçu.', 400));
 
     const user = await User.findById(req.user._id);
-    // Delete old avatar
     if (user.avatar) {
       const oldPath = path.join(__dirname, '../../uploads', user.avatar);
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
@@ -46,7 +48,8 @@ const uploadAvatar = async (req, res, next) => {
     user.avatar = relativePath;
     await user.save();
 
-    res.json({ success: true, message: 'Avatar mis à jour.', avatarUrl: `/uploads/${relativePath}` });
+    const serialized = serializeUser(user);
+    res.json({ success: true, message: 'Avatar mis à jour.', avatarUrl: serialized.avatarUrl, user: serialized });
   } catch (err) { next(err); }
 };
 
@@ -65,7 +68,8 @@ const uploadCover = async (req, res, next) => {
     user.coverImage = relativePath;
     await user.save();
 
-    res.json({ success: true, message: 'Image de couverture mise à jour.', coverUrl: `/uploads/${relativePath}` });
+    const serialized = serializeUser(user);
+    res.json({ success: true, message: 'Couverture mise à jour.', coverUrl: serialized.coverUrl, user: serialized });
   } catch (err) { next(err); }
 };
 
@@ -73,12 +77,13 @@ const uploadCover = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return next(createError('Les deux mots de passe sont requis.', 400));
+    }
     const user = await User.findById(req.user._id).select('+password');
-
     if (!(await user.comparePassword(currentPassword))) {
       return next(createError('Mot de passe actuel incorrect.', 401));
     }
-
     user.password = newPassword;
     await user.save();
     res.json({ success: true, message: 'Mot de passe modifié.' });
@@ -91,7 +96,7 @@ const getPublicProfile = async (req, res, next) => {
     const user = await User.findById(req.params.id)
       .select('aka avatar coverImage bio musicalGenres socialLinks createdAt');
     if (!user) return next(createError('Utilisateur introuvable.', 404));
-    res.json({ success: true, user });
+    res.json({ success: true, user: serializeUser(user) });
   } catch (err) { next(err); }
 };
 

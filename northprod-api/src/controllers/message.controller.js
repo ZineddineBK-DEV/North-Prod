@@ -203,10 +203,11 @@ const getStudioContact = async (req, res, next) => {
 // - All admins
 const getContacts = async (req, res, next) => {
   try {
+    // Include all active users regardless of email verification status
+    // so artists can always message the studio team and each other
     const contacts = await User.find({
       _id: { $ne: req.user._id },
       isActive: true,
-      isEmailVerified: true,
     }).select('_id aka firstName avatar role').sort({ role: 1, aka: 1 });
 
     res.json({ success: true, contacts });

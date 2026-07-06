@@ -129,6 +129,7 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
 
   markAllRead(e: MouseEvent) {
     e.stopPropagation();
+    // markAllAsRead() pipe already resets unreadCount via tap()
     this.notifService.markAllAsRead().subscribe();
     this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
   }
@@ -137,13 +138,12 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
   navigateNotification(n: Notification) {
     this.notifOpen = false;
     if (!n.isRead) {
+      // tap() in markAsRead handles the unreadCount decrement
       this.notifService.markAsRead(n._id).subscribe();
-      // Optimistic update
+      // Optimistic local update
       this.notifications = this.notifications.map(x =>
         x._id === n._id ? { ...x, isRead: true } : x
       );
-      const cur = this.notifService.unreadCount();
-      if (cur > 0) this.notifService.unreadCount.set(cur - 1);
     }
     const route = this.resolveRoute(n);
     if (route) this.router.navigateByUrl(route);

@@ -6,9 +6,14 @@ $gold:#c0a060;$bg:#0f0f0f;$card:#161616;$border:rgba(192,160,96,0.15);$text:#e0e
 .profile-header{background:$card;border:1px solid $border;border-radius:12px;
   padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:20px;
   @media(max-width:480px){flex-direction:column;text-align:center;}}
+.profile-avatar-wrap{position:relative;flex-shrink:0;}
 .profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,$gold,darken($gold,15%));
-  display:flex;align-items:center;justify-content:center;border:3px solid $gold;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;border:3px solid $gold;overflow:hidden;
   img{width:100%;height:100%;object-fit:cover;}span{color:#000;font-weight:800;font-size:28px;}}
+.avatar-upload-btn{position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;
+  background:$gold;border:2px solid $bg;color:#000;font-size:11px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:opacity 0.2s;
+  &:hover{opacity:0.85;}&:disabled{cursor:not-allowed;opacity:0.5;}}
 .profile-info{flex:1;
   h2{margin:0 0 4px;font-size:22px;color:#fff;}
   p{margin:0 0 2px;font-size:13px;color:$muted;}

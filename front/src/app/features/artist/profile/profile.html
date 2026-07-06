@@ -3,20 +3,35 @@
     <h1><i class="fa fa-user"></i> Mon Profil</h1>
   </div>
 
+  <!-- Alerts -->
+  @if(saved) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> Modifications sauvegardées.</div> }
+  @if(err)   { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
+
   <!-- Profile header -->
   <div class="profile-header">
-    <div class="profile-avatar">
-      @if(user.avatarUrl) { <img [src]="user.avatarUrl" [alt]="user.aka" /> }
-      @else { <span>{{ user.aka[0].toUpperCase() }}</span> }
+    <!-- Avatar with upload overlay -->
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar">
+        @if(avatarUrl) { <img [src]="avatarUrl" [alt]="user.aka" /> }
+        @else { <span>{{ (user.aka || 'A')[0].toUpperCase() }}</span> }
+      </div>
+      <button class="avatar-upload-btn" (click)="triggerAvatarUpload()" [disabled]="saving" title="Changer la photo">
+        <i class="fa fa-camera"></i>
+      </button>
+      <input #avatarInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onAvatarSelected($event)" />
     </div>
+
     <div class="profile-info">
       <h2>{{ user.aka }}</h2>
       <p>{{ user.firstName }} {{ user.lastName }}</p>
-      <p class="profile-email"><i class="fa fa-envelope"></i> {{ user.email }}</p>
+      <p class="profile-email"><i class="fa fa-envelope-o"></i> {{ user.email }}</p>
       <div class="profile-badges">
-        @if(user.isEmailVerified) { <span class="badge badge-ok"><i class="fa fa-check"></i> Email vérifié</span> }
-        @else { <span class="badge badge-warn">Email non vérifié</span> }
-        <span class="badge badge-muted">{{ user.role }}</span>
+        @if(user.isEmailVerified) {
+          <span class="badge badge-ok"><i class="fa fa-check"></i> Email vérifié</span>
+        } @else {
+          <span class="badge badge-warn"><i class="fa fa-clock-o"></i> Email non vérifié</span>
+        }
+        <span class="badge badge-muted">{{ user.role | titlecase }}</span>
       </div>
     </div>
   </div>
@@ -28,15 +43,12 @@
     <button class="tab" [class.active]="tab==='security'" (click)="tab='security'">Sécurité</button>
   </div>
 
-  @if(saved) { <div class="alert alert-ok"><i class="fa fa-check-circle"></i> Modifications sauvegardées.</div> }
-  @if(err)   { <div class="alert alert-err"><i class="fa fa-exclamation-circle"></i> {{ err }}</div> }
-
   <!-- Info tab -->
   @if(tab === 'info') {
     <form [formGroup]="form" (ngSubmit)="saveInfo()" class="dash-card form-card">
       <div class="form-grid">
         <div class="form-field">
-          <label>Nom de scène (AKA) *</label>
+          <label>Nom de scène (AKA) <span class="req">*</span></label>
           <input type="text" formControlName="aka" />
         </div>
         <div class="form-field">
@@ -44,16 +56,16 @@
           <input type="tel" formControlName="phone" placeholder="+216 XX XXX XXX" />
         </div>
         <div class="form-field">
-          <label>Prénom *</label>
+          <label>Prénom <span class="req">*</span></label>
           <input type="text" formControlName="firstName" />
         </div>
         <div class="form-field">
-          <label>Nom *</label>
+          <label>Nom <span class="req">*</span></label>
           <input type="text" formControlName="lastName" />
         </div>
       </div>
       <div class="form-field full">
-        <label>Biographie <span class="muted">(max 500 caractères)</span></label>
+        <label>Biographie <span class="hint">(max 500 caractères)</span></label>
         <textarea formControlName="bio" rows="4" maxlength="500" placeholder="Parlez de vous, de votre parcours musical..."></textarea>
       </div>
       <div class="form-field full">
@@ -68,7 +80,7 @@
       </div>
       <div class="form-actions">
         <button type="submit" class="btn-gold" [disabled]="saving || form.invalid">
-          @if(saving){<i class="fa fa-spinner fa-spin"></i> Sauvegarde...} @else {Sauvegarder}
+          @if(saving) { <i class="fa fa-spinner fa-spin"></i> Sauvegarde... } @else { Sauvegarder }
         </button>
       </div>
     </form>
@@ -80,14 +92,17 @@
       <div class="form-grid">
         @for(net of ['instagram','facebook','youtube','spotify','soundcloud','tiktok']; track net) {
           <div class="form-field">
-            <label><i class="fa fa-{{net==='soundcloud'?'soundcloud':net==='tiktok'?'music':net}}"></i> {{ net | titlecase }}</label>
+            <label>
+              <i class="fa fa-{{ net === 'soundcloud' ? 'soundcloud' : net === 'tiktok' ? 'music' : net }}"></i>
+              {{ net | titlecase }}
+            </label>
             <input type="url" [formControlName]="net" placeholder="https://..." />
           </div>
         }
       </div>
       <div class="form-actions">
         <button type="submit" class="btn-gold" [disabled]="saving">
-          @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else {Sauvegarder les liens}
+          @if(saving) { <i class="fa fa-spinner fa-spin"></i> } @else { Sauvegarder les liens }
         </button>
       </div>
     </form>
@@ -99,16 +114,16 @@
       <div class="form-grid single">
         <div class="form-field">
           <label>Mot de passe actuel</label>
-          <input type="password" formControlName="currentPassword" />
+          <input type="password" formControlName="currentPassword" autocomplete="current-password" />
         </div>
         <div class="form-field">
-          <label>Nouveau mot de passe (min. 8 caractères)</label>
-          <input type="password" formControlName="newPassword" />
+          <label>Nouveau mot de passe <span class="hint">(min. 8 caractères)</span></label>
+          <input type="password" formControlName="newPassword" autocomplete="new-password" />
         </div>
       </div>
       <div class="form-actions">
         <button type="submit" class="btn-gold" [disabled]="saving || passForm.invalid">
-          @if(saving){<i class="fa fa-spinner fa-spin"></i>} @else {Changer le mot de passe}
+          @if(saving) { <i class="fa fa-spinner fa-spin"></i> } @else { Changer le mot de passe }
         </button>
       </div>
     </form>
