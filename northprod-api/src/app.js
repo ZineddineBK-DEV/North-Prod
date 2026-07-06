@@ -59,8 +59,13 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
-// ── Static uploads ────────────────────────────────────────
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// ── Static uploads — MUST be before helmet() so CORP header is cross-origin ──
+// helmet() defaults to Cross-Origin-Resource-Policy: same-origin which blocks
+// images loaded by the Angular frontend from a different origin (port 4200 vs 5000)
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, '..', 'uploads')));
 
 // ── Health check ─────────────────────────────────────────
 app.get('/api/health', (req, res) => {

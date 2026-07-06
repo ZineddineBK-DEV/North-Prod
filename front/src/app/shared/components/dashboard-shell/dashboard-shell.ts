@@ -72,12 +72,13 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
       this.socket.connect();
       this.subs.add(
         this.socket.notification$.subscribe((notif: Notification) => {
-          // Prepend to list if panel is open (avoid duplicates by id)
+          // Prepend to list if panel is open (deduplicate by _id)
           if (!this.notifications.find(n => n._id === notif._id)) {
             this.notifications = [notif, ...this.notifications];
           }
-          // Increment unread counter
-          this.notifService.unreadCount.update(c => c + 1);
+          // Refresh the real count from server — avoids double-count caused by
+          // refreshCount() on init already including the new DB notification
+          this.notifService.refreshCount();
         })
       );
     }
