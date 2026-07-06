@@ -34,14 +34,6 @@ const initSocket = (server) => {
     socket.join(`user:${socket.userId}`);
 
     // ── Messaging ─────────────────────────────────────────
-    socket.on('message:send', (data) => {
-      // data: { toUserId, messageId, content, fileUrl }
-      io.to(`user:${data.toUserId}`).emit('message:receive', {
-        from: socket.userId,
-        ...data,
-      });
-    });
-
     socket.on('message:typing', (data) => {
       io.to(`user:${data.toUserId}`).emit('message:typing', {
         fromUserId: socket.userId,

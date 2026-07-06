@@ -24,8 +24,8 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
   auth         = inject(AuthService);
   notifService = inject(NotificationService);
   private socketSvc = inject(SocketService);
-  private router = inject(Router);
-  private elRef   = inject(ElementRef);
+  private router    = inject(Router);
+  private elRef     = inject(ElementRef);
 
   sidebarOpen   = false;
   userMenuOpen  = false;
@@ -33,7 +33,9 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   notifsLoading = false;
   routerLoading = false;
-  private routerSub = new Subscription();
+
+  // Single Subscription bag — never overwritten
+  private subs = new Subscription();
 
   roleLabel = computed(() => {
     if (this.auth.isAdmin())      return 'Administration';
@@ -44,28 +46,28 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
   navItems = computed<ShellNavItem[]>(() => {
     if (this.auth.isAdmin()) {
       return [
-        { path: '/admin/dashboard', label: 'Tableau de bord', icon: 'fa-th-large' },
-        { path: '/admin/users',     label: 'Utilisateurs',    icon: 'fa-users' },
-        { path: '/admin/portfolio', label: 'Portfolio',       icon: 'fa-image' },
-        { path: '/admin/services',  label: 'Services & Tarifs', icon: 'fa-list' },
-        { path: '/admin/hero',      label: 'Hero Média',      icon: 'fa-film' },
-        { path: '/admin/messages',  label: 'Messages',        icon: 'fa-comments' },
+        { path: '/admin/dashboard', label: 'Tableau de bord',  icon: 'fa-th-large' },
+        { path: '/admin/users',     label: 'Utilisateurs',     icon: 'fa-users' },
+        { path: '/admin/portfolio', label: 'Portfolio',        icon: 'fa-image' },
+        { path: '/admin/services',  label: 'Services & Tarifs',icon: 'fa-list' },
+        { path: '/admin/hero',      label: 'Hero Média',       icon: 'fa-film' },
+        { path: '/admin/messages',  label: 'Messages',         icon: 'fa-comments' },
       ];
     }
     if (this.auth.isProduction()) {
       return [
         { path: '/production/dashboard', label: 'Tableau de bord', icon: 'fa-th-large' },
-        { path: '/production/bookings',  label: 'Réservations',    icon: 'fa-calendar' },
-        { path: '/production/projects',  label: 'Projets',         icon: 'fa-music' },
-        { path: '/production/messages',  label: 'Messages',        icon: 'fa-comments' },
+        { path: '/production/bookings',  label: 'Réservations',   icon: 'fa-calendar' },
+        { path: '/production/projects',  label: 'Projets',        icon: 'fa-music' },
+        { path: '/production/messages',  label: 'Messages',       icon: 'fa-comments' },
       ];
     }
     return [
-      { path: '/artist/dashboard', label: 'Mon Espace',     icon: 'fa-th-large' },
-      { path: '/artist/bookings',  label: 'Réservations',   icon: 'fa-calendar' },
-      { path: '/artist/projects',  label: 'Mes Projets',    icon: 'fa-music' },
-      { path: '/artist/messages',  label: 'Messages',       icon: 'fa-comments' },
-      { path: '/artist/profile',   label: 'Mon Profil',     icon: 'fa-user' },
+      { path: '/artist/dashboard', label: 'Mon Espace',   icon: 'fa-th-large' },
+      { path: '/artist/bookings',  label: 'Réservations', icon: 'fa-calendar' },
+      { path: '/artist/projects',  label: 'Mes Projets',  icon: 'fa-music' },
+      { path: '/artist/messages',  label: 'Messages',     icon: 'fa-comments' },
+      { path: '/artist/profile',   label: 'Mon Profil',   icon: 'fa-user' },
     ];
   });
 
@@ -73,22 +75,27 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
     if (this.auth.isLoggedIn()) {
       this.notifService.refreshCount();
       this.socketSvc.connect();
-      // Real-time notification counter update
-      this.routerSub.add(
+
+      // Real-time notification badge update via socket
+      this.subs.add(
         this.socketSvc.notification$.subscribe(() => {
           this.notifService.unreadCount.set(this.notifService.unreadCount() + 1);
+          // If dropdown is open, reload the list so new item appears
+          if (this.notifOpen) this.loadNotifications();
         })
       );
     }
-    this.routerSub = this.router.events.subscribe(e => {
-      if (e instanceof NavigationStart)   { this.routerLoading = true; }
-      if (e instanceof NavigationEnd ||
-          e instanceof NavigationCancel ||
-          e instanceof NavigationError)   { this.routerLoading = false; }
-    });
+
+    // Page-transition loading bar
+    this.subs.add(
+      this.router.events.subscribe(e => {
+        if (e instanceof NavigationStart)                                            this.routerLoading = true;
+        if (e instanceof NavigationEnd || e instanceof NavigationCancel || e instanceof NavigationError) this.routerLoading = false;
+      })
+    );
   }
 
-  ngOnDestroy() { this.routerSub.unsubscribe(); }
+  ngOnDestroy() { this.subs.unsubscribe(); }
 
   @HostListener('document:click', ['$event'])
   onDocClick(e: MouseEvent) {
@@ -111,9 +118,7 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
     e.stopPropagation();
     this.userMenuOpen = false;
     this.notifOpen = !this.notifOpen;
-    if (this.notifOpen && this.notifications.length === 0) {
-      this.loadNotifications();
-    }
+    if (this.notifOpen) this.loadNotifications();
   }
 
   loadNotifications() {
@@ -133,33 +138,42 @@ export class DashboardShellComponent implements OnInit, OnDestroy {
     this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
   }
 
-  /** Section 6: notification click → navigate + mark read + close */
   navigateNotification(n: Notification) {
     this.notifOpen = false;
+
+    // Mark as read immediately (optimistic)
     if (!n.isRead) {
       this.notifService.markAsRead(n._id).subscribe();
-      n = { ...n, isRead: true };
-      this.notifications = this.notifications.map(x => x._id === n._id ? n : x);
-      const current = this.notifService.unreadCount();
-      if (current > 0) this.notifService.unreadCount.set(current - 1);
+      this.notifications = this.notifications.map(x =>
+        x._id === n._id ? { ...x, isRead: true } : x
+      );
+      const c = this.notifService.unreadCount();
+      if (c > 0) this.notifService.unreadCount.set(c - 1);
     }
-    const route = this.notifRoute(n);
+
+    const route = this.resolveNotifRoute(n);
     if (route) this.router.navigateByUrl(route);
   }
 
-  private notifRoute(n: Notification): string | null {
+  private resolveNotifRoute(n: Notification): string | null {
+    // Always use the stored link if present — it was set role-aware by the backend
     if (n.link) return n.link;
-    const role = this.auth.isAdmin() ? 'admin' : this.auth.isProduction() ? 'production' : 'artist';
+
+    // Fallback: derive from type using current user's role
+    const role = this.auth.isAdmin() ? 'admin'
+               : this.auth.isProduction() ? 'production'
+               : 'artist';
+
     switch (n.type as NotificationType) {
-      case 'message_received':                return `/${role}/messages`;
+      case 'message_received':                      return `/${role}/messages`;
       case 'booking_pending':
       case 'booking_confirmed':
       case 'booking_rejected':
-      case 'booking_reminder':  return n.resourceId ? `/${role}/bookings` : `/${role}/bookings`;
+      case 'booking_reminder':                      return `/${role}/bookings`;
       case 'project_updated':
-      case 'project_delivered': return n.resourceId ? `/${role}/projects` : `/${role}/projects`;
-      case 'file_uploaded':     return `/${role}/projects`;
-      default:                  return null;
+      case 'project_delivered':
+      case 'file_uploaded':                         return `/${role}/projects`;
+      default:                                      return null;
     }
   }
 

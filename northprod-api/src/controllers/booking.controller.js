@@ -163,7 +163,7 @@ const updateBookingStatus = async (req, res, next) => {
         type: 'booking_confirmed',
         title: 'Réservation confirmée ✅',
         message: `Votre réservation du ${new Date(booking.date).toLocaleDateString('fr-FR')} a été confirmée.`,
-        link: `/artist/bookings/${booking._id}`,
+        link: `/artist/bookings`,
         resourceId: booking._id,
         resourceType: 'Booking',
       });
